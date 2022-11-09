@@ -1,20 +1,33 @@
 CC := gcc
-CFLAGS := -g $(shell pkg-config --cflags glib-2.0)
 
-INCLUDES := -I/usr/include/glib-2.0 -Iinclude
-LIBS := $(shell pkg-config --libs glib-2.0)
-PKG_CONFIG := $(shell pkg-config --cflags glib-2.0)
+EXEC := li3
+FLAGS := -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds -Qunused-arguments
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+    FLAGS += -g -DDEBUG
+else
+    FLAGS += -O2
+endif
+LIBS := -lm `pkg-config --libs glib-2.0`
+PKG_CONFIG := `pkg-config --cflags glib-2.0`
+INC := -I include/
 
-OBJ := build/main.o build/user.o build/parser.o build/ride.o build/driver.o 
+SRC := $(wildcard src/*.c)
+OBJ := $(SRC:src/%.c=build/%.o)
 
-.PHONY: main
+BUILD_DIR := $(shell mkdir -p build)
+OUT_DIR := $(shell mkdir -p out)
+INCLUDE_DIR := $(wildcard include/*.h)
 
-main: ${OBJ}
-	@${CC} ${CFLAGS} -o $@ ${INCLUDES} ${PKG_CONFIG} $^ ${LIBS} ; echo "Finished Successufly $@"
+.PHONY: all
+all: build/$(EXEC)
 
-clean: 
-	@rm build/*.o -f main
-	
+build/$(EXEC): $(OBJ)
+	$(CC) $(FLAGS) $^ ${PKG_CONFIG} $(LIBS) -o $@
 
-build/%.o: %.c
-	@$(CC) $(FLAGS) -c $< ${PKG_CONFIG} ${LIBS} ${INC} -o $@ ; echo "Finished Successufly $@" 
+build/%.o: src/%.c
+	$(CC) $(FLAGS) -c $< ${PKG_CONFIG} $(LIBS) $(INC) -o $@
+
+.PHONY: clear
+clear:
+	rm -rf build/*
