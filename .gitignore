@@ -17,6 +17,8 @@ a.out
 *rides*.csv
 Resultados/
 
+*/build/*
+
 # Ignore idea
 /.idea/
 /.vscode/
