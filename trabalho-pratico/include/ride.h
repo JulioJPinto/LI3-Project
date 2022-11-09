@@ -4,7 +4,9 @@
 
 typedef struct ride Ride;
 
-Ride *create_ride();
+Ride* create_ride(int id, Date date, int driver_id, char* username, char* city, int distance, int score_user, int score_driver, float tip);
+
+void free_ride(Ride *ride);
 
 GString *ride_get_city(Ride *ride);
 
