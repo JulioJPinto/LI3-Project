@@ -1,8 +1,9 @@
 # Ignore all
-*
+trabalho-pratico/src
 
 # Unignore all with extensions
 !*.*
+!Makefile
 
 # Unignore all dirs
 !*/
@@ -15,3 +16,7 @@ a.out
 *drivers*.csv
 *rides*.csv
 Resultados/
+
+# Ignore idea
+/.idea/
+/.vscode/
