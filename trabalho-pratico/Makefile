@@ -1,33 +1,49 @@
 CC := gcc
 
 EXEC := li3
-FLAGS := -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds -Qunused-arguments
+CFLAGS := -std=c17 -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds -lm
+LIBS := $(shell pkg-config --libs glib-2.0)
+CFLAGS += $(shell pkg-config --cflags glib-2.0)
+CFLAGS += -Iinclude/
+
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
     FLAGS += -g -DDEBUG
+    EXEC := $(EXEC)-debug
 else
     FLAGS += -O2
+    EXEC := $(EXEC)-release
 endif
-LIBS := -lm `pkg-config --libs glib-2.0`
-PKG_CONFIG := `pkg-config --cflags glib-2.0`
-INC := -I include/
+
+BUILD_BASE_DIR := build
+BUILD_DIR_PATH :=
+ifeq ($(DEBUG), 1)
+    BUILD_DIR_PATH := $(BUILD_BASE_DIR)/debug
+else
+    BUILD_DIR_PATH := $(BUILD_BASE_DIR)/release
+endif
+
+BUILD_DIR := $(shell mkdir -p $(BUILD_DIR_PATH))
 
 SRC := $(wildcard src/*.c)
-OBJ := $(SRC:src/%.c=build/%.o)
+OBJ := $(SRC:src/%.c=$(BUILD_DIR_PATH)/%.o)
 
-BUILD_DIR := $(shell mkdir -p build)
-OUT_DIR := $(shell mkdir -p out)
-INCLUDE_DIR := $(wildcard include/*.h)
+WHITE := \033[0m
+YELLOW := \033[1;33m
 
 .PHONY: all
-all: build/$(EXEC)
+all: build
 
-build/$(EXEC): $(OBJ)
-	$(CC) $(FLAGS) $^ ${PKG_CONFIG} $(LIBS) -o $@
+build: $(BUILD_DIR_PATH)/$(EXEC)
+	@printf "$(YELLOW)$(EXEC) $(WHITE)compiled."
 
-build/%.o: src/%.c
-	$(CC) $(FLAGS) -c $< ${PKG_CONFIG} $(LIBS) $(INC) -o $@
+$(BUILD_DIR_PATH)/$(EXEC): $(OBJ)
+	@$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+$(BUILD_DIR_PATH)/%.o: src/%.c
+	@printf "Compiling $(YELLOW)$< $(WHITE)...\n"
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 .PHONY: clear
 clear:
-	rm -rf build/*
+	rm -rf build
