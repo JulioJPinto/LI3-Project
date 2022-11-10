@@ -12,11 +12,11 @@ BUILD_DIR_PATH :=
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-    FLAGS += -g -DDEBUG
+    CFLAGS += -g -DDEBUG=1
     EXEC := $(EXEC)-debug
     BUILD_DIR_PATH := $(BUILD_BASE_DIR)/debug
 else
-    FLAGS += -O2
+    CFLAGS += -O2
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := $(BUILD_BASE_DIR)/release
 endif
@@ -31,6 +31,12 @@ YELLOW := \033[1;33m
 
 .PHONY: all
 all: build
+
+build-debug:
+	@$(MAKE) DEBUG=1 build
+
+build-release:
+	@$(MAKE) DEBUG=0 build
 
 build: $(BUILD_DIR_PATH)/$(EXEC)
 

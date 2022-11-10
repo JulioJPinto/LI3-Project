@@ -3,6 +3,10 @@
 #include "file_util.h"
 
 int main(int argc, char **argv) {
+#ifdef DEBUG
+    printf("Running in debug mode.\n");
+#endif
+
     if (argc < 2) {
         printf("Usage: %s <dataset_folder_path> <queries_file_path>", argv[0]);
         return 0;
