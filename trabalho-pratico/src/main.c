@@ -16,6 +16,12 @@ int main(int argc, char **argv) {
     FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
 
     Catalog *catalog = create_catalog();
+    
+    Driver* driver;
+
+    while(driver = can_parse(drivers_file)){
+        register_driver(catalog, driver);
+    }
 
 //    register_ride(catalog, ...)
 //    register_user(catalog, ...)

@@ -5,18 +5,18 @@
 
 struct driver {
     int id;
-    GString name;
+    char* name;
     Date birth_date;
     Gender gender;
     CarClass car_class;
-    GString license_plate;
-    GString city;
+    char* license_plate;
+    char* city;
     Date account_creation_date;
     AccountStatus account_status;
 };
 
-Driver *create_driver(int id, GString name, Date birth_date, Gender gender, CarClass car_class, GString license_plate,
-                      GString city, Date account_creation_date, AccountStatus account_status) {
+Driver *create_driver(int id, char* name, Date birth_date, Gender gender, CarClass car_class, char* license_plate,
+                      char* city, Date account_creation_date, AccountStatus account_status) {
     Driver *driver = malloc(sizeof(Driver));
     driver->id = id;
     driver->name = name;
@@ -28,7 +28,7 @@ Driver *create_driver(int id, GString name, Date birth_date, Gender gender, CarC
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
 
-    return NULL;
+    return driver;
 }
 
 int driver_get_id(Driver *driver) {

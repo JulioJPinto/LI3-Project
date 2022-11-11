@@ -1,7 +1,7 @@
 CC := gcc
 
 EXEC := li3
-FLAGS := -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds -Qunused-arguments
+FLAGS := -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds 	
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
     FLAGS += -g -DDEBUG
