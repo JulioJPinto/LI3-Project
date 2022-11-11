@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "catalog.h"
 #include "file_util.h"
 
@@ -21,9 +22,9 @@ int main(int argc, char **argv) {
 
     Catalog *catalog = create_catalog();
 
-//    register_ride(catalog, ...)
-//    register_user(catalog, ...)
-//    register_driver(catalog, ...)
+    //    register_ride(catalog, ...)
+    //    register_user(catalog, ...)
+    //    register_driver(catalog, ...)
 
     fclose(drivers_file);
     fclose(rides_file);
@@ -40,9 +41,5 @@ int main(int argc, char **argv) {
 
     fclose(queries_file);
 
-    g_hash_table_new((GHashFunc) g_string_hash, (GEqualFunc) g_string_equal);
-
     return 0;
 }
-
-

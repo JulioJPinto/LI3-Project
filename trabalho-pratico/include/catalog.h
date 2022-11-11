@@ -4,9 +4,9 @@
 
 #include <glib.h>
 
-#include "user.h"
 #include "driver.h"
 #include "ride.h"
+#include "user.h"
 
 typedef struct Catalog Catalog;
 

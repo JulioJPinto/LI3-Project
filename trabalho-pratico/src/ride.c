@@ -1,10 +1,7 @@
 #include <glib.h>
 
-#include "struct_util.h"
-#include "driver.h"
-#include "user.h"
-
 #include "ride.h"
+#include "struct_util.h"
 
 typedef struct ride {
     int id;

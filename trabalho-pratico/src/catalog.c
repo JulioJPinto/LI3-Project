@@ -63,4 +63,3 @@ double get_price_average_from_city(Catalog *catalog, GString city_name) {
 
     return accumulative_average->total / accumulative_average->n;
 }
-

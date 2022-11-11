@@ -3,7 +3,8 @@
 #define LI3_STRUCT_UTIL_H
 
 typedef enum gender {
-    M, F
+    M,
+    F
 } Gender;
 
 typedef struct date {
@@ -11,15 +12,20 @@ typedef struct date {
 } Date;
 
 typedef enum payment_method {
-    CASH, DEBIT, CREDIT
+    CASH,
+    DEBIT,
+    CREDIT
 } PaymentMethod;
 
 typedef enum account_status {
-    ACTIVE, INACTIVE
+    ACTIVE,
+    INACTIVE
 } AccountStatus;
 
 typedef enum car_class {
-    BASIC, GREEN, PREMIUM
+    BASIC,
+    GREEN,
+    PREMIUM
 } CarClass;
 
 #endif //LI3_STRUCT_UTIL_H

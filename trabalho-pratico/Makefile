@@ -7,18 +7,15 @@ CFLAGS += -Iinclude/
 CFLAGS += $(shell pkg-config --cflags glib-2.0)
 LIBS := $(shell pkg-config --libs glib-2.0)
 
-BUILD_BASE_DIR := build
-BUILD_DIR_PATH :=
-
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
     CFLAGS += -g -DDEBUG=1
     EXEC := $(EXEC)-debug
-    BUILD_DIR_PATH := $(BUILD_BASE_DIR)/debug
+    BUILD_DIR_PATH := build/debug
 else
     CFLAGS += -O2
     EXEC := $(EXEC)-release
-    BUILD_DIR_PATH := $(BUILD_BASE_DIR)/release
+    BUILD_DIR_PATH := build/release
 endif
 
 BUILD_DIR := $(shell mkdir -p $(BUILD_DIR_PATH))
@@ -30,7 +27,7 @@ WHITE := \033[0m
 YELLOW := \033[1;33m
 
 .PHONY: all
-all: build
+all: format build-release build-debug
 
 build-debug:
 	@$(MAKE) DEBUG=1 build
@@ -51,3 +48,6 @@ $(BUILD_DIR_PATH)/%.o: src/%.c
 .PHONY: clean
 clean:
 	rm -rf build
+
+format:
+	clang-format -i src/*.c include/*.h

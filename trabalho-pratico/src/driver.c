@@ -1,7 +1,7 @@
 #include <glib.h>
 
-#include "struct_util.h"
 #include "driver.h"
+#include "struct_util.h"
 
 struct driver {
     int id;

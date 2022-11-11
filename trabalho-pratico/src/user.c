@@ -1,6 +1,5 @@
 #include "user.h"
 
-#include <glib.h>
 #include "struct_util.h"
 
 typedef struct user {
