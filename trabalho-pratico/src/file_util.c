@@ -2,6 +2,7 @@
 #include <glib.h>
 
 #include "file_util.h"
+#include "logger.h"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PATH_SEPARATOR "\\"
@@ -26,9 +27,15 @@ FILE *open_file_folder(const char *const folder_path, const char *const file_nam
 FILE *open_file(const char *const file_name) {
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        fprintf(stderr, "Could not open file %s\n", file_name);
-        exit(EXIT_FAILURE);
+        log_panic("Could not open file %s\n", file_name);
     }
 
     return file;
+}
+
+void format_fgets_input_line(char *line_buffer) {
+    size_t line_buffer_length = strlen(line_buffer);
+    if (line_buffer[line_buffer_length - 1] == '\n') {
+        line_buffer[line_buffer_length - 1] = '\0';
+    }
 }
