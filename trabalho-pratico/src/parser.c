@@ -1,16 +1,19 @@
 #include <glib.h>
 
 #include "parser.h"
+#include "ride.h"
 #include <stdio.h>
 
 typedef void* (*parse_line_function_pointer)(char* string);
 
 void read_file(const char* file_path, parse_line_function_pointer parse_line_function){
-    FILE* csv_file = fopen(file_path,"r");
+    FILE *csv_file = fopen(file_path,"r");
 
-    static char buffer[1024];
-    while(fgets(buffer, 1024, csv_file)){
+    char buffer[10000];
+    //int i = 0;
+    while(fgets(buffer, 10000, csv_file)){
         parse_line_function(buffer);
+        //i++;
     }
 
 }
@@ -80,31 +83,29 @@ PaymentMethod parse_pay_method(char* string){
 
 void* parse_driver(char* line){
 
-    char* idString = strtok(line,";");
+    char* idString = strsep(line,";"); 
     int id = parse_int(idString);
 
-    char* name = strtok(NULL,";");
+    char* name = strsep(line,";");
 
-    char* dateString = strtok(NULL,";");
+    char* dateString = strsep(line,";");
     Date* date = parse_date(dateString);
 
-    char* genderString = strtok(NULL,";");
+    char* genderString = strsep(line,";");
     Gender gender = parse_gender(genderString);
 
-    char* carClassString = strtok(NULL,";");
+    char* carClassString = strsep(line,";");
     CarClass car_class = parse_car_class(carClassString);
 
-    char* license_plate = strtok(NULL,";");
+    char* license_plate = strsep(line,";");
     
-    char* city = strtok(NULL,";");
+    char* city = strsep(line,";");
 
-    char* creationDateString = strtok(NULL,";");
+    char* creationDateString = strsep(line,";");
     Date* creation_date = parse_date(creationDateString);
 
-    char* accStatusString = strtok(NULL,";");
+    char* accStatusString = strsep(line,";");
     AccountStatus acc_status = parse_acc_status(accStatusString);
-
-    Driver *driver = create_driver(id, name, *date, gender, car_class, license_plate, city, *creation_date, acc_status);
 
 }
 

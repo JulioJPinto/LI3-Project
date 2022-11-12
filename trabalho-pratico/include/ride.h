@@ -11,6 +11,6 @@ Ride* create_ride(int id, Date date, int driver_id, char* username, char* city, 
 
 void free_ride(Ride *ride);
 
-GString *ride_get_city(Ride *ride);
+char* *ride_get_city(Ride *ride);
 
 #endif //LI3_RIDE_H

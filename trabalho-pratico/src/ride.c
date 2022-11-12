@@ -39,6 +39,6 @@ void free_ride(Ride *ride){
     free(ride);
 }
 
-GString *ride_get_city(Ride *ride) {
-    return g_string_new_len(ride->city.str, (gssize) ride->city.len);
+char* *ride_get_city(Ride *ride) {
+    return *(ride->city);
 }
