@@ -17,12 +17,12 @@ typedef enum file_type {
 
 typedef void *(*parse_line_function_pointer)(char *string);
 
-void read_file(FILE *file_path, parse_line_function_pointer parse_line_function);
+void parse_file(FILE *file_path, parse_line_function_pointer parse_line_function);
 
-void *parse_driver(char *line);
+void *parse_driver_line(char *line);
 
-void *parse_ride(char *line);
+void *parse_ride_line(char *line);
 
-void *parse_user(char *line);
+void *parse_user_line(char *line);
 
 #endif //LI3_STRUCT_UTIL_H
