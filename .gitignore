@@ -18,6 +18,8 @@ a.out
 Resultados/
 
 */build/*
+input.txt
+*.pdf
 
 # Ignore idea
 /.idea/

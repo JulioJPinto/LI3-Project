@@ -39,7 +39,7 @@ build: $(BUILD_DIR_PATH)/$(EXEC)
 
 $(BUILD_DIR_PATH)/$(EXEC): $(OBJ)
 	@$(CC) -o $@ $^ $(CFLAGS) -lm $(LIBS)
-	@printf "$(YELLOW)$(EXEC) $(WHITE)compiled."
+	@printf "$(YELLOW)$(EXEC) $(WHITE)compiled.\n"
 
 $(BUILD_DIR_PATH)/%.o: src/%.c
 	@printf "Compiling $(YELLOW)$<$(WHITE)...\n"
@@ -51,3 +51,7 @@ clean:
 
 format:
 	clang-format -i src/*.c include/*.h
+
+# TODO: add support for valgrind
+leaks:
+	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input.txt
