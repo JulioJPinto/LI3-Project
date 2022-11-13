@@ -1,13 +1,11 @@
 #include <glib.h>
 
 #include "parser.h"
-#include "ride.h"
 #include <stdio.h>
 
 typedef void* (*parse_line_function_pointer)(char* string);
 
-void read_file(const char* file_path, parse_line_function_pointer parse_line_function){
-    FILE *csv_file = fopen(file_path,"r");
+void read_file(FILE* csv_file, parse_line_function_pointer parse_line_function){
 
     static char buffer[10000];
     for(int i = 0; fgets(buffer, 10000, csv_file); i++){
@@ -26,59 +24,40 @@ double parse_double(char* string){
     return strtod(string,NULL);
 }
 
-Date *parse_date(char* string){
-    Date *date_parsed = malloc(sizeof(struct date));
-
+Date parse_date(char* string){
     char* svptr;
+    Date date_parsed = {
 
-    date_parsed->day = parse_int(strtok_r(string,"/",&svptr)); 
-    date_parsed->month = parse_int(strtok_r(NULL,"/",&svptr));
-    date_parsed->year = parse_int(strtok_r(NULL,";",&svptr));
+    .day = parse_int(strtok_r(string,"/",&svptr)),
+    .month = parse_int(strtok_r(NULL,"/",&svptr)),
+    .year = parse_int(strtok_r(NULL,";",&svptr)) 
+
+    };
 
     return date_parsed;
 }
 
 Gender parse_gender(char* string){
 
-    if (strcmp(string, "F")){
-        return F;
-    } else {
-        return M;
-    }
+    return(string[0] == 'F' ? F : M);
 
 }
 
 CarClass parse_car_class(char* string){
 
-    if(strcmp(string,"green") == 0){
-        return GREEN;
-    } else if(strcmp(string,"premium") == 0){
-        return PREMIUM;
-    } else {
-        return BASIC;
-    }
+    return(string[0] == 'g' ? GREEN : (string[0] == 'p' ? PREMIUM : BASIC));
 }
 
 
 AccountStatus parse_acc_status(char* string){
 
-    if (strcmp(string, "active")){
-        return ACTIVE;
-    }
-    
-    return INACTIVE;  
+    return (string[0] == 'a' ? ACTIVE : INACTIVE);
 }
 
 
 PaymentMethod parse_pay_method(char* string){
 
-    if(strcmp(string,"cash") == 0){
-        return CASH;
-    } else if(strcmp(string,"credit_card") == 0){
-        return CREDIT;
-    } else {
-        return DEBIT;
-    }
+    return (string[1] == 'a' ? CASH : (string[1] == 'r' ? CREDIT : DEBIT) );
 
 }
 
@@ -86,90 +65,90 @@ PaymentMethod parse_pay_method(char* string){
 void* parse_driver(char* line){
     char* saveptr;
 
-    char* idString = strtok_r(line,";",&saveptr); 
+    char* idString = strtok(line,";"); 
     int id = parse_int(idString);
 
-    char* name = strtok_r(NULL,";",&saveptr);
+    char* name = strtok(NULL,";");
 
-    char* dateString = strtok_r(NULL,";",&saveptr);
-    Date* date = parse_date(dateString);
+    char* dateString = strtok(NULL,";");
+    Date date = parse_date(dateString);
 
-    char* genderString = strtok_r(NULL,";",&saveptr);
+    char* genderString = strtok(NULL,";");
     Gender gender = parse_gender(genderString);
 
-    char* carClassString = strtok_r(NULL,";",&saveptr);
+    char* carClassString = strtok(NULL,";");
     CarClass car_class = parse_car_class(carClassString);
 
-    char* license_plate = strtok_r(NULL,";",&saveptr);
+    char* license_plate = strtok(NULL,";");
     
-    char* city = strtok_r(NULL,";",&saveptr);
+    char* city = strtok(NULL,";");
 
-    char* creationDateString = strtok_r(NULL,";",&saveptr);
-    Date* creation_date = parse_date(creationDateString);
+    char* creationDateString = strtok(NULL,";");
+    Date creation_date = parse_date(creationDateString);
 
-    char* accStatusString = strtok_r(NULL,";",&saveptr);
+    char* accStatusString = strtok(NULL,";");
     AccountStatus acc_status = parse_acc_status(accStatusString);
 
-    Driver *driver = create_driver(id, name, *date, gender, car_class, license_plate, city, *creation_date, acc_status);
+    Driver *driver = create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
 }
 
 void* parse_ride(char* line){
     char *saveptr;
     
-    char* idString = strtok_r(line,";",&saveptr);
+    char* idString = strtok(line,";");
     int id = parse_int(idString);
 
-    char* dateString = strtok_r(NULL,";",&saveptr);
-    Date* date = parse_date(dateString);
+    char* dateString = strtok(NULL,";");
+    Date date = parse_date(dateString);
 
-    char* driverString = strtok_r(NULL,";",&saveptr);
+    char* driverString = strtok(NULL,";");
     int driver_id = parse_int(driverString);
 
-    char* user = strtok_r(NULL,";",&saveptr);
+    char* user = strtok(NULL,";");
 
-    char* city = strtok_r(NULL,";",&saveptr);
+    char* city = strtok(NULL,";");
 
-    char* distanceString = strtok_r(NULL,";",&saveptr);
+    char* distanceString = strtok(NULL,";");
     int distance = parse_int(distanceString);
 
-    char* userScoreString = strtok_r(NULL,";",&saveptr);
+    char* userScoreString = strtok(NULL,";");
     int user_score = parse_int(userScoreString);
 
-    char* driverScoreString = strtok_r(NULL,";",&saveptr);
+    char* driverScoreString = strtok(NULL,";");
     int driver_score = parse_int(driverScoreString);
 
-    char* tipString = strtok_r(NULL,";",&saveptr);
+    char* tipString = strtok(NULL,";");
     double tip = parse_double(tipString);
 
-    char* comment = strtok_r(NULL,";",&saveptr);
+    char* comment = strtok(NULL,";");
 
-    Ride *ride = create_ride(id, *date, driver_id, user, city, distance, user_score, driver_score, tip);
+    Ride *ride = create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 
 }
 
 void* parse_user(char* line){
     char* saveptr;
 
-    char* username = strtok_r(line,";",&saveptr);
+    char* username = strtok(line,";");
 
-    char* name = strtok_r(NULL,";",&saveptr);
+    char* name = strtok(NULL,";");
 
-    char* genderString = strtok_r(NULL,";",&saveptr);
+    char* genderString = strtok(NULL,";");
     Gender gender = parse_gender(genderString);
 
-    char* birthDateString = strtok_r(NULL,";",&saveptr);
-    Date* birth_date = parse_date(birthDateString);
+    char* birthDateString = strtok(NULL,";");
+    Date birth_date = parse_date(birthDateString);
 
-    char* accCreationString = strtok_r(NULL,";",&saveptr);
-    Date* acc_creation = parse_date(accCreationString);
+    char* accCreationString = strtok(NULL,";");
+    Date acc_creation = parse_date(accCreationString);
 
-    char* payMethodString = strtok_r(NULL,";",&saveptr);
+    char* payMethodString = strtok(NULL,";");
     PaymentMethod pay_method = parse_pay_method(payMethodString);
 
-    char* accStatusString = strtok_r(NULL,";",&saveptr);
+    char* accStatusString = strtok(NULL,";");
     AccountStatus acc_status = parse_acc_status(accStatusString);
 
-    User *user = create_user(username, name, gender, *birth_date, *acc_creation, pay_method, acc_status);
+    User *user = create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
 
 }
 

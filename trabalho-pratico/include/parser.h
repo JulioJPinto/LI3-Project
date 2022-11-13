@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "struct_util.h"
 #include <glib.h>
+#include <stdio.h>
 
 typedef enum file_type{
     USERS, DRIVERS, RIDE
@@ -14,7 +15,7 @@ typedef enum file_type{
 
 typedef void* (*parse_line_function_pointer)(char* string);
 
-void read_file(const char* file_path, parse_line_function_pointer parse_line_function);
+void read_file(FILE* file_path, parse_line_function_pointer parse_line_function);
 
 void* parse_driver(char* line);
 
