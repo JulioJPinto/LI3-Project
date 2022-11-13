@@ -38,11 +38,6 @@ Date *parse_date(char* string){
     return date_parsed;
 }
 
-void *print_date(Date *date){
-
-    printf("%d/%d/%d;", date->day, date->month, date->year);
-}
-
 Gender parse_gender(char* string){
 
     if (strcmp(string, "F")){
@@ -51,12 +46,6 @@ Gender parse_gender(char* string){
         return M;
     }
 
-}
-
-
-void *print_gender(Gender gender){
-    if (gender == F) printf("F;");
-    else printf("M;");
 }
 
 CarClass parse_car_class(char* string){
@@ -70,13 +59,6 @@ CarClass parse_car_class(char* string){
     }
 }
 
-void *print_car_class(CarClass class){
-
-    if(class == GREEN) printf("GREEN;");
-    else if (class == PREMIUM) printf("PREMIUM;");
-    else if (class == BASIC) printf("BASIC;");
-}
-
 
 AccountStatus parse_acc_status(char* string){
 
@@ -87,10 +69,6 @@ AccountStatus parse_acc_status(char* string){
     return INACTIVE;  
 }
 
-void *print_acc_status(AccountStatus status){
-    if (status == ACTIVE) printf("ACTIVE;\n");
-    else printf("INACTIVE;\n");
-}
 
 PaymentMethod parse_pay_method(char* string){
 
