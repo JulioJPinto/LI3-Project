@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define UNUSED(x) (void) (x)
+
 void log_debug(const char *format, ...) {
+    UNUSED(format);
 #ifdef DEBUG
     va_list args;
     va_start(args, format);

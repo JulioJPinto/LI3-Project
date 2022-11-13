@@ -55,5 +55,7 @@ int main(int argc, char **argv) {
 
     log_info("Executed %d queries in %lf seconds.\n", query_count, g_timer_elapsed(timer, NULL));
 
+    g_timer_destroy(timer);
+
     return 0;
 }

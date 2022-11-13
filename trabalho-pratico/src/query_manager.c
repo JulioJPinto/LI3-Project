@@ -18,11 +18,12 @@ void execute_query(Catalog *catalog, FILE *output, char *query) {
 
     if (*query_id_str_left != '\0') {
         fprintf(output, "Invalid query id: %s\n", args[0]);
-        return;
+        goto free;
     }
 
     run_query(catalog, output, query_id, args + 1);
 
+free:
     g_strfreev(args);
 }
 
