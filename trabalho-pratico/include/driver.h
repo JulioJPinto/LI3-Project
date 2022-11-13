@@ -7,8 +7,8 @@
 
 typedef struct driver Driver;
 
-Driver *create_driver(int id, char* name, Date birth_date, Gender gender, CarClass car_class, char* license_plate,
-                      char* city, Date account_creation_date, AccountStatus account_status);
+Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
+                      char *city, Date account_creation_date, AccountStatus account_status);
 
 int driver_get_id(Driver *driver);
 

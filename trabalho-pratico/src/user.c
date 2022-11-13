@@ -11,7 +11,7 @@ typedef struct user {
     AccountStatus account_status;
 } User;
 
-User *create_user(char* username, char* name, Gender gender, Date birth_date, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status){
+User *create_user(char *username, char *name, Gender gender, Date birth_date, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {
     User *user = malloc(sizeof(struct user));
 
     user->username = username;
@@ -22,10 +22,9 @@ User *create_user(char* username, char* name, Gender gender, Date birth_date, Da
     user->account_status = acc_status;
 
     return user;
-    
 }
 
-void free_user(User* user){
+void free_user(User *user) {
     free(user);
 }
 

@@ -7,8 +7,8 @@ typedef struct ride {
     int id;
     Date date;
     int driver_id;
-    char* user_username;
-    char* city;
+    char *user_username;
+    char *city;
     int distance;
     int score_user;
     int score_driver;
@@ -16,7 +16,7 @@ typedef struct ride {
     // GString comment;
 } Ride;
 
-Ride* create_ride(int id, Date date, int driver_id, char* username, char* city, int distance, int score_user, int score_driver, float tip){
+Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, float tip) {
     Ride *ride = malloc(sizeof(Ride));
 
     ride->id = id;
@@ -32,10 +32,10 @@ Ride* create_ride(int id, Date date, int driver_id, char* username, char* city, 
     return ride;
 }
 
-void free_ride(Ride *ride){
+void free_ride(Ride *ride) {
     free(ride);
 }
 
-char* *ride_get_city(Ride *ride) {
+char **ride_get_city(Ride *ride) {
     return *(ride->city);
 }
