@@ -3,6 +3,7 @@
 #define LI3_USER_H
 
 #include <glib.h>
+#include "struct_util.h"
 
 typedef struct user User;
 
