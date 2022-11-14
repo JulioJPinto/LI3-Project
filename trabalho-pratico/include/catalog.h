@@ -10,7 +10,7 @@
 
 typedef struct Catalog Catalog;
 
-Catalog *create_catalog();
+Catalog *create_catalog(void);
 
 void free_catalog(Catalog *catalog);
 
@@ -20,7 +20,7 @@ void register_driver(Catalog *catalog, Driver *driver);
 
 void register_ride(Catalog *catalog, Ride *ride);
 
-User *get_user_from_username(Catalog *catalog, GString username);
+User *get_user_from_username(Catalog *catalog, char* username);
 
 Driver *get_driver_from_id(Catalog *catalog, int id);
 

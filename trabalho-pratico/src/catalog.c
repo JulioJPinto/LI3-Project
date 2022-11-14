@@ -1,65 +1,85 @@
 #include "catalog.h"
+#include "price_util.h"
 
 typedef struct Catalog {
+    GPtrArray *users_array;
+    GPtrArray *drivers_array;
+    GPtrArray *rides_array;
+
     GHashTable *user_from_username_hashtable;
     GHashTable *driver_from_id_hashtable;
-    GHashTable *average_ride_price_from_city;
 } Catalog;
 
-typedef struct AccumulativeAverage {
-    double total;
-    double n;
-} AccumulativeAverage;
-
-void register_user(Catalog *catalog, User *user) {
-    g_hash_table_insert(catalog->user_from_username_hashtable, user_get_username(user), user);
+void glib_wrapper_free_user(gpointer user) {
+    free_user(user);
 }
 
-void register_driver(Catalog *catalog, Driver *driver) {
-    int key = driver_get_id(driver);
-    g_hash_table_insert(catalog->driver_from_id_hashtable, &key, driver);
+void glib_wrapper_free_driver(gpointer driver) {
+    free_driver(driver);
 }
 
-void register_ride(Catalog *catalog, Ride *ride) {
-    GHashTable *table = catalog->average_ride_price_from_city;
-    char *city = ride_get_city(ride);
-    if (g_hash_table_contains(table, city)) {
-        // add price to current
-    } else {
-        AccumulativeAverage accumulative_average = {
-                // compute price
-        };
-        // trocar struct pra malloc
-        g_hash_table_insert(table, city, &accumulative_average);
-    }
+void glib_wrapper_free_ride(gpointer ride) {
+    free_ride(ride);
 }
 
-Catalog *create_catalog() {
+Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
+    catalog->users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
+    catalog->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
+    catalog->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
+
     catalog->user_from_username_hashtable = g_hash_table_new(g_str_hash, g_str_equal);
-    catalog->driver_from_id_hashtable = g_hash_table_new(g_int_hash, g_int_equal);
-    catalog->average_ride_price_from_city = g_hash_table_new(g_str_hash, g_str_equal);
+    catalog->driver_from_id_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
 
     return catalog;
 }
 
-void free_catalog(Catalog *catalog) {
-    g_hash_table_destroy(catalog->user_from_username_hashtable);
-    g_hash_table_destroy(catalog->driver_from_id_hashtable);
-    free(catalog);
+void register_user(Catalog *catalog, User *user) {
+    g_ptr_array_add(catalog->users_array, user);
+    g_hash_table_insert(catalog->user_from_username_hashtable, user_get_username(user), user);
 }
 
-User *get_user_from_username(Catalog *catalog, GString username) {
-    return g_hash_table_lookup(catalog->user_from_username_hashtable, &username);
+void register_driver(Catalog *catalog, Driver *driver) {
+    g_ptr_array_add(catalog->drivers_array, driver);
+
+    int *key = malloc(sizeof(int));
+    *key = driver_get_id(driver);
+    // No need to free the key, it will be freed when the Driver is freed
+
+    g_hash_table_insert(catalog->driver_from_id_hashtable, key, driver);
+}
+
+void register_ride(Catalog *catalog, Ride *ride) {
+    g_ptr_array_add(catalog->rides_array, ride);
+
+    Driver *driver = get_driver_from_id(catalog, ride_get_driver_id(ride));
+    double total_price = ride_get_tip(ride) + compute_price(ride_get_distance(ride), driver_get_car_class(driver));
+
+    driver_increment_number_of_rides(driver);
+    driver_add_score(driver, ride_get_score_driver(ride));
+    driver_add_earned(driver, total_price);
+
+    User *user = get_user_from_username(catalog, ride_get_user_username(ride));
+    user_increment_number_of_rides(user);
+    user_add_score(user, ride_get_score_user(ride));
+    user_add_spent(user, total_price);
+}
+
+User *get_user_from_username(Catalog *catalog, char *username) {
+    return g_hash_table_lookup(catalog->user_from_username_hashtable, username);
 }
 
 Driver *get_driver_from_id(Catalog *catalog, int id) {
     return g_hash_table_lookup(catalog->driver_from_id_hashtable, &id);
 }
 
-double get_price_average_from_city(Catalog *catalog, GString city_name) {
-    AccumulativeAverage *accumulative_average = g_hash_table_lookup(catalog->average_ride_price_from_city, &city_name);
+void free_catalog(Catalog *catalog) {
+    g_ptr_array_free(catalog->users_array, TRUE);
+    g_ptr_array_free(catalog->drivers_array, TRUE);
+    g_ptr_array_free(catalog->rides_array, TRUE);
 
-    return accumulative_average->total / accumulative_average->n;
+    g_hash_table_destroy(catalog->user_from_username_hashtable);
+    g_hash_table_destroy(catalog->driver_from_id_hashtable);
+    free(catalog);
 }
