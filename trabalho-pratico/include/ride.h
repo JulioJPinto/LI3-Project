@@ -7,10 +7,10 @@
 
 typedef struct ride Ride;
 
-Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, float tip);
+Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip);
 
 void free_ride(Ride *ride);
 
-char **ride_get_city(Ride *ride);
+char *ride_get_city(Ride *ride);
 
 #endif //LI3_RIDE_H

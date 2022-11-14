@@ -28,7 +28,6 @@ void free_user(User *user) {
     free(user);
 }
 
-
 char *user_get_username(User *user) {
     return user->username;
 }

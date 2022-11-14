@@ -12,11 +12,11 @@ typedef struct ride {
     int distance;
     int score_user;
     int score_driver;
-    float tip;
+    double tip;
     // GString comment;
 } Ride;
 
-Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, float tip) {
+Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
     Ride *ride = malloc(sizeof(Ride));
 
     ride->id = id;
@@ -36,6 +36,6 @@ void free_ride(Ride *ride) {
     free(ride);
 }
 
-char **ride_get_city(Ride *ride) {
-    return *(ride->city);
+char *ride_get_city(Ride *ride) {
+    return ride->city;
 }
