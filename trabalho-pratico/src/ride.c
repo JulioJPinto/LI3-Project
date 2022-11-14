@@ -7,15 +7,35 @@ typedef struct ride {
     int id;
     Date date;
     int driver_id;
-    GString user_username;
-    GString city;
+    char *user_username;
+    char *city;
     int distance;
     int score_user;
     int score_driver;
-    float tip;
+    double tip;
     // GString comment;
 } Ride;
 
-GString *ride_get_city(Ride *ride) {
-    return g_string_new_len(ride->city.str, (gssize) ride->city.len);
+Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
+    Ride *ride = malloc(sizeof(Ride));
+
+    ride->id = id;
+    ride->date = date;
+    ride->driver_id = driver_id;
+    ride->user_username = username;
+    ride->city = city;
+    ride->distance = distance;
+    ride->score_user = score_user;
+    ride->score_driver = score_driver;
+    ride->tip = tip;
+
+    return ride;
+}
+
+void free_ride(Ride *ride) {
+    free(ride);
+}
+
+char *ride_get_city(Ride *ride) {
+    return ride->city;
 }

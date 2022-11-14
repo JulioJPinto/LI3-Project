@@ -5,6 +5,7 @@
 #include "file_util.h"
 #include "logger.h"
 #include "query_manager.h"
+#include "parser.h"
 
 int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
@@ -20,25 +21,52 @@ int main(int argc, char **argv) {
     char *dataset_folder_path = argv[1];
     char *queries_file_path = argv[2];
 
+    FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
     FILE *drivers_file = open_file_folder(dataset_folder_path, "drivers.csv");
     FILE *rides_file = open_file_folder(dataset_folder_path, "rides.csv");
-    FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
 
     Catalog *catalog = create_catalog();
 
-    //    register_ride(catalog, ...)
-    //    register_user(catalog, ...)
-    //    register_driver(catalog, ...)
+    char *line_buffer = malloc(1024 * sizeof(char));
 
+    int count = 0;
+    fgets(line_buffer, 1024, drivers_file);
+    Driver *driver;
+    while ((driver = read_drivers_file(drivers_file, line_buffer, 1024)) != NULL) {
+        register_driver(catalog, driver);
+        count++;
+    }
+
+    log_info("Read %d drivers.\n", count);
+
+    count = 0;
+    fgets(line_buffer, 1024, users_file);
+    User *user;
+    while ((user = read_users_file(users_file, line_buffer, 1024)) != NULL) {
+        register_user(catalog, user);
+        count++;
+    }
+
+    log_info("Read %d users.\n", count);
+
+    count = 0;
+    fgets(line_buffer, 1024, rides_file);
+    Ride *ride;
+    while ((ride = read_rides_file(rides_file, line_buffer, 1024)) != NULL) {
+        register_ride(catalog, ride);
+        count++;
+    }
+
+    log_info("Read %d rides.\n", count);
+
+    fclose(users_file);
     fclose(drivers_file);
     fclose(rides_file);
-    fclose(users_file);
 
     FILE *queries_file = open_file(queries_file_path);
 
     int query_count = 0;
 
-    char *line_buffer = malloc(1024 * sizeof(char));
     while (fgets(line_buffer, 1024, queries_file)) {
         format_fgets_input_line(line_buffer);
         log_info("Executing query '%s'\n", line_buffer);

@@ -22,7 +22,7 @@ void register_driver(Catalog *catalog, Driver *driver) {
 
 void register_ride(Catalog *catalog, Ride *ride) {
     GHashTable *table = catalog->average_ride_price_from_city;
-    GString *city = ride_get_city(ride);
+    char *city = ride_get_city(ride);
     if (g_hash_table_contains(table, city)) {
         // add price to current
     } else {
@@ -35,11 +35,11 @@ void register_ride(Catalog *catalog, Ride *ride) {
 }
 
 Catalog *create_catalog() {
-    Catalog *catalog = malloc(sizeof(Catalog));
+    Catalog *catalog = malloc(sizeof(struct Catalog));
 
-    catalog->user_from_username_hashtable = g_hash_table_new((GHashFunc) g_string_hash, (GEqualFunc) g_string_equal);
+    catalog->user_from_username_hashtable = g_hash_table_new(g_str_hash, g_str_equal);
     catalog->driver_from_id_hashtable = g_hash_table_new(g_int_hash, g_int_equal);
-    catalog->average_ride_price_from_city = g_hash_table_new((GHashFunc) g_string_hash, (GEqualFunc) g_string_equal);
+    catalog->average_ride_price_from_city = g_hash_table_new(g_str_hash, g_str_equal);
 
     return catalog;
 }
