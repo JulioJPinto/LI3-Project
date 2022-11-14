@@ -11,6 +11,8 @@ typedef struct date {
     int day, month, year;
 } Date;
 
+int get_age(Date date_of_birth);
+
 typedef enum payment_method {
     CASH,
     DEBIT,

@@ -5,7 +5,7 @@ typedef struct User {
     char *username;
     char *name;
     Gender gender;
-    Date birth_date;
+    Date birthdate;
     Date account_create_date;
     PaymentMethod payment_method;
     AccountStatus account_status;
@@ -16,14 +16,15 @@ typedef struct User {
     double total_spent;
 } User;
 
-User *create_user(char *username, char *name, Gender gender, Date birth_date, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {
+User *create_user(char *username, char *name, Gender gender, Date birthdate, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {
     User *user = malloc(sizeof(struct User));
 
     user->username = g_strdup(username);
     user->name = g_strdup(name);
     user->gender = gender;
-    user->birth_date = birth_date;
+    user->birthdate = birthdate;
     user->account_create_date = acc_creation;
+    user->payment_method = pay_method;
     user->account_status = acc_status;
 
     return user;
@@ -39,6 +40,22 @@ char *user_get_username(User *user) {
     return user->username;
 }
 
+char *user_get_name(User *user) {
+    return user->name;
+}
+
+Gender user_get_gender(User *user) {
+    return user->gender;
+}
+
+Date user_get_birthdate(User *user) {
+    return user->birthdate;
+}
+
+AccountStatus user_get_account_status(User *user) {
+    return user->account_status;
+}
+
 void user_increment_number_of_rides(User *user) {
     user->rides_amount++;
 }
@@ -49,4 +66,16 @@ void user_add_score(User *user, int score) {
 
 void user_add_spent(User *user, double spent) {
     user->total_spent += spent;
+}
+
+double user_get_total_spent(User *user) {
+    return user->total_spent;
+}
+
+int user_get_number_of_rides(User *user) {
+    return user->rides_amount;
+}
+
+double user_get_average_score(User *user) {
+    return (double) user->accumulated_score / (double) user->rides_amount;
 }

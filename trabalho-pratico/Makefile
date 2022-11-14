@@ -1,7 +1,7 @@
 CC := gcc
 
 EXEC := li3
-CFLAGS := -std=c17 -Wall -Wextra -Wwrite-strings -Wno-parentheses -Wpedantic -Warray-bounds
+CFLAGS := -std=c11 -Wall -Wextra -Wdouble-promotion -Werror=pedantic -Werror=vla -pedantic-errors -Wfatal-errors -flto
 CFLAGS += -Iinclude/
 
 CFLAGS += $(shell pkg-config --cflags glib-2.0)
@@ -9,11 +9,11 @@ LIBS := $(shell pkg-config --libs glib-2.0)
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-    CFLAGS += -g -DDEBUG=1
+    CFLAGS += -O0 -g -DDEBUG=1
     EXEC := $(EXEC)-debug
     BUILD_DIR_PATH := build/debug
 else
-    CFLAGS += -O2
+    CFLAGS += -O2 -march=native -mtune=native
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := build/release
 endif

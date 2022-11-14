@@ -59,10 +59,6 @@ int main(int argc, char **argv) {
 
     log_info("Read %d rides.\n", count);
 
-    fclose(users_file);
-    fclose(drivers_file);
-    fclose(rides_file);
-
     FILE *queries_file = open_file(queries_file_path);
 
     int query_count = 0;
@@ -75,13 +71,17 @@ int main(int argc, char **argv) {
         query_count++;
     }
 
-    free(line_buffer);
-    fclose(queries_file);
-    free_catalog(catalog);
-
     g_timer_stop(timer);
 
     log_info("Executed %d queries in %lf seconds.\n", query_count, g_timer_elapsed(timer, NULL));
+
+    fclose(users_file);
+    fclose(drivers_file);
+    fclose(rides_file);
+
+    free(line_buffer);
+    fclose(queries_file);
+    free_catalog(catalog);
 
     g_timer_destroy(timer);
 

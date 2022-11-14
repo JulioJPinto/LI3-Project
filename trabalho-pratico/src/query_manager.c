@@ -2,10 +2,10 @@
 
 #include <stdlib.h>
 
-typedef void (*QueryFunction)(Catalog *, FILE *, char **);
+#include "queries.h"
 
 static const QueryFunction query_functions[] = {
-        // TODO: Add query functions here
+        execute_query_find_user_or_driver_by_name_or_id,
 };
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);

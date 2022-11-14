@@ -20,9 +20,9 @@ void register_driver(Catalog *catalog, Driver *driver);
 
 void register_ride(Catalog *catalog, Ride *ride);
 
-User *get_user_from_username(Catalog *catalog, char* username);
+User *catalog_get_user(Catalog *catalog, char* username);
 
-Driver *get_driver_from_id(Catalog *catalog, int id);
+Driver *catalog_get_driver(Catalog *catalog, int id);
 
 double get_price_average_from_city(Catalog *catalog, GString city_name);
 

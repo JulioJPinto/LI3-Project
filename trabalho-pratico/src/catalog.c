@@ -53,24 +53,24 @@ void register_driver(Catalog *catalog, Driver *driver) {
 void register_ride(Catalog *catalog, Ride *ride) {
     g_ptr_array_add(catalog->rides_array, ride);
 
-    Driver *driver = get_driver_from_id(catalog, ride_get_driver_id(ride));
+    Driver *driver = catalog_get_driver(catalog, ride_get_driver_id(ride));
     double total_price = ride_get_tip(ride) + compute_price(ride_get_distance(ride), driver_get_car_class(driver));
 
     driver_increment_number_of_rides(driver);
     driver_add_score(driver, ride_get_score_driver(ride));
     driver_add_earned(driver, total_price);
 
-    User *user = get_user_from_username(catalog, ride_get_user_username(ride));
+    User *user = catalog_get_user(catalog, ride_get_user_username(ride));
     user_increment_number_of_rides(user);
     user_add_score(user, ride_get_score_user(ride));
     user_add_spent(user, total_price);
 }
 
-User *get_user_from_username(Catalog *catalog, char *username) {
+User *catalog_get_user(Catalog *catalog, char *username) {
     return g_hash_table_lookup(catalog->user_from_username_hashtable, username);
 }
 
-Driver *get_driver_from_id(Catalog *catalog, int id) {
+Driver *catalog_get_driver(Catalog *catalog, int id) {
     return g_hash_table_lookup(catalog->driver_from_id_hashtable, &id);
 }
 
