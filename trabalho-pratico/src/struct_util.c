@@ -1,6 +1,6 @@
 #include "struct_util.h"
 
-const static Date reference_date = {9, 10, 2022};
+static const Date reference_date = {9, 10, 2022};
 
 int get_age(Date date_of_birth) {
     if (reference_date.month > date_of_birth.month ||

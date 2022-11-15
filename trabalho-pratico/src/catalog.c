@@ -1,14 +1,14 @@
 #include "catalog.h"
 #include "price_util.h"
 
-typedef struct Catalog {
+struct Catalog {
     GPtrArray *users_array;
     GPtrArray *drivers_array;
     GPtrArray *rides_array;
 
     GHashTable *user_from_username_hashtable;
     GHashTable *driver_from_id_hashtable;
-} Catalog;
+};
 
 void glib_wrapper_free_user(gpointer user) {
     free_user(user);

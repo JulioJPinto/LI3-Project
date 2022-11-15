@@ -1,7 +1,7 @@
 #include "user.h"
 #include <glib.h>
 
-typedef struct User {
+struct User {
     char *username;
     char *name;
     Gender gender;
@@ -14,7 +14,7 @@ typedef struct User {
     int rides_amount;
     int accumulated_score;
     double total_spent;
-} User;
+};
 
 User *create_user(char *username, char *name, Gender gender, Date birthdate, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {
     User *user = malloc(sizeof(struct User));

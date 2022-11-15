@@ -3,7 +3,7 @@
 #include "ride.h"
 #include "struct_util.h"
 
-typedef struct Ride {
+struct Ride {
     int id;
     Date date;
     int driver_id;
@@ -14,7 +14,7 @@ typedef struct Ride {
     int score_driver;
     double tip;
     // GString comment;
-} Ride;
+};
 
 Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
     Ride *ride = malloc(sizeof(Ride));

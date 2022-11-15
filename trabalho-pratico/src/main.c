@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
 
     if (argc < 2) {
-        log_warning("Usage: %s <dataset_folder_path> <queries_file_path>", argv[0]);
+        log_warning("Usage: %s <dataset_folder_path> <queries_file_path>\n", argv[0]);
         return 0;
     }
 
