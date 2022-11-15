@@ -96,7 +96,7 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
         char *name = driver_get_name(driver);
         double average_score = driver_get_average_score(driver);
 
-        fprintf(output, "%d;%s;%.3f\n", id, name, average_score);
+        fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
     }
 
     g_ptr_array_free(result, TRUE);

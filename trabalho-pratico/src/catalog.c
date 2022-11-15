@@ -81,6 +81,10 @@ void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result) {
     }
 }
 
+int compare_driver_by_activeness(Driver *a, Driver *b) {
+    return (int) driver_get_account_status(a) - (int) driver_get_account_status(b);
+}
+
 int compare_driver_by_id(Driver *a, Driver *b) {
     return driver_get_id(a) - driver_get_id(b);
 }
@@ -99,6 +103,11 @@ int compare_driver_by_score(Driver *a, Driver *b) {
 int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
     Driver *a_driver = *((Driver **) a);
     Driver *b_driver = *((Driver **) b);
+
+    int by_activeness = compare_driver_by_activeness(a_driver, b_driver);
+    if (by_activeness != 0) {
+        return by_activeness;
+    }
 
     int by_score = compare_driver_by_score(b_driver, a_driver);
     if (by_score != 0) {
