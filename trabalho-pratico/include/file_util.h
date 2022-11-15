@@ -21,4 +21,17 @@ FILE *open_file(const char *file_name);
  */
 void format_fgets_input_line(char *line_buffer);
 
+/*
+ * Creates the output folder if it does not exist.
+ */
+void create_output_folder_if_not_exists(void);
+
+/*
+ * Creates a file for the output of a command.
+ * The file is created in the output folder.
+ * The file name is command<command_number>_output.txt
+ * The file should be closed after use.
+ */
+FILE *create_command_output_file(int command_number);
+
 #endif //LI3_FILE_UTIL_H

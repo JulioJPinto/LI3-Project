@@ -7,6 +7,8 @@
 #include "query_manager.h"
 #include "parser.h"
 
+#define OUTPUT_FOLDER "Resultados"
+
 int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
 
@@ -65,11 +67,17 @@ int main(int argc, char **argv) {
 
     int query_count = 0;
 
+    create_output_folder_if_not_exists();
+
     while (fgets(line_buffer, 1024, queries_file)) {
         format_fgets_input_line(line_buffer);
         log_info("Executing query '%s'\n", line_buffer);
 
-        execute_query(catalog, stdout, line_buffer);
+        FILE *output_file = create_command_output_file(query_count + 1);
+
+        execute_query(catalog, output_file, line_buffer);
+        fclose(output_file);
+
         query_count++;
     }
 

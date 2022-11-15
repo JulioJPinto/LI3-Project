@@ -48,6 +48,7 @@ $(BUILD_DIR_PATH)/%.o: src/%.c
 .PHONY: clean
 clean:
 	rm -rf build
+	rm -rf Resultados
 
 format:
 	clang-format -i src/*.c include/*.h

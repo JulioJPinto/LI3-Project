@@ -10,6 +10,8 @@
 #define PATH_SEPARATOR "/"
 #endif
 
+#define OUTPUT_FOLDER "Resultados"
+
 FILE *open_file_folder(const char *const folder_path, const char *const file_name) {
     GString *file_path = g_string_sized_new(strlen(folder_path) + strlen(file_name) + 1);
 
@@ -38,4 +40,15 @@ void format_fgets_input_line(char *line_buffer) {
     if (line_buffer[line_buffer_length - 1] == '\n') {
         line_buffer[line_buffer_length - 1] = '\0';
     }
+}
+
+void create_output_folder_if_not_exists(void) {
+    g_mkdir_with_parents(OUTPUT_FOLDER, 0777);
+}
+
+FILE *create_command_output_file(int command_number) {
+    char *filename = g_strdup_printf(OUTPUT_FOLDER PATH_SEPARATOR "command%d_output.txt", command_number);
+    FILE *output = fopen(filename, "w");
+    g_free(filename);
+    return output;
 }
