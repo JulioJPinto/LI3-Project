@@ -16,6 +16,8 @@ a.out
 *drivers*.csv
 *rides*.csv
 Resultados/
+Resultados-expected/
+programa-principal
 
 */build/*
 input.txt

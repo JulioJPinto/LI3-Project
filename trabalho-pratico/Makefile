@@ -27,7 +27,7 @@ WHITE := \033[0m
 YELLOW := \033[1;33m
 
 .PHONY: all
-all: format build-release build-debug
+all: build-release copy-build-release-to-main-folder
 
 build-debug:
 	@$(MAKE) DEBUG=1 build
@@ -49,10 +49,17 @@ $(BUILD_DIR_PATH)/%.o: src/%.c
 clean:
 	rm -rf build
 	rm -rf Resultados
+	rm -f programa-principal
 
 format:
 	clang-format -i src/*.c include/*.h
 
+copy-build-release-to-main-folder: build-release
+	cp $(BUILD_DIR_PATH)/$(EXEC) programa-principal
+
 # TODO: add support for valgrind
 leaks:
 	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input.txt
+
+test-results:
+	@diff -r Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0
