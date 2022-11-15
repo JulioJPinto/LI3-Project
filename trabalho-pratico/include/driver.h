@@ -49,6 +49,11 @@ CarClass driver_get_car_class(Driver *driver);
 AccountStatus driver_get_account_status(Driver *driver);
 
 /*
+ * Returns the date of the last ride of the Driver
+ */
+Date driver_get_last_ride_date(Driver *driver);
+
+/*
  * Increments the rides amount of the Driver
  */
 void driver_increment_number_of_rides(Driver *driver);
@@ -77,5 +82,10 @@ int driver_get_number_of_rides(Driver *driver);
  * Returns the total money earned by the Driver
  */
 double driver_get_total_earned(Driver *driver);
+
+/*
+ * Sets a new last ride if the new ride is more recent than the current saved one
+ */
+void driver_register_last_ride_date(Driver *driver, Date date);
 
 #endif //LI3_DRIVER_H

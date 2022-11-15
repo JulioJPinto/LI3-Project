@@ -2,10 +2,14 @@
 
 #define UNUSED(x) (void) (x)
 
+/*
+ * Same as fprintf but only print to stream if DEBUG macro is defined.
+ */
 void fprintf_debug(FILE *stream, const char *format, ...) {
 #ifdef DEBUG
     va_list args;
     va_start(args, format);
+    fprintf(stream, "(empty) ");
     vfprintf(stream, format, args);
     va_end(args);
 #else
@@ -71,4 +75,29 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
     } else {
         execute_query_find_driver_by_id(catalog, output, id);
     }
+}
+
+void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
+    char *end_ptr;
+    int n = (int) strtol(args[0], &end_ptr, 10);
+    if (*end_ptr != '\0') {
+        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+        return;
+    }
+
+    GPtrArray *result = g_ptr_array_sized_new(n + 100);
+
+    catalog_get_top_n_drivers(catalog, n, result);
+
+    for (int i = 0; i < n; i++) {
+        Driver *driver = g_ptr_array_index(result, i);
+
+        int id = driver_get_id(driver);
+        char *name = driver_get_name(driver);
+        double average_score = driver_get_average_score(driver);
+
+        fprintf(output, "%d;%s;%.3f\n", id, name, average_score);
+    }
+
+    g_ptr_array_free(result, TRUE);
 }

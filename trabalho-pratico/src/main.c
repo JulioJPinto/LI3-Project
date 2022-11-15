@@ -59,6 +59,8 @@ int main(int argc, char **argv) {
 
     log_info("Read %d rides.\n", count);
 
+    notify_stop_registering(catalog);
+
     FILE *queries_file = open_file(queries_file_path);
 
     int query_count = 0;

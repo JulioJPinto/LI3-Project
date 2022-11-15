@@ -6,6 +6,7 @@
 
 static const QueryFunction query_functions[] = {
         execute_query_find_user_or_driver_by_name_or_id,
+        execute_query_top_n_drivers,
 };
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);
@@ -18,12 +19,10 @@ void execute_query(Catalog *catalog, FILE *output, char *query) {
 
     if (*query_id_str_left != '\0') {
         fprintf(output, "Invalid query id: %s\n", args[0]);
-        goto free;
+    } else {
+        run_query(catalog, output, query_id, args + 1);
     }
 
-    run_query(catalog, output, query_id, args + 1);
-
-free:
     g_strfreev(args);
 }
 

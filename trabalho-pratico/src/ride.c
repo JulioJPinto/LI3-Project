@@ -41,6 +41,10 @@ int ride_get_driver_id(Ride *ride) {
     return ride->driver_id;
 }
 
+Date ride_get_date(Ride *ride) {
+    return ride->date;
+}
+
 char *ride_get_user_username(Ride *ride) {
     return ride->user_username;
 }

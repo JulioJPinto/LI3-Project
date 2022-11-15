@@ -18,6 +18,7 @@ struct Driver {
     int rides_amount;
     int accumulated_score;
     double total_earned;
+    Date last_ride_date;
 };
 
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
@@ -32,6 +33,11 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->city = g_strdup(city);
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
+
+    driver->rides_amount = 0;
+    driver->accumulated_score = 0;
+    driver->total_earned = 0;
+    driver->last_ride_date = (Date) {0, 0, 0};
 
     return driver;
 }
@@ -60,6 +66,10 @@ AccountStatus driver_get_account_status(Driver *driver) {
     return driver->account_status;
 }
 
+Date driver_get_last_ride_date(Driver *driver) {
+    return driver->last_ride_date;
+}
+
 void driver_increment_number_of_rides(Driver *driver) {
     driver->rides_amount++;
 }
@@ -82,6 +92,12 @@ double driver_get_average_score(Driver *driver) {
 
 double driver_get_total_earned(Driver *driver) {
     return driver->total_earned;
+}
+
+void driver_register_last_ride_date(Driver *driver, Date date) {
+    if(date_compare(date, driver->last_ride_date) > 0) {
+        driver->last_ride_date = date;
+    }
 }
 
 void free_driver(Driver *driver) {

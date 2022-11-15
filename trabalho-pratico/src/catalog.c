@@ -59,6 +59,7 @@ void register_ride(Catalog *catalog, Ride *ride) {
     driver_increment_number_of_rides(driver);
     driver_add_score(driver, ride_get_score_driver(ride));
     driver_add_earned(driver, total_price);
+    driver_register_last_ride_date(driver, ride_get_date(ride));
 
     User *user = catalog_get_user(catalog, ride_get_user_username(ride));
     user_increment_number_of_rides(user);
@@ -72,6 +73,49 @@ User *catalog_get_user(Catalog *catalog, char *username) {
 
 Driver *catalog_get_driver(Catalog *catalog, int id) {
     return g_hash_table_lookup(catalog->driver_from_id_hashtable, &id);
+}
+
+void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result) {
+    for (int i = 0; i < n; i++) {
+        g_ptr_array_add(result, g_ptr_array_index(catalog->drivers_array, i));
+    }
+}
+
+int compare_driver_by_id(Driver *a, Driver *b) {
+    return driver_get_id(a) - driver_get_id(b);
+}
+
+int compare_driver_by_last_ride(Driver *a, Driver *b) {
+    return date_compare(driver_get_last_ride_date(a), driver_get_last_ride_date(b));
+}
+
+int compare_driver_by_score(Driver *a, Driver *b) {
+    double average_score_a = driver_get_average_score(a);
+    double average_score_b = driver_get_average_score(b);
+
+    return (average_score_a > average_score_b) - (average_score_a < average_score_b);
+}
+
+int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
+    Driver *a_driver = *((Driver **) a);
+    Driver *b_driver = *((Driver **) b);
+
+    int by_score = compare_driver_by_score(b_driver, a_driver);
+    if (by_score != 0) {
+        return by_score;
+    }
+
+    int by_last_ride = compare_driver_by_last_ride(b_driver, a_driver);
+    if (by_last_ride != 0) {
+        return by_last_ride;
+    }
+
+    int by_id = compare_driver_by_id(b_driver, a_driver);
+    return by_id;
+}
+
+void notify_stop_registering(Catalog *catalog) {
+    g_ptr_array_sort(catalog->drivers_array, glib_wrapper_sort_drivers);
 }
 
 void free_catalog(Catalog *catalog) {

@@ -18,6 +18,11 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 int ride_get_driver_id(Ride *ride);
 
 /*
+ * Returns the date of the ride
+ */
+Date ride_get_date(Ride *ride);
+
+/*
  * Returns the user's username of the ride
  */
 char *ride_get_user_username(Ride *ride);
