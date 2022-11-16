@@ -13,12 +13,12 @@ void fprintf_debug(FILE *stream, const char *format, ...) {
     vfprintf(stream, format, args);
     va_end(args);
 #else
-    fprintf(stream, "");
     UNUSED(stream);
     UNUSED(format);
 #endif
 }
 
+//Query 1
 void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *username) {
     User *user = catalog_get_user(catalog, username);
 
@@ -77,6 +77,7 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
     }
 }
 
+//Query 2
 void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
     char *end_ptr;
     int n = (int) strtol(args[0], &end_ptr, 10);
@@ -97,6 +98,32 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
         double average_score = driver_get_average_score(driver);
 
         fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
+    }
+
+    g_ptr_array_free(result, TRUE);
+}
+
+//Query 3
+void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args) {
+    char *end_ptr;
+    int n = (int) strtol(args[0], &end_ptr, 10);
+    if (*end_ptr != '\0') {
+        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+        return;
+    }
+
+    GPtrArray *result = g_ptr_array_sized_new(n + 100);
+
+    catalog_get_longest_n_total_distance(catalog, n, result);
+
+    for (int i = 0; i < n; i++) {
+        User *user = g_ptr_array_index(result, i);
+
+        char *username = user_get_username(user);
+        char *name = user_get_name(user);
+        int total_distance = user_get_total_distance(user);
+
+        fprintf(output, "%s;%s;%d\n", username, name, total_distance);
     }
 
     g_ptr_array_free(result, TRUE);

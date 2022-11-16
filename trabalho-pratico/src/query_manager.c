@@ -7,6 +7,7 @@
 static const QueryFunction query_functions[] = {
         execute_query_find_user_or_driver_by_name_or_id,
         execute_query_top_n_drivers,
+        execute_query_longest_n_total_distance,
 };
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);

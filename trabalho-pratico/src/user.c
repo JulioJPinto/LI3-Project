@@ -14,6 +14,8 @@ struct User {
     int rides_amount;
     int accumulated_score;
     double total_spent;
+    int total_distance;
+    Date most_recent_ride;
 };
 
 User *create_user(char *username, char *name, Gender gender, Date birthdate, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {
@@ -26,6 +28,12 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     user->account_create_date = acc_creation;
     user->payment_method = pay_method;
     user->account_status = acc_status;
+
+    user->rides_amount = 0;
+    user->accumulated_score = 0;
+    user->total_spent = 0;
+    user->total_distance = 0;
+    user->most_recent_ride = (Date){.day = 0, .month = 0, .year = 0};
 
     return user;
 }
@@ -78,4 +86,24 @@ int user_get_number_of_rides(User *user) {
 
 double user_get_average_score(User *user) {
     return (double) user->accumulated_score / (double) user->rides_amount;
+}
+
+int user_get_total_distance(User *user) {
+    return user->total_distance;
+}
+
+int user_add_total_distance(User *user, int distance) {
+    return user->total_distance += distance;
+}
+
+Date user_get_most_recent_ride(User *user) {
+    return user->most_recent_ride;
+}
+
+void user_set_last_ride_date(User *user, Date date) {
+    Date user_last_ride = user->most_recent_ride;
+
+    if (date_compare(user_last_ride, date) < 0) {
+        user->most_recent_ride = date;
+    }
 }

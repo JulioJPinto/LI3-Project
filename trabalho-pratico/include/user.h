@@ -42,31 +42,52 @@ AccountStatus user_get_account_status(User *user);
 /*
  * Increments the rides amount of the User
  */
-void user_increment_number_of_rides(User* user);
+void user_increment_number_of_rides(User *user);
 
 /*
  * Increments the accumulated score of the User
  */
-void user_add_score(User* user, int score);
+void user_add_score(User *user, int score);
 
 /*
  * Increments the total money spent of the User
  */
-void user_add_spent(User* user, double spent);
+void user_add_spent(User *user, double spent);
 
 /*
  * Returns the total money spent of the User
  */
-double user_get_total_spent(User* user);
+double user_get_total_spent(User *user);
 
 /*
  * Returns the number of rides of the User
  */
-int user_get_number_of_rides(User* user);
+int user_get_number_of_rides(User *user);
 
 /*
  * Returns the average score of the User
  */
-double user_get_average_score(User* user);
+double user_get_average_score(User *user);
+
+/*
+ * Return the total distance traveled by the User
+ */
+int user_get_total_distance(User *user);
+
+/*
+ * Increments the total distance traveled by the User
+ */
+int user_add_total_distance(User *user, int distance);
+
+/*
+ * Return the date of the most recent ride done by the User
+ */
+Date user_get_most_recent_ride(User *user);
+
+/*
+ * Sets the date of the last ride done by the user to the date passed 
+ * if the date is more recent then the current set date
+ */
+void user_set_last_ride_date(User *user, Date date);
 
 #endif //LI3_USER_H

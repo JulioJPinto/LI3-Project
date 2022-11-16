@@ -35,6 +35,8 @@ Driver *catalog_get_driver(Catalog *catalog, int id);
  */
 void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result);
 
+void catalog_get_longest_n_total_distance(Catalog *catalog, int n, GPtrArray *result);
+
 double get_price_average_from_city(Catalog *catalog, GString city_name);
 
 #endif //LI3_CATALOG_H

@@ -17,4 +17,9 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
  */
 void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args);
 
+/*
+ * Executes the query number 3.
+ */
+void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args);
+
 #endif //LI3_QUERIES_H

@@ -65,6 +65,8 @@ void register_ride(Catalog *catalog, Ride *ride) {
     user_increment_number_of_rides(user);
     user_add_score(user, ride_get_score_user(ride));
     user_add_spent(user, total_price);
+    user_add_total_distance(user, ride_get_distance(ride));
+    user_set_last_ride_date(user, ride_get_date(ride));
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {
@@ -83,6 +85,12 @@ void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result) {
 
 int compare_driver_by_activeness(Driver *a, Driver *b) {
     return (int) driver_get_account_status(a) - (int) driver_get_account_status(b);
+}
+
+void catalog_get_longest_n_total_distance(Catalog *catalog, int n, GPtrArray *result) {
+    for (int i = 0; i < n; i++) {
+        g_ptr_array_add(result, g_ptr_array_index(catalog->users_array, i));
+    }
 }
 
 int compare_driver_by_id(Driver *a, Driver *b) {
@@ -123,8 +131,61 @@ int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
     return by_id;
 }
 
+int compare_user_by_total_distance(User *a, User *b) {
+    int total_distance_a = user_get_total_distance(a);
+    int total_distance_b = user_get_total_distance(b);
+
+    return total_distance_a - total_distance_b;
+}
+
+int compare_user_by_last_ride(User *a, User *b) {
+    Date last_ride_date_a = user_get_most_recent_ride(a);
+    Date last_ride_date_b = user_get_most_recent_ride(b);
+
+    return date_compare(last_ride_date_a, last_ride_date_b);
+}
+
+int compare_user_by_username(User *a, User *b) {
+    char *user_username_a = user_get_username(a);
+    char *user_username_b = user_get_username(b);
+
+    return (strcmp(user_username_a, user_username_b));
+}
+
+int compare_user_by_activeness(User *a, User *b) {
+    AccountStatus acc_status_a = user_get_account_status(a);
+    AccountStatus acc_status_b = user_get_account_status(b);
+
+    return acc_status_a - acc_status_b;
+}
+
+int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
+    User *a_user = *((User **) a);
+    User *b_user = *((User **) b);
+
+    int by_activeness = compare_user_by_activeness(a_user, b_user);
+    if (by_activeness != 0) {
+        return by_activeness;
+    }
+
+
+    int by_total_distance = compare_user_by_total_distance(b_user, a_user);
+    if (by_total_distance != 0) {
+        return by_total_distance;
+    }
+
+    int by_last_ride = compare_user_by_last_ride(b_user, a_user);
+    if (by_last_ride != 0) {
+        return by_last_ride;
+    }
+
+    int by_username = compare_user_by_username(b_user, a_user);
+    return by_username;
+}
+
 void notify_stop_registering(Catalog *catalog) {
     g_ptr_array_sort(catalog->drivers_array, glib_wrapper_sort_drivers);
+    g_ptr_array_sort(catalog->users_array, glib_wrapper_sort_users);
 }
 
 void free_catalog(Catalog *catalog) {

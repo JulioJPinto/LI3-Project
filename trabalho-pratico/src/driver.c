@@ -37,7 +37,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->rides_amount = 0;
     driver->accumulated_score = 0;
     driver->total_earned = 0;
-    driver->last_ride_date = (Date) {0, 0, 0};
+    driver->last_ride_date = (Date){0, 0, 0};
 
     return driver;
 }
@@ -95,7 +95,7 @@ double driver_get_total_earned(Driver *driver) {
 }
 
 void driver_register_last_ride_date(Driver *driver, Date date) {
-    if(date_compare(date, driver->last_ride_date) > 0) {
+    if (date_compare(date, driver->last_ride_date) > 0) {
         driver->last_ride_date = date;
     }
 }

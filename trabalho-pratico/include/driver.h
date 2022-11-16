@@ -26,7 +26,7 @@ int driver_get_id(Driver *driver);
 /*
  * Returns the name of the Driver
  */
-char* driver_get_name(Driver *driver);
+char *driver_get_name(Driver *driver);
 
 /*
  * Returns the birthdate of the Driver
