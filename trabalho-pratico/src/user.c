@@ -1,4 +1,5 @@
 #include "user.h"
+#include "parser.h"
 #include <glib.h>
 
 struct User {
@@ -36,6 +37,30 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     user->most_recent_ride = (Date){.day = 0, .month = 0, .year = 0};
 
     return user;
+}
+
+void *parse_line_user(char **arg) {
+
+    char *username = arg[0];
+
+    char *name = arg[1];
+
+    char *gender_string = arg[2];
+    Gender gender = parse_gender(gender_string);
+
+    char *birth_date_string = arg[3];
+    Date birth_date = parse_date(birth_date_string);
+
+    char *acc_creation_string = arg[4];
+    Date acc_creation = parse_date(acc_creation_string);
+
+    char *pay_method_string = arg[5];
+    PaymentMethod pay_method = parse_pay_method(pay_method_string);
+
+    char *acc_status_string = arg[6];
+    AccountStatus acc_status = parse_acc_status(acc_status_string);
+
+    return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
 }
 
 void free_user(User *user) {
