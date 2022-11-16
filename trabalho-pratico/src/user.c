@@ -45,11 +45,11 @@ void free_user(User *user) {
 }
 
 char *user_get_username(User *user) {
-    return user->username;
+    return g_strdup(user->username);
 }
 
 char *user_get_name(User *user) {
-    return user->name;
+    return g_strdup(user->name);
 }
 
 Gender user_get_gender(User *user) {
@@ -100,7 +100,7 @@ Date user_get_most_recent_ride(User *user) {
     return user->most_recent_ride;
 }
 
-void user_set_last_ride_date(User *user, Date date) {
+void user_register_ride_date(User *user, Date date) {
     Date user_last_ride = user->most_recent_ride;
 
     if (date_compare(user_last_ride, date) < 0) {

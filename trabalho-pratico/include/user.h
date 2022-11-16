@@ -15,12 +15,14 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
 void free_user(User *user);
 
 /*
- * Returns the username of the User
+ * Returns a copy of the username of the User
+ * The caller is responsible for freeing the memory allocated for the username
  */
 char *user_get_username(User *user);
 
 /*
- * Returns the name of the User
+ * Returns a copy of the name of the User
+ * The caller is responsible for freeing the memory allocated for the name
  */
 char *user_get_name(User *user);
 
@@ -86,8 +88,8 @@ Date user_get_most_recent_ride(User *user);
 
 /*
  * Sets the date of the last ride done by the user to the date passed 
- * if the date is more recent then the current set date
+ * if the date is more recent than the current set date
  */
-void user_set_last_ride_date(User *user, Date date);
+void user_register_ride_date(User *user, Date date);
 
 #endif //LI3_USER_H

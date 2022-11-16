@@ -46,7 +46,7 @@ Date ride_get_date(Ride *ride) {
 }
 
 char *ride_get_user_username(Ride *ride) {
-    return ride->user_username;
+    return g_strdup(ride->user_username);
 }
 
 int ride_get_distance(Ride *ride) {
@@ -66,5 +66,5 @@ double ride_get_tip(Ride *ride) {
 }
 
 char *ride_get_city(Ride *ride) {
-    return ride->city;
+    return g_strdup(ride->city);
 }

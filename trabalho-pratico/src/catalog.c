@@ -29,15 +29,29 @@ Catalog *create_catalog(void) {
     catalog->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
     catalog->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
 
-    catalog->user_from_username_hashtable = g_hash_table_new(g_str_hash, g_str_equal);
+    catalog->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
     catalog->driver_from_id_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
 
     return catalog;
 }
 
+void free_catalog(Catalog *catalog) {
+    g_ptr_array_free(catalog->users_array, TRUE);
+    g_ptr_array_free(catalog->drivers_array, TRUE);
+    g_ptr_array_free(catalog->rides_array, TRUE);
+
+    g_hash_table_destroy(catalog->user_from_username_hashtable);
+    g_hash_table_destroy(catalog->driver_from_id_hashtable);
+    free(catalog);
+}
+
 void register_user(Catalog *catalog, User *user) {
     g_ptr_array_add(catalog->users_array, user);
-    g_hash_table_insert(catalog->user_from_username_hashtable, user_get_username(user), user);
+
+    char *key = user_get_username(user);
+    // No need to free the key, it's freed by the hashtable when the user is removed
+
+    g_hash_table_insert(catalog->user_from_username_hashtable, key, user);
 }
 
 void register_driver(Catalog *catalog, Driver *driver) {
@@ -59,14 +73,18 @@ void register_ride(Catalog *catalog, Ride *ride) {
     driver_increment_number_of_rides(driver);
     driver_add_score(driver, ride_get_score_driver(ride));
     driver_add_earned(driver, total_price);
-    driver_register_last_ride_date(driver, ride_get_date(ride));
+    driver_register_ride_date(driver, ride_get_date(ride));
 
-    User *user = catalog_get_user(catalog, ride_get_user_username(ride));
+    char *username = ride_get_user_username(ride);
+
+    User *user = catalog_get_user(catalog, username);
     user_increment_number_of_rides(user);
     user_add_score(user, ride_get_score_user(ride));
     user_add_spent(user, total_price);
     user_add_total_distance(user, ride_get_distance(ride));
-    user_set_last_ride_date(user, ride_get_date(ride));
+    user_register_ride_date(user, ride_get_date(ride));
+
+    free(username);
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {
@@ -108,6 +126,36 @@ int compare_driver_by_score(Driver *a, Driver *b) {
     return (average_score_a > average_score_b) - (average_score_a < average_score_b);
 }
 
+int compare_user_by_total_distance(User *a, User *b) {
+    int total_distance_a = user_get_total_distance(a);
+    int total_distance_b = user_get_total_distance(b);
+
+    return total_distance_a - total_distance_b;
+}
+
+int compare_user_by_last_ride(User *a, User *b) {
+    Date last_ride_date_a = user_get_most_recent_ride(a);
+    Date last_ride_date_b = user_get_most_recent_ride(b);
+
+    return date_compare(last_ride_date_a, last_ride_date_b);
+}
+
+int compare_user_by_username(User *a, User *b) {
+    char *user_username_a = user_get_username(a);
+    char *user_username_b = user_get_username(b);
+
+    int result = strcmp(user_username_a, user_username_b);
+
+    free(user_username_a);
+    free(user_username_b);
+
+    return result;
+}
+
+int compare_user_by_activeness(User *a, User *b) {
+    return (int) user_get_account_status(a) - (int) user_get_account_status(b);
+}
+
 int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
     Driver *a_driver = *((Driver **) a);
     Driver *b_driver = *((Driver **) b);
@@ -127,36 +175,7 @@ int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
         return by_last_ride;
     }
 
-    int by_id = compare_driver_by_id(b_driver, a_driver);
-    return by_id;
-}
-
-int compare_user_by_total_distance(User *a, User *b) {
-    int total_distance_a = user_get_total_distance(a);
-    int total_distance_b = user_get_total_distance(b);
-
-    return total_distance_a - total_distance_b;
-}
-
-int compare_user_by_last_ride(User *a, User *b) {
-    Date last_ride_date_a = user_get_most_recent_ride(a);
-    Date last_ride_date_b = user_get_most_recent_ride(b);
-
-    return date_compare(last_ride_date_a, last_ride_date_b);
-}
-
-int compare_user_by_username(User *a, User *b) {
-    char *user_username_a = user_get_username(a);
-    char *user_username_b = user_get_username(b);
-
-    return (strcmp(user_username_a, user_username_b));
-}
-
-int compare_user_by_activeness(User *a, User *b) {
-    AccountStatus acc_status_a = user_get_account_status(a);
-    AccountStatus acc_status_b = user_get_account_status(b);
-
-    return acc_status_a - acc_status_b;
+    return compare_driver_by_id(b_driver, a_driver);
 }
 
 int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
@@ -168,7 +187,6 @@ int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
         return by_activeness;
     }
 
-
     int by_total_distance = compare_user_by_total_distance(b_user, a_user);
     if (by_total_distance != 0) {
         return by_total_distance;
@@ -179,21 +197,10 @@ int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
         return by_last_ride;
     }
 
-    int by_username = compare_user_by_username(b_user, a_user);
-    return by_username;
+    return compare_user_by_username(b_user, a_user);
 }
 
 void notify_stop_registering(Catalog *catalog) {
     g_ptr_array_sort(catalog->drivers_array, glib_wrapper_sort_drivers);
     g_ptr_array_sort(catalog->users_array, glib_wrapper_sort_users);
-}
-
-void free_catalog(Catalog *catalog) {
-    g_ptr_array_free(catalog->users_array, TRUE);
-    g_ptr_array_free(catalog->drivers_array, TRUE);
-    g_ptr_array_free(catalog->rides_array, TRUE);
-
-    g_hash_table_destroy(catalog->user_from_username_hashtable);
-    g_hash_table_destroy(catalog->driver_from_id_hashtable);
-    free(catalog);
 }

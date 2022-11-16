@@ -1,6 +1,6 @@
-#include <glib.h>
-
 #include "driver.h"
+
+#include <glib.h>
 #include "struct_util.h"
 
 struct Driver {
@@ -29,7 +29,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->birthdate = birth_date;
     driver->gender = gender;
     driver->car_class = car_class;
-    driver->license_plate = license_plate;
+    driver->license_plate = g_strdup(license_plate);
     driver->city = g_strdup(city);
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
@@ -47,7 +47,7 @@ int driver_get_id(Driver *driver) {
 }
 
 char *driver_get_name(Driver *driver) {
-    return driver->name;
+    return g_strdup(driver->name);
 }
 
 Date driver_get_birthdate(Driver *driver) {
@@ -94,7 +94,7 @@ double driver_get_total_earned(Driver *driver) {
     return driver->total_earned;
 }
 
-void driver_register_last_ride_date(Driver *driver, Date date) {
+void driver_register_ride_date(Driver *driver, Date date) {
     if (date_compare(date, driver->last_ride_date) > 0) {
         driver->last_ride_date = date;
     }
@@ -102,6 +102,7 @@ void driver_register_last_ride_date(Driver *driver, Date date) {
 
 void free_driver(Driver *driver) {
     free(driver->name);
+    free(driver->license_plate);
     free(driver->city);
     free(driver);
 }

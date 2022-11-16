@@ -58,7 +58,7 @@ copy-build-release-to-main-folder: build-release
 	cp $(BUILD_DIR_PATH)/$(EXEC) programa-principal
 
 # TODO: add support for valgrind
-leaks:
+leaks: build-debug
 	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input.txt
 
 test-results:

@@ -40,6 +40,8 @@ void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *usern
     double total_spent = user_get_total_spent(user);
 
     fprintf(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+
+    free(name);
 }
 
 void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
@@ -63,6 +65,8 @@ void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
     double total_spent = driver_get_total_earned(driver);
 
     fprintf(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+
+    free(name);
 }
 
 void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *output, char **args) {
@@ -98,6 +102,8 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
         double average_score = driver_get_average_score(driver);
 
         fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
+
+        free(name);
     }
 
     g_ptr_array_free(result, TRUE);
@@ -124,6 +130,9 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
         int total_distance = user_get_total_distance(user);
 
         fprintf(output, "%s;%s;%d\n", username, name, total_distance);
+
+        free(username);
+        free(name);
     }
 
     g_ptr_array_free(result, TRUE);

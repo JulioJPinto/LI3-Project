@@ -23,7 +23,8 @@ int ride_get_driver_id(Ride *ride);
 Date ride_get_date(Ride *ride);
 
 /*
- * Returns the user's username of the ride
+ * Returns a copy of the user's username of the ride
+ * The caller is responsible for freeing the memory allocated for the username
  */
 char *ride_get_user_username(Ride *ride);
 

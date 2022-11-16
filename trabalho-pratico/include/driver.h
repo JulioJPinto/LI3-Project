@@ -24,7 +24,8 @@ void free_driver(Driver *driver);
 int driver_get_id(Driver *driver);
 
 /*
- * Returns the name of the Driver
+ * Returns a copy of the name of the Driver
+ * The caller is responsible for freeing the memory allocated for the name
  */
 char *driver_get_name(Driver *driver);
 
@@ -86,6 +87,6 @@ double driver_get_total_earned(Driver *driver);
 /*
  * Sets a new last ride if the new ride is more recent than the current saved one
  */
-void driver_register_last_ride_date(Driver *driver, Date date);
+void driver_register_ride_date(Driver *driver, Date date);
 
 #endif //LI3_DRIVER_H
