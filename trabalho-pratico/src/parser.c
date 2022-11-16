@@ -12,14 +12,19 @@ double parse_double(char *string) {
 }
 
 Date parse_date(char *string) {
-    char *svptr;
-    Date parsed_date = {
-            .day = parse_int(strtok_r(string, "/", &svptr)),
-            .month = parse_int(strtok_r(NULL, "/", &svptr)),
-            .year = parse_int(strtok_r(NULL, ";", &svptr)),
-    };
+    if (strlen(string) != 10) {
+        return (Date){0, 0, 0};
+    }
 
-    return parsed_date;
+    string[2] = '\0';
+    string[5] = '\0';
+    string[10] = '\0';
+
+    int day = parse_int(string);
+    int month = parse_int(string + 3);
+    int year = parse_int(string + 6);
+
+    return (Date){day, month, year};
 }
 
 Gender parse_gender(const char *string) {

@@ -62,4 +62,4 @@ leaks:
 	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input.txt
 
 test-results:
-	@diff -r Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0
+	@diff -yr Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0
