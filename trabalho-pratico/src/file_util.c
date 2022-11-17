@@ -13,15 +13,10 @@
 #define OUTPUT_FOLDER "Resultados"
 
 FILE *open_file_folder(const char *const folder_path, const char *const file_name) {
-    GString *file_path = g_string_sized_new(strlen(folder_path) + strlen(file_name) + 1);
+    gchar *string = g_build_path(PATH_SEPARATOR, folder_path, file_name, NULL);
+    FILE *file = open_file(string);
 
-    g_string_append(file_path, folder_path);
-    g_string_append(file_path, PATH_SEPARATOR);
-    g_string_append(file_path, file_name);
-
-    FILE *file = open_file(file_path->str);
-
-    g_string_free(file_path, TRUE);
+    free(string);
 
     return file;
 }
