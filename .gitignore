@@ -26,3 +26,18 @@ input.txt
 # Ignore idea
 /.idea/
 /.vscode/
+
+# LaTeX
+
+*/Relatorio/*.aux
+*/Relatorio/*.fdb_latexmk
+*/Relatorio/*.fls
+*/Relatorio/*.log
+*/Relatorio/*.out
+!relatorio-fase1.pdf
+
+# MacOS
+
+.DS_Store
+
+
