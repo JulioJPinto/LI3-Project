@@ -65,4 +65,4 @@ test-results:
 	@diff -yr Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0
 
 compile-latex:
-	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && mv relatorio-fase1.pdf ../
+	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../

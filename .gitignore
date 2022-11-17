@@ -29,12 +29,14 @@ input.txt
 
 # LaTeX
 
+!relatorio-fase1.pdf
 */Relatorio/*.aux
 */Relatorio/*.fdb_latexmk
 */Relatorio/*.fls
 */Relatorio/*.log
 */Relatorio/*.out
-!relatorio-fase1.pdf
+*/Relatorio/*.pdf
+*/Relatorio/*.synctex.gz
 
 # MacOS
 
