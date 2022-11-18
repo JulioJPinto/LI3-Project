@@ -137,3 +137,12 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
 
     g_ptr_array_free(result, TRUE);
 }
+
+//Query 4
+void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **args) {
+    char *city = args[0];
+
+    double average_price = catalog_get_average_price_in_city(catalog, city);
+
+    fprintf(output, "%.3f\n", average_price);
+}

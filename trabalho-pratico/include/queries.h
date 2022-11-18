@@ -22,4 +22,9 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args);
  */
 void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args);
 
+/*
+ * Executes the query number 4.
+ */
+void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **args);
+
 #endif //LI3_QUERIES_H

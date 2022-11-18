@@ -14,6 +14,9 @@ struct Ride {
     int score_driver;
     double tip;
     // GString comment;
+
+    // Query specific
+    double price;
 };
 
 Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
@@ -67,4 +70,12 @@ double ride_get_tip(Ride *ride) {
 
 char *ride_get_city(Ride *ride) {
     return g_strdup(ride->city);
+}
+
+void ride_set_price(Ride *ride, double price) {
+    ride->price = price;
+}
+
+double ride_get_price(Ride *ride) {
+    return ride->price;
 }

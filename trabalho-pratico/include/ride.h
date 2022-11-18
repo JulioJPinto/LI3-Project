@@ -55,4 +55,16 @@ void free_ride(Ride *ride);
 
 char *ride_get_city(Ride *ride);
 
+/*
+ * Sets the price of the ride
+ * The price is calculated by the function `compute_price` when the ride is registered in the catalog
+ */
+void ride_set_price(Ride *ride, double price);
+
+/*
+ * Returns the price of the ride
+ * The price is calculated and set when the ride is registered in the catalog
+ */
+double ride_get_price(Ride *ride);
+
 #endif //LI3_RIDE_H
