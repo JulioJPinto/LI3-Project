@@ -92,4 +92,9 @@ Date user_get_most_recent_ride(User *user);
  */
 void user_register_ride_date(User *user, Date date);
 
+/*
+ * Parses a string of the User File. 
+ */
+User *parse_line_user(char **arg);
+
 #endif //LI3_USER_H

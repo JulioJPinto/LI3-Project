@@ -43,23 +43,13 @@ PaymentMethod parse_pay_method(const char *string) {
     return (string[1] == 'a' ? CASH : (string[1] == 'r' ? CREDIT : DEBIT));
 }
 
-User *read_users_file(FILE *stream, char *line_buffer, int line_buffer_size) {
-    if (fgets(line_buffer, line_buffer_size, stream) == NULL) {
-        return NULL;
-    }
-    return parse_line_user(line_buffer);
-}
+void read_file(FILE *stream, parser_line_function* parse_line_function, void* arg0, register_function* register_function) {
+    char *line_buffer = malloc(1024 * sizeof(char));
 
-Driver *read_drivers_file(FILE *stream, char *line_buffer, int line_buffer_size) {
-    if (fgets(line_buffer, line_buffer_size, stream) == NULL) {
-        return NULL;
+    if (fgets(line_buffer, 1024, stream) == NULL) {
+        return;
     }
-    return parse_line_driver(line_buffer);
-}
 
-Ride *read_rides_file(FILE *stream, char *line_buffer, int line_buffer_size) {
-    if (fgets(line_buffer, line_buffer_size, stream) == NULL) {
-        return NULL;
-    }
-    return parse_line_ride(line_buffer);
+    register_function(arg0, (parse_line_function(line_buffer)));
+    
 }
