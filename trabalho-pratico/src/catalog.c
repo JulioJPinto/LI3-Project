@@ -197,7 +197,7 @@ int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
         return by_last_ride;
     }
 
-    return compare_user_by_username(b_user, a_user);
+    return compare_user_by_username(a_user, b_user);
 }
 
 void notify_stop_registering(Catalog *catalog) {
