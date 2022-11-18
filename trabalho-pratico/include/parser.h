@@ -8,6 +8,10 @@
 #include "user.h"
 #include "ride.h"
 
+typedef void* *(parser_line_function)(char*);
+
+typedef void *(register_function)(void* arg0, void* arg1);
+
 int parse_int(char *string);
 
 double parse_double(char *string);
@@ -22,10 +26,6 @@ AccountStatus parse_acc_status(const char *string);
 
 PaymentMethod parse_pay_method(const char *string);
 
-User *read_users_file(FILE *stream, char *line_buffer, int line_buffer_size);
-
-Driver *read_drivers_file(FILE *stream, char *line_buffer, int line_buffer_size);
-
-Ride *read_rides_file(FILE *stream, char *line_buffer, int line_buffer_size);
+void read_file(FILE *stream, parser_line_function *parse_line_function, void* arg0, register_function* register_function);
 
 #endif //LI3_PARSER_H

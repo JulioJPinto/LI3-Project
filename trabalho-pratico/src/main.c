@@ -30,37 +30,9 @@ int main(int argc, char **argv) {
     Catalog *catalog = create_catalog();
 
     char *line_buffer = malloc(1024 * sizeof(char));
-
-    int count = 0;
-    fgets(line_buffer, 1024, drivers_file);
-    Driver *driver;
-    while ((driver = read_drivers_file(drivers_file, line_buffer, 1024)) != NULL) {
-        register_driver(catalog, driver);
-        count++;
-    }
-
-    log_info("Read %d drivers.\n", count);
-
-    count = 0;
-    fgets(line_buffer, 1024, users_file);
-    User *user;
-    while ((user = read_users_file(users_file, line_buffer, 1024)) != NULL) {
-        register_user(catalog, user);
-        count++;
-    }
-
-    log_info("Read %d users.\n", count);
-
-    count = 0;
-    fgets(line_buffer, 1024, rides_file);
-    Ride *ride;
-    while ((ride = read_rides_file(rides_file, line_buffer, 1024)) != NULL) {
-        register_ride(catalog, ride);
-        count++;
-    }
-
-    log_info("Read %d rides.\n", count);
-
+    
+    read_file(users_file, parse_line_user, catalog, register_user);
+    
     notify_stop_registering(catalog);
 
     FILE *queries_file = open_file(queries_file_path);

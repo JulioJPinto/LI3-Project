@@ -39,7 +39,7 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-void *parse_line_user(char **arg) {
+User *parse_line_user(char **arg) {
 
     char *username = arg[0];
 
