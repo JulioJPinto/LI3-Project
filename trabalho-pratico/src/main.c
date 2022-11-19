@@ -6,6 +6,7 @@
 #include "logger.h"
 #include "query_manager.h"
 #include "parser.h"
+#include "wrappers.h"
 
 #define OUTPUT_FOLDER "Resultados"
 
@@ -30,11 +31,11 @@ int main(int argc, char **argv) {
     Catalog *catalog = create_catalog();
 
     char *line_buffer = malloc(1024 * sizeof(char));
-    
+
     read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
     read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
     read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
-    
+
     notify_stop_registering(catalog);
 
     FILE *queries_file = open_file(queries_file_path);
