@@ -93,8 +93,8 @@ void user_set_last_ride_date(User *user, Date date);
 /*
  * Parses a string of the User File. 
  */
-User *parse_line_user(char **arg);
+User *parse_line_user(char *arg);
 
-void* wrapper_voidp_parse_user(char **arg, void* user);
+void* wrapper_voidp_parse_user(char *arg);
 
 #endif //LI3_USER_H

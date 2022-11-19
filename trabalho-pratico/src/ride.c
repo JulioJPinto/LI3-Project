@@ -24,7 +24,7 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     ride->date = date;
     ride->driver_id = driver_id;
     ride->user_username = g_strdup(username);
-    ride->city = city;
+    ride->city = g_strdup(city);
     ride->distance = distance;
     ride->score_user = score_user;
     ride->score_driver = score_driver;
@@ -33,38 +33,38 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     return ride;
 }
 
-void* wrapper_voidp_parse_ride(char **arg, void* ride){
-    ride = parse_line_user(arg);
+void* wrapper_voidp_parse_ride(char *arg){
+    return parse_line_user(arg);
 }
 
-void *parse_line_ride(char **arg) {
+void *parse_line_ride(char *arg) {
 
-    char *id_string = arg[0];
+    char *id_string = strtok(arg, ";");
     int id = parse_int(id_string);
 
-    char *date_string = arg[1];
+    char *date_string = strtok(NULL, ";");
     Date date = parse_date(date_string);
 
-    char *driver_string = arg[2];
+    char *driver_string = strtok(NULL, ";");
     int driver_id = parse_int(driver_string);
 
-    char *user = arg[3];
+    char *user = strtok(NULL, ";");
 
-    char *city = arg[4];
+    char *city = strtok(NULL, ";");
 
-    char *distance_string = arg[5];
+    char *distance_string = strtok(NULL, ";");
     int distance = parse_int(distance_string);
 
-    char *user_score_string = arg[6];
+    char *user_score_string = strtok(NULL, ";");
     int user_score = parse_int(user_score_string);
 
-    char *driver_score_string = arg[7];
+    char *driver_score_string = strtok(NULL, ";");
     int driver_score = parse_int(driver_score_string);
 
-    char *tip_string = arg[8];
+    char *tip_string = strtok(NULL, ";");
     double tip = parse_double(tip_string);
 
-    //    char *comment = arg[];
+    //    char *comment = strtok(NULL, ";");;
 
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }
