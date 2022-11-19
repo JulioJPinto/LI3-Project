@@ -179,10 +179,6 @@ uint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
         }
     }
 
-    if (low < array->len && date_compare(date, ride_get_date(g_ptr_array_index(array, mid))) < 0) {
-        low++;
-    }
-
     // TODO: maybe stop binary search when finds a date that is equal to
     //  the given date and then do a linear search backwards to find the lower bound
 
