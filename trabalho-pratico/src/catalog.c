@@ -132,6 +132,18 @@ void wrapper_voidp_register_ride(void *catalog, void *ride) {
     register_ride((Catalog *) catalog, (Ride *) ride);
 }
 
+void wrapper_voidp_register_user(void *catalog, void *user) {
+    register_user((Catalog *) catalog, (User *) user);
+}
+
+void wrapper_voidp_register_driver(void *catalog, void *driver) {
+    register_driver((Catalog *) catalog, (Driver *) driver);
+}
+
+void wrapper_voidp_register_ride(void *catalog, void *ride) {
+    register_ride((Catalog *) catalog, (Ride *) ride);
+}
+
 User *catalog_get_user(Catalog *catalog, char *username) {
     return g_hash_table_lookup(catalog->user_from_username_hashtable, username);
 }
