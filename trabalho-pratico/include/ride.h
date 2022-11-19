@@ -54,4 +54,6 @@ void free_ride(Ride *ride);
 
 char *ride_get_city(Ride *ride);
 
+void* wrapper_voidp_parse_ride(char **arg, void* ride);
+
 #endif //LI3_RIDE_H

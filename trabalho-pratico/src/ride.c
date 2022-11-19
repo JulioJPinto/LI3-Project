@@ -33,6 +33,10 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     return ride;
 }
 
+void* wrapper_voidp_parse_ride(char **arg, void* ride){
+    ride = parse_line_user(arg);
+}
+
 void *parse_line_ride(char **arg) {
 
     char *id_string = arg[0];

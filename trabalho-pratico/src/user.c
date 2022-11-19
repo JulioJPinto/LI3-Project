@@ -63,6 +63,10 @@ User *parse_line_user(char **arg) {
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
 }
 
+void* wrapper_voidp_parse_user(char **arg, void* user){
+    user = parse_line_user(arg);
+}
+
 void free_user(User *user) {
     free(user->username);
     free(user->name);

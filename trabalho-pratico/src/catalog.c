@@ -40,6 +40,10 @@ void register_user(Catalog *catalog, User *user) {
     g_hash_table_insert(catalog->user_from_username_hashtable, user_get_username(user), user);
 }
 
+void* wrapper_voidp_register_user(void* catalog, void* user){
+    register_user(catalog, user);
+}
+
 void register_driver(Catalog *catalog, Driver *driver) {
     g_ptr_array_add(catalog->drivers_array, driver);
 
@@ -48,6 +52,10 @@ void register_driver(Catalog *catalog, Driver *driver) {
     // No need to free the key, it will be freed when the Driver is freed
 
     g_hash_table_insert(catalog->driver_from_id_hashtable, key, driver);
+}
+
+void* wrapper_voidp_register_driver(void* catalog, void* driver){
+    register_driver(catalog, driver);
 }
 
 void register_ride(Catalog *catalog, Ride *ride) {
@@ -67,6 +75,10 @@ void register_ride(Catalog *catalog, Ride *ride) {
     user_add_spent(user, total_price);
     user_add_total_distance(user, ride_get_distance(ride));
     user_set_last_ride_date(user, ride_get_date(ride));
+}
+
+void* wrapper_voidp_register_ride(void* catalog, void* ride){
+    register_ride(catalog, ride);
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {

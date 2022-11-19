@@ -43,13 +43,20 @@ PaymentMethod parse_pay_method(const char *string) {
     return (string[1] == 'a' ? CASH : (string[1] == 'r' ? CREDIT : DEBIT));
 }
 
-void read_file(FILE *stream, parser_line_function* parse_line_function, void* arg0, register_function* register_function) {
+void read_file(FILE *stream, parser_line_function* parse_line_function, void* catalog, register_function* register_function) {
     char *line_buffer = malloc(1024 * sizeof(char));
 
     if (fgets(line_buffer, 1024, stream) == NULL) {
         return;
     }
+    char **array_str;
+    for(int i = 0; i < 11 && array_str[i] != NULL; i++){
+        array_str[i] = strtok(line_buffer, ";");
+    }
+    void* strc;
 
-    register_function(arg0, (parse_line_function(line_buffer)));
+    parse_line_function(array_str, strc);
+
+    register_function(catalog, strc);
     
 }

@@ -88,4 +88,6 @@ double driver_get_total_earned(Driver *driver);
  */
 void driver_register_last_ride_date(Driver *driver, Date date);
 
+void* wrapper_voidp_parse_driver(char **arg, void* driver);
+
 #endif //LI3_DRIVER_H
