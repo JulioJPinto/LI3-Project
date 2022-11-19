@@ -42,9 +42,9 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     return driver;
 }
 
-void *parse_line_driver(char *arg) {
+Driver *parse_line_driver(char *line) {
 
-    char *id_string = strtok(arg, ";");
+    char *id_string = strtok(line, ";");
     int id = parse_int(id_string);
 
     char *name = strtok(NULL, ";");

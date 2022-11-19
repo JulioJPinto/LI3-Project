@@ -2,10 +2,6 @@
 #ifndef LI3_STRUCT_UTIL_H
 #define LI3_STRUCT_UTIL_H
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 typedef enum gender {
     M,
     F

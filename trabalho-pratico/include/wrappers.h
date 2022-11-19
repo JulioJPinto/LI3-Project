@@ -5,20 +5,18 @@
 #include "driver.h"
 #include "ride.h"
 #include "user.h"
+#include "catalog.h"
 
-/*
- * Wrapper function for the Parse line user function
- */
 void *wrapper_voidp_parse_user(char *arg);
 
-/*
- * Wrapper function for the Parse line driver function
- */
 void *wrapper_voidp_parse_driver(char *arg);
 
-/*
- * Wrapper function for the Parse line ride function
- */
 void *wrapper_voidp_parse_ride(char *arg);
+
+void wrapper_voidp_register_user(void *catalog, void *user);
+
+void wrapper_voidp_register_driver(void *catalog, void *driver);
+
+void wrapper_voidp_register_ride(void *catalog, void *ride);
 
 #endif //LI3_WRAPPERS_H

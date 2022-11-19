@@ -36,8 +36,8 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     return ride;
 }
 
-void *parse_line_ride(char *arg) {
-    char *id_string = strtok(arg, ";");
+Ride *parse_line_ride(char *line) {
+    char *id_string = strtok(line, ";");
     int id = parse_int(id_string);
 
     char *date_string = strtok(NULL, ";");

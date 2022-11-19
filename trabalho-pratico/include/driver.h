@@ -16,7 +16,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 /*
  + Parses a line of the CSV to a driver   
  */
-void *parse_line_driver(char *arg);
+Driver *parse_line_driver(char *line);
 
 /*
  * Frees the memory allocated for the Driver.

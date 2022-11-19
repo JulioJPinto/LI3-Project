@@ -5,13 +5,9 @@
 #include <stdio.h>
 
 #include "struct_util.h"
-/*
- * Typedef for the Parse Line Functions
- */
+
 typedef void *(ParserLineFunction) (char *);
-/*
- * Typedef for Apply Functions   
- */
+
 typedef void(ApplyFunction)(void *, void *);
 
 /*

@@ -1,7 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 #include "struct_util.h"
 
-
-static const Date reference_date = {22, 11, 2022};
+static const Date reference_date = {9, 10, 2022};
 
 int parse_int(char *string) {
     return (int) strtol(string, NULL, 10);
