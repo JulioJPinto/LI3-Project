@@ -152,7 +152,7 @@ double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
     // Performance impact of this loop is negligible, even with ~200000 rides per city.
     // We also assume that the user won't ask this query twice for the same city, so no need to cache.
 
-    for (uint i = 0; i < rides->len; i++) {
+    for (guint i = 0; i < rides->len; i++) {
         Ride *ride = g_ptr_array_index(rides, i);
         total_price += ride_get_price(ride);
     }
@@ -163,11 +163,11 @@ double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
 /*
  * Returns the index of the lowest ride whose date is greater than the given date.
  */
-uint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
-    uint mid;
+guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
+    guint mid;
 
-    uint low = 0;
-    uint high = array->len;
+    guint low = 0;
+    guint high = array->len;
 
     while (low < high) {
         mid = low + (high - low) / 2;
