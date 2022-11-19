@@ -49,14 +49,7 @@ void read_file(FILE *stream, parser_line_function* parse_line_function, void* ca
     if (fgets(line_buffer, 1024, stream) == NULL) {
         return;
     }
-    char **array_str;
-    for(int i = 0; i < 11 && array_str[i] != NULL; i++){
-        array_str[i] = strtok(line_buffer, ";");
-    }
-    void* strc;
 
-    parse_line_function(array_str, strc);
-
-    register_function(catalog, strc);
-    
+    register_function(catalog, parse_line_function(line_buffer));
+     
 }

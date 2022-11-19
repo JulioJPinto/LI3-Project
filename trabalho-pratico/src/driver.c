@@ -43,37 +43,37 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     return driver;
 }
 
-void *parse_line_driver(char **arg) {
+void *parse_line_driver(char *arg) {
 
-    char *id_string = arg[0];
+    char *id_string = strtok(arg, ";");
     int id = parse_int(id_string);
 
-    char *name = arg[1];
+    char *name = strtok(NULL, ";");
 
-    char *date_string = arg[2];
+    char *date_string = strtok(NULL, ";");
     Date date = parse_date(date_string);
 
-    char *gender_string = arg[3];
+    char *gender_string = strtok(NULL, ";");
     Gender gender = parse_gender(gender_string);
 
-    char *car_class_string = arg[4];
+    char *car_class_string = strtok(NULL, ";");
     CarClass car_class = parse_car_class(car_class_string);
 
-    char *license_plate = arg[5];
+    char *license_plate = strtok(NULL, ";");
 
-    char *city = arg[6];
+    char *city = strtok(NULL, ";");
 
-    char *creation_date_string = arg[7];
+    char *creation_date_string = strtok(NULL, ";");
     Date creation_date = parse_date(creation_date_string);
 
-    char *acc_status_string = arg[8];
+    char *acc_status_string = strtok(NULL, ";");
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
 }
 
-void* wrapper_voidp_parse_driver(char **arg, void* driver){
-    driver = parse_line_driver(arg);
+void* wrapper_voidp_parse_driver(char *arg){
+    return parse_line_driver(arg);
 }
 
 int driver_get_id(Driver *driver) {

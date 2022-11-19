@@ -8,7 +8,7 @@
 #include "user.h"
 #include "ride.h"
 
-typedef void* (parser_line_function)(char**, void*);
+typedef void* (parser_line_function)(char*);
 
 typedef void *(register_function)(void* arg0, void* arg1);
 

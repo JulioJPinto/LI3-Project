@@ -39,32 +39,32 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char **arg) {
+User *parse_line_user(char* arg) {
 
-    char *username = arg[0];
+    char *username = strtok(arg, ";");
 
-    char *name = arg[1];
+    char *name = strtok(NULL,";");
 
-    char *gender_string = arg[2];
+    char *gender_string = strtok(NULL, ";");
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = arg[3];
+    char *birth_date_string = strtok(NULL, ";");
     Date birth_date = parse_date(birth_date_string);
 
-    char *acc_creation_string = arg[4];
+    char *acc_creation_string = strtok(NULL, ";");
     Date acc_creation = parse_date(acc_creation_string);
 
-    char *pay_method_string = arg[5];
+    char *pay_method_string = strtok(NULL, ";");
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = arg[6];
+    char *acc_status_string = strtok(NULL, ";");
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
 }
 
-void* wrapper_voidp_parse_user(char **arg, void* user){
-    user = parse_line_user(arg);
+void* wrapper_voidp_parse_user(char *arg){
+    return parse_line_user(arg);
 }
 
 void free_user(User *user) {
