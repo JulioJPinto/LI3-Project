@@ -14,6 +14,11 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
                       char *city, Date account_creation_date, AccountStatus account_status);
 
 /*
+ + Parses a line of the CSV to a driver   
+ */
+void *parse_line_driver(char *arg);
+
+/*
  * Frees the memory allocated for the Driver.
  */
 void free_driver(Driver *driver);
@@ -88,7 +93,5 @@ double driver_get_total_earned(Driver *driver);
  * Sets a new last ride if the new ride is more recent than the current saved one
  */
 void driver_register_ride_date(Driver *driver, Date date);
-
-void* wrapper_voidp_parse_driver(char *arg);
 
 #endif //LI3_DRIVER_H

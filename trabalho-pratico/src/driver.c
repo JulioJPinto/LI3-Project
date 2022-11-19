@@ -2,7 +2,6 @@
 
 #include <glib.h>
 #include "struct_util.h"
-#include "parser.h"
 
 struct Driver {
     int id;
@@ -70,10 +69,6 @@ void *parse_line_driver(char *arg) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
-}
-
-void* wrapper_voidp_parse_driver(char *arg){
-    return parse_line_driver(arg);
 }
 
 int driver_get_id(Driver *driver) {

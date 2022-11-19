@@ -39,11 +39,11 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char* arg) {
+User *parse_line_user(char *arg) {
 
     char *username = strtok(arg, ";");
 
-    char *name = strtok(NULL,";");
+    char *name = strtok(NULL, ";");
 
     char *gender_string = strtok(NULL, ";");
     Gender gender = parse_gender(gender_string);
@@ -61,10 +61,6 @@ User *parse_line_user(char* arg) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
-}
-
-void* wrapper_voidp_parse_user(char *arg){
-    return parse_line_user(arg);
 }
 
 void free_user(User *user) {

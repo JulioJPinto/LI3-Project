@@ -67,10 +67,6 @@ void *parse_line_ride(char *arg) {
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }
 
-void* wrapper_voidp_parse_ride(char *arg){
-    return parse_line_ride(arg);
-}
-
 void free_ride(Ride *ride) {
     free(ride->user_username);
     free(ride);

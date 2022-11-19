@@ -13,6 +13,10 @@ typedef struct Ride Ride;
 Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip);
 
 /*
+ + Parses a line of the CSV to a ride   
+ */
+void *parse_line_ride(char *arg);
+/*
  * Returns the driver id of the ride
  */
 int ride_get_driver_id(Ride *ride);
