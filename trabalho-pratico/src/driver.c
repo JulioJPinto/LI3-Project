@@ -72,6 +72,10 @@ void *parse_line_driver(char **arg) {
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
 }
 
+void* wrapper_voidp_parse_driver(char **arg, void* driver){
+    driver = parse_line_driver(arg);
+}
+
 int driver_get_id(Driver *driver) {
     return driver->id;
 }
