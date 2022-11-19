@@ -146,3 +146,23 @@ void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **
 
     fprintf(output, "%.3f\n", average_price);
 }
+
+// TODO: remove this and replace with parser.c parse date
+// (waiting for parser.c rewrite)
+
+int parse_int(char *string);
+
+Date parse_date(char *string);
+
+//Query 5
+void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, char **args) {
+    char *start_date_string = args[0];
+    char *end_date_string = args[1];
+
+    Date start_date = parse_date(start_date_string);
+    Date end_date = parse_date(end_date_string);
+
+    double average_price = catalog_get_average_price_in_date_range(catalog, start_date, end_date);
+
+    fprintf(output, "%.3f\n", average_price);
+}

@@ -2,13 +2,15 @@
 #include "catalog.h"
 #include "price_util.h"
 
+#include "catalog_sort.h"
+
 struct Catalog {
     GPtrArray *users_array;
     GPtrArray *drivers_array;
     GPtrArray *rides_array;
 
     GHashTable *user_from_username_hashtable; // key: username (char*), value: User*
-    GHashTable *driver_from_id_hashtable; // key: driver id (int), value: Driver*
+    GHashTable *driver_from_id_hashtable;     // key: driver id (int), value: Driver*
 
     GHashTable *rides_in_city_hashtable; // key: city (char*), value: GPtrArray of rides
 };
@@ -158,100 +160,70 @@ double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
     return total_price / rides->len;
 }
 
-int compare_driver_by_activeness(Driver *a, Driver *b) {
-    return (int) driver_get_account_status(a) - (int) driver_get_account_status(b);
-}
+/*
+ * Returns the index of the lowest ride whose date is greater than the given date.
+ */
+uint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
+    uint mid;
 
-int compare_driver_by_id(Driver *a, Driver *b) {
-    return driver_get_id(a) - driver_get_id(b);
-}
+    uint low = 0;
+    uint high = array->len;
 
-int compare_driver_by_last_ride(Driver *a, Driver *b) {
-    return date_compare(driver_get_last_ride_date(a), driver_get_last_ride_date(b));
-}
+    while (low < high) {
+        mid = low + (high - low) / 2;
 
-int compare_driver_by_score(Driver *a, Driver *b) {
-    double average_score_a = driver_get_average_score(a);
-    double average_score_b = driver_get_average_score(b);
-
-    return (average_score_a > average_score_b) - (average_score_a < average_score_b);
-}
-
-int compare_user_by_total_distance(User *a, User *b) {
-    int total_distance_a = user_get_total_distance(a);
-    int total_distance_b = user_get_total_distance(b);
-
-    return total_distance_a - total_distance_b;
-}
-
-int compare_user_by_last_ride(User *a, User *b) {
-    Date last_ride_date_a = user_get_most_recent_ride(a);
-    Date last_ride_date_b = user_get_most_recent_ride(b);
-
-    return date_compare(last_ride_date_a, last_ride_date_b);
-}
-
-int compare_user_by_username(User *a, User *b) {
-    char *user_username_a = user_get_username(a);
-    char *user_username_b = user_get_username(b);
-
-    int result = strcmp(user_username_a, user_username_b);
-
-    free(user_username_a);
-    free(user_username_b);
-
-    return result;
-}
-
-int compare_user_by_activeness(User *a, User *b) {
-    return (int) user_get_account_status(a) - (int) user_get_account_status(b);
-}
-
-int glib_wrapper_sort_drivers(gconstpointer a, gconstpointer b) {
-    Driver *a_driver = *((Driver **) a);
-    Driver *b_driver = *((Driver **) b);
-
-    int by_activeness = compare_driver_by_activeness(a_driver, b_driver);
-    if (by_activeness != 0) {
-        return by_activeness;
+        if (date_compare(date, ride_get_date(g_ptr_array_index(array, mid))) <= 0) {
+            high = mid;
+        } else {
+            low = mid + 1;
+        }
     }
 
-    int by_score = compare_driver_by_score(b_driver, a_driver);
-    if (by_score != 0) {
-        return by_score;
+    if (low < array->len && date_compare(date, ride_get_date(g_ptr_array_index(array, mid))) < 0) {
+        low++;
     }
 
-    int by_last_ride = compare_driver_by_last_ride(b_driver, a_driver);
-    if (by_last_ride != 0) {
-        return by_last_ride;
-    }
+    // TODO: maybe stop binary search when finds a date that is equal to
+    //  the given date and then do a linear search backwards to find the lower bound
 
-    return compare_driver_by_id(b_driver, a_driver);
+    return low;
 }
 
-int glib_wrapper_sort_users(gconstpointer a, gconstpointer b) {
-    User *a_user = *((User **) a);
-    User *b_user = *((User **) b);
+/*
+ * This can also be done with a hashtable that keeps the accumulated price for each date,
+ * do two binary searches for the lower and upper bounds and return the difference.
+ * (maybe not worth it)
+ */
+double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date) {
+    GPtrArray *rides = catalog->rides_array;
 
-    int by_activeness = compare_user_by_activeness(a_user, b_user);
-    if (by_activeness != 0) {
-        return by_activeness;
+    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
+
+    double total_price = 0;
+    int rides_count = 0;
+
+    Ride *current_ride;
+    Date current_ride_date;
+
+    while (current_value_index < rides->len) {
+        current_ride = g_ptr_array_index(rides, current_value_index);
+        current_ride_date = ride_get_date(current_ride);
+
+        if (date_compare(current_ride_date, end_date) > 0)
+            break;
+
+        total_price += ride_get_price(current_ride);
+        rides_count++;
+
+        current_value_index++;
     }
 
-    int by_total_distance = compare_user_by_total_distance(b_user, a_user);
-    if (by_total_distance != 0) {
-        return by_total_distance;
-    }
-
-    int by_last_ride = compare_user_by_last_ride(b_user, a_user);
-    if (by_last_ride != 0) {
-        return by_last_ride;
-    }
-
-    return compare_user_by_username(a_user, b_user);
+    // divide by zero check
+    return rides_count != 0 ? total_price / rides_count : 0;
 }
 
 void notify_stop_registering(Catalog *catalog) {
-    g_ptr_array_sort(catalog->drivers_array, glib_wrapper_sort_drivers);
-    g_ptr_array_sort(catalog->users_array, glib_wrapper_sort_users);
+    g_ptr_array_sort(catalog->drivers_array, glib_wrapper_compare_drivers_by_score);
+    g_ptr_array_sort(catalog->users_array, glib_wrapper_compare_users_by_total_distance);
+    g_ptr_array_sort(catalog->rides_array, glib_wrapper_compare_rides_by_date);
 }

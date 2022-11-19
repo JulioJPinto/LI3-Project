@@ -49,4 +49,10 @@ void catalog_get_longest_n_total_distance(Catalog *catalog, int n, GPtrArray *re
  */
 double catalog_get_average_price_in_city(Catalog *p_catalog, char *city);
 
+/*
+ * Returns the average price of rides between the given dates.
+ * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ */
+double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
+
 #endif //LI3_CATALOG_H
