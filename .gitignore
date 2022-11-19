@@ -21,6 +21,7 @@ programa-principal
 
 */build/*
 input.txt
+input2.txt
 *.pdf
 
 # Ignore idea
