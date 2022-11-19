@@ -36,12 +36,7 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     return ride;
 }
 
-void* wrapper_voidp_parse_ride(char *arg){
-    return parse_line_user(arg);
-}
-
 void *parse_line_ride(char *arg) {
-
     char *id_string = strtok(arg, ";");
     int id = parse_int(id_string);
 
@@ -70,6 +65,10 @@ void *parse_line_ride(char *arg) {
     //    char *comment = strtok(NULL, ";");;
 
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
+}
+
+void* wrapper_voidp_parse_ride(char *arg){
+    return parse_line_ride(arg);
 }
 
 void free_ride(Ride *ride) {

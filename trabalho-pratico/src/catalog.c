@@ -67,10 +67,6 @@ void register_user(Catalog *catalog, User *user) {
     g_hash_table_insert(catalog->user_from_username_hashtable, key, user);
 }
 
-void* wrapper_voidp_register_user(void* catalog, void* user){
-    register_user(catalog, user);
-}
-
 void register_driver(Catalog *catalog, Driver *driver) {
     g_ptr_array_add(catalog->drivers_array, driver);
 
@@ -124,8 +120,16 @@ void register_ride(Catalog *catalog, Ride *ride) {
     catalog_ride_index_city(catalog, ride);
 }
 
-void* wrapper_voidp_register_ride(void* catalog, void* ride){
-    register_ride(catalog, ride);
+void wrapper_voidp_register_user(void *catalog, void *user) {
+    register_user((Catalog *) catalog, (User *) user);
+}
+
+void wrapper_voidp_register_driver(void *catalog, void *driver) {
+    register_driver((Catalog *) catalog, (Driver *) driver);
+}
+
+void wrapper_voidp_register_ride(void *catalog, void *ride) {
+    register_ride((Catalog *) catalog, (Ride *) ride);
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {

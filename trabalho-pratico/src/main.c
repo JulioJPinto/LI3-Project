@@ -31,10 +31,9 @@ int main(int argc, char **argv) {
 
     char *line_buffer = malloc(1024 * sizeof(char));
     
-    read_file(users_file, wrapper_voidp_parse_user, catalog, wrapper_voidp_register_user);
-    read_file(drivers_file, wrapper_voidp_parse_driver, catalog, wrapper_voidp_register_driver);
-    read_file(rides_file, wrapper_voidp_parse_ride, catalog, wrapper_voidp_register_ride);
-
+    read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
+    read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
+    read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
     
     notify_stop_registering(catalog);
 

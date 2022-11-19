@@ -4,13 +4,11 @@
 
 #include <stdio.h>
 
-#include "driver.h"
-#include "user.h"
-#include "ride.h"
+#include "struct_util.h"
 
-typedef void* (parser_line_function)(char*);
+typedef void *(ParserLineFunction) (char *);
 
-typedef void *(register_function)(void* arg0, void* arg1);
+typedef void(ApplyFunction)(void *, void *);
 
 int parse_int(char *string);
 
@@ -26,6 +24,6 @@ AccountStatus parse_acc_status(const char *string);
 
 PaymentMethod parse_pay_method(const char *string);
 
-void read_file(FILE *stream, parser_line_function *parse_line_function, void* arg0, register_function* register_function);
+void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunction *apply_function, void *apply_function_first_arg);
 
 #endif //LI3_PARSER_H
