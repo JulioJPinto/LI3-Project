@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-
 #include "catalog.h"
 #include "file_util.h"
 #include "logger.h"
 #include "query_manager.h"
 #include "parser.h"
+#include "wrappers.h"
 
 #define OUTPUT_FOLDER "Resultados"
 
@@ -31,35 +31,9 @@ int main(int argc, char **argv) {
 
     char *line_buffer = malloc(1024 * sizeof(char));
 
-    int count = 0;
-    fgets(line_buffer, 1024, drivers_file);
-    Driver *driver;
-    while ((driver = read_drivers_file(drivers_file, line_buffer, 1024)) != NULL) {
-        register_driver(catalog, driver);
-        count++;
-    }
-
-    log_info("Read %d drivers.\n", count);
-
-    count = 0;
-    fgets(line_buffer, 1024, users_file);
-    User *user;
-    while ((user = read_users_file(users_file, line_buffer, 1024)) != NULL) {
-        register_user(catalog, user);
-        count++;
-    }
-
-    log_info("Read %d users.\n", count);
-
-    count = 0;
-    fgets(line_buffer, 1024, rides_file);
-    Ride *ride;
-    while ((ride = read_rides_file(rides_file, line_buffer, 1024)) != NULL) {
-        register_ride(catalog, ride);
-        count++;
-    }
-
-    log_info("Read %d rides.\n", count);
+    read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
+    read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
+    read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
 
     notify_stop_registering(catalog);
 

@@ -1,6 +1,6 @@
-#include <glib.h>
-
 #include "ride.h"
+
+#include <glib.h>
 #include "struct_util.h"
 
 struct Ride {
@@ -26,13 +26,44 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     ride->date = date;
     ride->driver_id = driver_id;
     ride->user_username = g_strdup(username);
-    ride->city = city;
+    ride->city = g_strdup(city);
     ride->distance = distance;
     ride->score_user = score_user;
     ride->score_driver = score_driver;
     ride->tip = tip;
 
     return ride;
+}
+
+Ride *parse_line_ride(char *line, char *delim) {
+    char *id_string = strtok(line, delim);
+    int id = parse_int(id_string);
+
+    char *date_string = strtok(NULL, delim);
+    Date date = parse_date(date_string);
+
+    char *driver_string = strtok(NULL, delim);
+    int driver_id = parse_int(driver_string);
+
+    char *user = strtok(NULL, delim);
+
+    char *city = strtok(NULL, delim);
+
+    char *distance_string = strtok(NULL, delim);
+    int distance = parse_int(distance_string);
+
+    char *user_score_string = strtok(NULL, delim);
+    int user_score = parse_int(user_score_string);
+
+    char *driver_score_string = strtok(NULL, delim);
+    int driver_score = parse_int(driver_score_string);
+
+    char *tip_string = strtok(NULL, delim);
+    double tip = parse_double(tip_string);
+
+    //    char *comment = strtok(NULL, delim);;
+
+    return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }
 
 void free_ride(Ride *ride) {

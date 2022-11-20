@@ -3,7 +3,6 @@
 #define LI3_DRIVER_H
 
 #include "struct_util.h"
-#include <glib.h>
 
 typedef struct Driver Driver;
 
@@ -12,6 +11,11 @@ typedef struct Driver Driver;
  */
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
                       char *city, Date account_creation_date, AccountStatus account_status);
+
+/*
+ + Parses a line of the CSV to a driver   
+ */
+Driver *parse_line_driver(char *line, char *delim);
 
 /*
  * Frees the memory allocated for the Driver.

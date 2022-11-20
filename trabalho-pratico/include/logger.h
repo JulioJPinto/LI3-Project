@@ -2,8 +2,6 @@
 #ifndef LI3_LOGGER_H
 #define LI3_LOGGER_H
 
-#include <stdio.h>
-
 /*
  * Logs a debug message if the DEBUG flag is defined.
  */

@@ -1,7 +1,6 @@
 #include "driver.h"
 
 #include <glib.h>
-#include "struct_util.h"
 
 struct Driver {
     int id;
@@ -40,6 +39,34 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->last_ride_date = (Date){0, 0, 0};
 
     return driver;
+}
+
+Driver *parse_line_driver(char *line, char *delim) {
+    char *id_string = strtok(line, delim);
+    int id = parse_int(id_string);
+
+    char *name = strtok(NULL, delim);
+
+    char *date_string = strtok(NULL, delim);
+    Date date = parse_date(date_string);
+
+    char *gender_string = strtok(NULL, delim);
+    Gender gender = parse_gender(gender_string);
+
+    char *car_class_string = strtok(NULL, delim);
+    CarClass car_class = parse_car_class(car_class_string);
+
+    char *license_plate = strtok(NULL, delim);
+
+    char *city = strtok(NULL, delim);
+
+    char *creation_date_string = strtok(NULL, delim);
+    Date creation_date = parse_date(creation_date_string);
+
+    char *acc_status_string = strtok(NULL, delim);
+    AccountStatus acc_status = parse_acc_status(acc_status_string);
+
+    return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
 }
 
 int driver_get_id(Driver *driver) {

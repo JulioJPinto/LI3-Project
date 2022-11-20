@@ -4,14 +4,13 @@
 
 #include <stdio.h>
 
-#include "driver.h"
-#include "user.h"
-#include "ride.h"
+typedef void *(ParserLineFunction) (char *);
 
-User *read_users_file(FILE *stream, char *line_buffer, int line_buffer_size);
+typedef void(ApplyFunction)(void *, void *);
 
-Driver *read_drivers_file(FILE *stream, char *line_buffer, int line_buffer_size);
-
-Ride *read_rides_file(FILE *stream, char *line_buffer, int line_buffer_size);
+/*
+ * Function that reads the CSV file and parses each line to a pre-defined struct
+ */
+void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunction *apply_function, void *apply_function_first_arg);
 
 #endif //LI3_PARSER_H

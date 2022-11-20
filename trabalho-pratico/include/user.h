@@ -2,7 +2,6 @@
 #ifndef LI3_USER_H
 #define LI3_USER_H
 
-#include <glib.h>
 #include "struct_util.h"
 
 typedef struct User User;
@@ -91,5 +90,10 @@ Date user_get_most_recent_ride(User *user);
  * if the date is more recent than the current set date
  */
 void user_register_ride_date(User *user, Date date);
+
+/*
+ * Parses a string of the User File. 
+ */
+User *parse_line_user(char *line, char *delim);
 
 #endif //LI3_USER_H

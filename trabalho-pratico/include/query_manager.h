@@ -2,7 +2,6 @@
 #ifndef LI3_QUERY_MANAGER_H
 #define LI3_QUERY_MANAGER_H
 
-#include <glib.h>
 #include <stdio.h>
 
 #include "catalog.h"
