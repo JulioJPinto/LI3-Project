@@ -39,7 +39,7 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char *line, char* delim) {
+User *parse_line_user(char *line, char *delim) {
     char *username = strtok(line, delim);
 
     char *name = strtok(NULL, delim);

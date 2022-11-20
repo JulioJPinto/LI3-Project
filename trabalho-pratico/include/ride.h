@@ -15,7 +15,7 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 /*
  + Parses a line of the CSV to a ride   
  */
-Ride *parse_line_ride(char *line);
+Ride *parse_line_ride(char *line, char *delim);
 /*
  * Returns the driver id of the ride
  */

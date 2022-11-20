@@ -121,7 +121,6 @@ void register_ride(Catalog *catalog, Ride *ride) {
 }
 
 
-
 User *catalog_get_user(Catalog *catalog, char *username) {
     return g_hash_table_lookup(catalog->user_from_username_hashtable, username);
 }
