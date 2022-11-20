@@ -39,24 +39,24 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char *line) {
-    char *username = strtok(line, ";");
+User *parse_line_user(char *line, char* delim) {
+    char *username = strtok(line, delim);
 
-    char *name = strtok(NULL, ";");
+    char *name = strtok(NULL, delim);
 
-    char *gender_string = strtok(NULL, ";");
+    char *gender_string = strtok(NULL, delim);
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = strtok(NULL, ";");
+    char *birth_date_string = strtok(NULL, delim);
     Date birth_date = parse_date(birth_date_string);
 
-    char *acc_creation_string = strtok(NULL, ";");
+    char *acc_creation_string = strtok(NULL, delim);
     Date acc_creation = parse_date(acc_creation_string);
 
-    char *pay_method_string = strtok(NULL, ";");
+    char *pay_method_string = strtok(NULL, delim);
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = strtok(NULL, ";");
+    char *acc_status_string = strtok(NULL, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);

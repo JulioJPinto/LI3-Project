@@ -16,15 +16,9 @@ void free_catalog(Catalog *catalog);
 
 void register_user(Catalog *catalog, User *user);
 
-void wrapper_voidp_register_user(void *catalog, void *user);
-
 void register_driver(Catalog *catalog, Driver *driver);
 
-void wrapper_voidp_register_driver(void *catalog, void *driver);
-
 void register_ride(Catalog *catalog, Ride *ride);
-
-void wrapper_voidp_register_ride(void *catalog, void *ride);
 
 void notify_stop_registering(Catalog *catalog);
 
