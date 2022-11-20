@@ -1,8 +1,7 @@
-#include <glib.h>
-
 #include "ride.h"
+
+#include <glib.h>
 #include "struct_util.h"
-#include "parser.h"
 
 struct Ride {
     int id;

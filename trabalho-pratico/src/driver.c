@@ -1,7 +1,6 @@
 #include "driver.h"
 
 #include <glib.h>
-#include "struct_util.h"
 
 struct Driver {
     int id;
@@ -43,7 +42,6 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 }
 
 Driver *parse_line_driver(char *line, char *delim) {
-
     char *id_string = strtok(line, delim);
     int id = parse_int(id_string);
 

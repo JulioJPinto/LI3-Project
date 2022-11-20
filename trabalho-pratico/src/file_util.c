@@ -1,7 +1,6 @@
-#include <string.h>
-#include <glib.h>
-
 #include "file_util.h"
+
+#include <glib.h>
 #include "logger.h"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)

@@ -3,7 +3,6 @@
 #define LI3_DRIVER_H
 
 #include "struct_util.h"
-#include <glib.h>
 
 typedef struct Driver Driver;
 

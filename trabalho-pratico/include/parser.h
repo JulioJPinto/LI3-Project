@@ -4,8 +4,6 @@
 
 #include <stdio.h>
 
-#include "struct_util.h"
-
 typedef void *(ParserLineFunction) (char *);
 
 typedef void(ApplyFunction)(void *, void *);

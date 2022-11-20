@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-
 #include "catalog.h"
 #include "file_util.h"
 #include "logger.h"

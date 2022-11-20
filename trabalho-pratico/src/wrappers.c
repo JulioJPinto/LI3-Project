@@ -1,5 +1,7 @@
 #include "wrappers.h"
 
+#include "catalog.h"
+
 void *wrapper_voidp_parse_user(char *arg) {
     return parse_line_user(arg, ";");
 }

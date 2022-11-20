@@ -1,8 +1,7 @@
+#include "struct_util.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-
-#include "struct_util.h"
 
 static const Date reference_date = {9, 10, 2022};
 
