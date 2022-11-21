@@ -3,10 +3,12 @@
 \usepackage[portuguese]{babel}
 
 \usepackage[a4paper]{geometry}
+\usepackage{pbox}
+\usepackage{caption, booktabs}
+\usepackage{makecell}
+\usepackage{cellspace}
+\usepackage{lipsum}  
 
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
 \title{Relatório da Fase 1 - Grupo 03}
 \author{Francisco Macedo Ferreira (A100660)\\Hugo ... Ramos (A100644)\\Júlio ...}
@@ -22,23 +24,132 @@
 
     \section{Desenvolvimento}
 
-        Este é o desenvolvimento. 
-        \\Para já só foi desenvolvida a query 1, 2 e 3.
+        Este é o desenvolvimento.
 
         \subsection{Pipeline atual}
 
         \subsection{Estratégias Seguidas}
 
-        Lista de estratégias seguidas.
+        Para a primeira fase do projeto foram implementadas as queries 1, 2, 3, 4 e 5.
 
         \subsubsection{Query 1}
+            Para acesso rápido a perfis pelo \emph{id's} de condutores ou 
+            \emph{username's} de utilizadores foram utilizadas duas 
+            \emph{HashTables} (uma para indexar os perfis de condutores e outra 
+            para perfis de utilizadores) com \emph{key id e username} e 
+            \emph{value Driver* e User*} respetivamente. Esses \emph{HashTables}
+            são populados conforme a leitura dos ficheiros {.csv} e informações
+            como número de viagens, soma total de avaliações (para poder ser 
+            calculado a média), total gasto/auferido eram calculados e guardados 
+            na estrutura de dados dos utilizadores e dos condutores\footnote{Pode 
+            ser uma possível quebra de encapsulamento. Ainda aguardamos a resposta
+            do docente sobre esse quesito.}. A decisão de buscar informações de
+            utilizadores ou condutores é feita pela confirmação se o primeiro 
+            argumento da query é um número ou não: se for um número busca-se por
+            condutores (\emph{id}), se não busca-se por utilizadores (\emph{username}).
+            \\
+            \\Com isto é possível um acesso em tempo constante a essas
+            informações, com o custo da leitura dos ficheiros ser um pouco maior
+            (devido ao calculo necessário de \emph{hashes} para cada \emph{key} 
+            e não só). Como na segunda fase o número de perfis irá aumentar
+            exponencialmente e é esperado múltiplos acessos a estas informações, 
+            seja de várias queries destas ou do modo interativo ainda a 
+            implementar, o custo de leitura dos ficheiros superior é muito 
+            justificado.
         \subsubsection{Query 2}
+            Na query 2, para rápido acesso aos condutores com maior média foi 
+            feito \emph{sorting} da \emph{array} (presente no catálogo) de 
+            condutores, conforme a sua média, no fim da leitura dos ficheiros.
+            Isto poderá ser otimizado a fazer com que o \emph{sorting} seja
+            \emph{lazy} (será abordado este tópico mais tarde).
+            Durante a execução da query basta obter os N primeiros 
+            condutores da \emph{array} e temos a execução em práticamente em
+            tempo constante (agora é copiado os N elementos para uma array, mas
+            poderá ser otimizado).
         \subsubsection{Query 3}
-
-        \subsection{Análise de desempenho}
+            
+        \subsubsection{Query 4}
+            Nesta query, o preço médio das viagens numa determinada cidade é 
+            calculada (em tempo linear conforme o número de viagens por cidade)
+            durante a execução da query. Durante a leitura das viagens,
+            é inserido a viagem conforme a sua cidade numa 
+            \emph{HashTable (key: cidade, value: Array de Ride*)}. 
+            O preço médio não é pré-calculado, pois o cálculo desta é 
+            relativamente rápido devido às viagens já estarem separadas por cidade
+            e é expectável que só se aceda a este valor uma vez, por isso
+            guardá-lo será desnecessário.
+            Esta \emph{HashTable} já existe devido à query 7 que necessitará de
+            acesso rápido a viagens conforme a sua cidade. 
+            \\
+            \\Futuramente, conforme a expansão do dataset, esta implementação 
+            poderá ter que ser reformulada, por causa do cálculo em execução mas
+            para já tivemos bom desempenho com a atual.
         
-        \subsection{Possíveis futuras limitações}
+        \subsubsection{Query 5}
+            \newcommand{\param}[1]{$<${#1}$>$}
+            Já na query 5, no fim da leitura das viagens é feito \emph{sorting}
+            das viagens pela sua data, por ordem crescente. Com isto, assumindo 
+            que \param{data A} e \param{data B} são os argumentos da query, 
+            basta aceder ao primeiro elemento a partir do qual \param{data A} é 
+            menor ou igual do que a data desse elemento. A partir daí, podemos
+            percorrer a lista até encontrar uma viagem que a sua data seja
+            maior que \param{data B}, acumulando o preço das viagens para no fim
+            calcular a sua média. O tal primeiro elemento é encontrado com
+            uma implementação semelhante à \textbf{std::lower\_bound} de \emph{C++},
+            usando \emph{binary search}. Isto é possível devido à lista estar
+            organizada pela data das viagens.
+            \\
+            \\Para evitar percorrer a lista, podia ter sido pré-calculado uma \emph{array}
+            em que cada indíce tinha o somatório de preços para trás desse indíce
+            e o preço médio era calculado subtraindo o \emph{upper\_bound}
+            com o \emph{lower\_bound} do \emph{range} das datas e dividindo pelo 
+            número de elementos entre eles. Essa ideia foi rápidamente descartada
+            devido às datas dos argumentos serem relativamente perto, portanto
+            são poucas as viagens a iterar. Esta solução também iria aumentar 
+            consideravelmente o tempo de leitura dos ficheiros.
 
+        \newpage
+        \subsection{Análise de desempenho}
+            Comparando o desempenho da execução das queries 1, 2, 3, 4 e 5 para 
+            os ficheiros de input do conjunto de testes expandido das pastas 
+            \emph{tests1} e \emph{tests2} (excluindo as queries não 
+            implementadas) temos na Tabela 2 os resultados conforme as 
+            especificações dos computadores na Tabela 1.
+            \\
+            \\O programa foi compilado com as flags \emph{-O2 -flto}.
+            
+            \begin{table}[hbt!]
+                \centering
+                \begin{tabular}{|*{4}{c|}}
+                    \hline
+                    & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
+                    \hline
+                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & - & - \\
+                    RAM        & 16GB RAM LPDDR5                 & - & - \\
+                    Disco      & 500GB NVME                      & - & - \\
+                    OS         & MacOS Ventura 13.0.1            & - & - \\
+                    Compilador & Apple Clang 14.0.0              & - & - \\
+                    \hline
+                \end{tabular}
+                \caption{Performances em diferentes PCs}
+            \end{table}
+
+            \begin{table}[hbt!]
+                \centering
+                \begin{tabular}{|*{4}{c|}}
+                    \hline
+                    & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
+                    \hline
+                    tests 1.txt & - & - & - \\
+                    tests 2.txt & - & - & - \\
+                    \hline
+                \end{tabular}
+                \caption{Tempos de execução em diferentes PCs}
+            \end{table}
+
+        \subsection{Possíveis otimizações e futuras limitações}
+        \lipsum[1]
     \section{Conclusão}
+    \lipsum[1]
 
 \end{document}
