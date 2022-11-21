@@ -4,6 +4,9 @@
 
 #include "catalog_sort.h"
 
+/**
+ * Struct that represents a catalog.
+ */
 struct Catalog {
     GPtrArray *users_array;
     GPtrArray *drivers_array;
@@ -77,7 +80,10 @@ void register_driver(Catalog *catalog, Driver *driver) {
     g_hash_table_insert(catalog->driver_from_id_hashtable, key, driver);
 }
 
-void catalog_ride_index_city(Catalog *catalog, Ride *ride) {
+/**
+ * Internal function of register_ride that indexes the city of the ride.
+ */
+static void catalog_ride_index_city(Catalog *catalog, Ride *ride) {
     char *city = ride_get_city(ride); // Only needs to be freed if the city is already in the hashtable
 
     GPtrArray *rides_in_city;
@@ -161,7 +167,7 @@ double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
     return total_price / rides->len;
 }
 
-/*
+/**
  * Returns the index of the lowest ride whose date is greater than the given date.
  */
 guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {

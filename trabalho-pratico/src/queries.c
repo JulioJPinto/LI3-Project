@@ -2,7 +2,7 @@
 
 #define UNUSED(x) (void) (x)
 
-/*
+/**
  * Same as fprintf but only print to stream if DEBUG macro is defined.
  */
 void fprintf_debug(FILE *stream, const char *format, ...) {
@@ -18,7 +18,9 @@ void fprintf_debug(FILE *stream, const char *format, ...) {
 #endif
 }
 
-//Query 1
+/**
+ * Query 1 for users
+ */
 void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *username) {
     User *user = catalog_get_user(catalog, username);
 
@@ -44,6 +46,9 @@ void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *usern
     free(name);
 }
 
+/**
+ * Query 1 for driver
+ */
 void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
     Driver *driver = catalog_get_driver(catalog, id);
 
@@ -69,6 +74,9 @@ void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
     free(name);
 }
 
+/**
+ * Query 1
+ */
 void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *output, char **args) {
     char *id_or_username = args[0];
 
@@ -81,7 +89,9 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
     }
 }
 
-//Query 2
+/**
+ * Query 2
+ */
 void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
     char *end_ptr;
     int n = (int) strtol(args[0], &end_ptr, 10);
@@ -109,7 +119,9 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
     g_ptr_array_free(result, TRUE);
 }
 
-//Query 3
+/**
+ * Query 3
+ */
 void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args) {
     char *end_ptr;
     int n = (int) strtol(args[0], &end_ptr, 10);
@@ -138,7 +150,9 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
     g_ptr_array_free(result, TRUE);
 }
 
-//Query 4
+/**
+ * Query 4
+ */
 void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **args) {
     char *city = args[0];
 
@@ -147,14 +161,9 @@ void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **
     fprintf(output, "%.3f\n", average_price);
 }
 
-// TODO: remove this and replace with parser.c parse date
-// (waiting for parser.c rewrite)
-
-int parse_int(char *string);
-
-Date parse_date(char *string);
-
-//Query 5
+/**
+ * Query 5
+ */
 void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, char **args) {
     char *start_date_string = args[0];
     char *end_date_string = args[1];

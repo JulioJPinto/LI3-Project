@@ -5,10 +5,13 @@
 #include "logger.h"
 #include "query_manager.h"
 #include "parser.h"
-#include "wrappers.h"
+#include "main_wrappers.h"
 
 #define OUTPUT_FOLDER "Resultados"
 
+/**
+ * Main entry point
+ */
 int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
 
@@ -49,7 +52,7 @@ int main(int argc, char **argv) {
 
         FILE *output_file = create_command_output_file(query_count + 1);
 
-        execute_query(catalog, output_file, line_buffer);
+        parse_and_run_query(catalog, output_file, line_buffer);
         fclose(output_file);
 
         query_count++;

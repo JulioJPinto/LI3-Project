@@ -2,6 +2,9 @@
 
 #include <glib.h>
 
+/**
+ * Struct that represents a user.
+ */
 struct User {
     char *username;
     char *name;

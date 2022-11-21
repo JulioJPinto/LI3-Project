@@ -14,7 +14,7 @@ static const QueryFunction query_functions[] = {
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);
 
-void execute_query(Catalog *catalog, FILE *output, char *query) {
+void parse_and_run_query(Catalog *catalog, FILE *output, char *query) {
     char **args = g_strsplit(query, " ", 0);
 
     char *query_id_str_left;

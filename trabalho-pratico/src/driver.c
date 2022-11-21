@@ -2,6 +2,9 @@
 
 #include <glib.h>
 
+/**
+ * Struct that represents a driver.
+ */
 struct Driver {
     int id;
     char *name;

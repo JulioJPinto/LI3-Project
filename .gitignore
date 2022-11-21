@@ -43,4 +43,6 @@ input2.txt
 
 .DS_Store
 
+# Doxygen
 
+*/doxygen-output/

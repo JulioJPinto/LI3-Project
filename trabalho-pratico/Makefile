@@ -50,6 +50,7 @@ clean:
 	rm -rf build
 	rm -rf Resultados
 	rm -f programa-principal
+	rm -rf doxygen-output
 
 format:
 	clang-format -i src/*.c include/*.h
@@ -66,3 +67,10 @@ test-results:
 
 compile-latex:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../
+
+generate-doxygen:
+	doxygen doxyfile.cfg
+	python3 -m coverxygen --xml-dir doxygen-output/xml --src-dir . --output doxygen-output/doc-coverage.info --kind enum,function,struct,union,typedef
+	genhtml --no-function-coverage --no-branch-coverage doxygen-output/doc-coverage.info -o doxygen-output
+	realpath doxygen-output/index.html | sed 's/^/file:\/\//'
+

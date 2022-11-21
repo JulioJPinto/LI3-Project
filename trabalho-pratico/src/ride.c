@@ -3,6 +3,9 @@
 #include <glib.h>
 #include "struct_util.h"
 
+/**
+ * Struct that represents a ride.
+ */
 struct Ride {
     int id;
     Date date;
