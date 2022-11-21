@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-typedef void *(ParserLineFunction) (char *);
+typedef void *(ParserLineFunction) (char *, char *);
 
 typedef void(ApplyFunction)(void *, void *);
 
