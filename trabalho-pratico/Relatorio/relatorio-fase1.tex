@@ -20,28 +20,34 @@
 
     \section{Introdução}
 
-    Esta é a introdução.
+    Este relatório tem como intuito abordar a primeira fase do projeto da UC Laboratórios 
+    de Informática III do ano letivo 2022/2023.\\
+    Nesta fase como objetivos o trabalho necessitava a implementação de \emph{parsing} dos
+    dados de entrada, funcionar através do modo de operação \emph{batch}, realizar pelo menos um terço das \emph{queries} (pelo menos 3 \emph{queries}) e deverá também considerar que o tamanho dos ficheiros de entrada (\emph{users.csv, drivers.csv} e \emph{rides.csv}), em linhas, terá 100.000, 10.000 e 1.000.000, respetivamente.
+    Ainda mais, no projeto, em geral, existe uma necessidade do uso de conceitos de encapsulamento e modularidade.
+    \\Este relatório irá abrangir as decisões tomadas pelo grupo tal como o método de raciocínio para desenvolvimento do mesmo.
+    
 
     \section{Desenvolvimento}
-
-        Este é o desenvolvimento.
 
         \subsection{Pipeline atual}
             O nosso pipeline funciona da seguinte maneira.
             A main recebe primeiro os \emph{paths} do \emph{dataset} e do \emph{input}.
-            A seguir esta manda os ficheiros para a função \emph{read_file} e aplica a
-            cada linha de cada ficheiro do dataset e retorna a respetiva estrutura de 
-            dados devidamente \emph{parsed}.
-            Estas estruturas são enviadas para um catálogo onde será feito o indexamento
-            em \emph{HashTables} e \emph{arrays} das respetivas estruturas, através do
-            uso de funções como as \emph{register} no \emph{catalog.c}. No fim da criação
-            do catálogo este será ordenada, através da \emph{notifiy_stop_registering}
-            de maneira a tornar as queries ainda mais efecientes.
+            A seguir esta manda os ficheiros para a função de \emph{parsing}, esta função
+            recebe uma função de registo, uma função de \emph{parse} de linha e um argumento 
+            (do ponto de vista do código um argumento qualquer mas do ponto de vista do projeto um catálogo).
+            No fim da criação do catálogo este será ordenada de maneira a tornar as 
+            queries ainda mais efecientes.
             
         \subsection{Estratégias Seguidas}
 
-        Para a primeira fase do projeto foram implementadas as queries 1, 2, 3, 4 e 5.
-
+            Para a primeira fase do trabalho decidimos implementar as bases do projeto, como o parser e definir as estruturas dos dados que utilizaremos ao longo do projeto ( Como o catálogo para guardar os dados e os \emph{users, drivers} e \emph{rides} de forma a guardar os respetivos campos dos utilizadores, condutores e viagens). Ainda mais implementamos as \emph{queries} 1, 2, 3, 4 e 5. 
+        \subsubsection{Parser}
+            De maneira a tornar a leitura e o \emph{parsing} dos ficheiros de
+            entrada, relativamente rápidos, decidimos percorrer o ficheiro linha a linha.
+            Sempre que este lê uma linha, de acordo com a função de \emph{parsing} passada
+            nesta, este irá dar \emph{parse} à linha que recebe, transformando o na respetiva estrutura de dados (\emph{users, drivers} e \emph{rides}). Ainda mais este insere a estrutura de dados no respetivo catálogo.
+            \\Futuramente poderemos otimizar o código de maneira a tornar a leitura do ficheiro mais rápido, visto que o tamanho dos ficheiros também  irá aumentar, tal como poderemos otimizar o registo das estruturas de dados para o catálogo.
         \subsubsection{Query 1}
             Para acesso rápido a perfis pelo \emph{id's} de condutores ou 
             \emph{username's} de utilizadores foram utilizadas duas 
@@ -141,11 +147,11 @@
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & - & - \\
-                    RAM        & 16GB RAM LPDDR5                 & - & - \\
-                    Disco      & 500GB NVME                      & - & - \\
-                    OS         & MacOS Ventura 13.0.1            & - & - \\
-                    Compilador & Apple Clang 14.0.0              & - & - \\
+                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U (8)  & - \\
+                    RAM        & 16GB RAM LPDDR5                 & 8MB RAM LPDDR5  & - \\
+                    Disco      & 500GB NVME                      & 500GB NVME & - \\
+                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel: 6.0.9-arch-1 & - \\
+                    Compilador & Apple Clang 14.0.0              & GCC 12.2.0 (GCC) & - \\
                     \hline
                 \end{tabular}
                 \caption{Performances em diferentes PCs}
