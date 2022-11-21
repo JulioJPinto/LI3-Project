@@ -11,7 +11,7 @@
 
 
 \title{Relatório da Fase 1 - Grupo 03}
-\author{Francisco Macedo Ferreira (A100660)\\Hugo ... Ramos (A100644)\\Júlio ...}
+\author{Francisco Macedo Ferreira (A100660)\\Hugo ... Ramos (A100644)\\Júlio José Medeiros Pereira Pinto (A100742)}
 
 % Document
 \begin{document}
@@ -27,7 +27,17 @@
         Este é o desenvolvimento.
 
         \subsection{Pipeline atual}
-
+            O nosso pipeline funciona da seguinte maneira.
+            A main recebe primeiro os \emph{paths} do \emph{dataset} e do \emph{input}.
+            A seguir esta manda os ficheiros para a função \emph{read_file} e aplica a
+            cada linha de cada ficheiro do dataset e retorna a respetiva estrutura de 
+            dados devidamente \emph{parsed}.
+            Estas estruturas são enviadas para um catálogo onde será feito o indexamento
+            em \emph{HashTables} e \emph{arrays} das respetivas estruturas, através do
+            uso de funções como as \emph{register} no \emph{catalog.c}. No fim da criação
+            do catálogo este será ordenada, através da \emph{notifiy_stop_registering}
+            de maneira a tornar as queries ainda mais efecientes.
+            
         \subsection{Estratégias Seguidas}
 
         Para a primeira fase do projeto foram implementadas as queries 1, 2, 3, 4 e 5.
@@ -67,7 +77,14 @@
             tempo constante (agora é copiado os N elementos para uma array, mas
             poderá ser otimizado).
         \subsubsection{Query 3}
-            
+            Para a query 3, tal como na query 2, foi feito um \emph{sorting} da
+            \emph{array} (presente no catálogo) de utilizadores, de maneira a 
+            otimizar o acesso aos users com maior distância total percorrida.
+            Tal como na query 2, o método de \emph{sorting} poderá ser otimizado
+            da mesma maneira.
+            Durante a execução destea query o tempo de execução será praticamente
+            contstante, porém poderá vir a ser otimizado a maneira como os N
+            primeiros utilizadores são guardados.        
         \subsubsection{Query 4}
             Nesta query, o preço médio das viagens numa determinada cidade é 
             calculada (em tempo linear conforme o número de viagens por cidade)
