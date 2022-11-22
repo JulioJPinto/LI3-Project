@@ -186,9 +186,8 @@
                     CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 8-core         & Intel i7-1165G7
                     RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz              & 16GB RAM DDR4 3200 MHz
                     Disco      & 500GB NVME                      & 500GB NVME                    & 1TB SSD
-                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9-arch-1 & Windows 11 Home 21H2
+                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9-arch-1 & Windows 11 WSL 1.0 (Ubuntu 20.04)
                     Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0                    & GCC 9.2.0
-                    Notas                                                                        & WSL 1.0
                     \hline
                 \end{tabular}
                 \caption{Performances em diferentes PCs}
@@ -200,16 +199,15 @@
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    Loading de ficheiros                  & 767.1ms & 1.44s & 1427.4ms
+                    Loading de ficheiros                  & 767.1ms & 1466.1ms & 1427.4ms
                     Execução de 13 queries (tests\_1.txt)    & 8.0ms   & 23.3ms & 32.7ms
-                    Execução de 29 queries (tests\_2.txt) & 14.1ms  & 192.4ms &  66.5 ms
+                    Execução de 29 queries (tests\_2.txt) & 14.1ms  & 45.2ms &  66.5 ms
                     \hline
                 \end{tabular}
                 \caption{Tempos de execução em diferentes PCs}
             \end{table}            
             
             Sobre o uso de memória, o programa usa, em pico, próximo de um total de 168 MB.
-            \\\\Nota: O PC 2 tem tido problemas de desempenho nos últimos meses apesar das características do mesmo , estes problemas podem ser devido à idade do computador (6 anos) ou por motivos dos quais desconhecemos.
 
         \subsection{Possíveis otimizações e futuras limitações}
         Como podemos ver na Tabela 2, o tempo de execução das queries é muito
