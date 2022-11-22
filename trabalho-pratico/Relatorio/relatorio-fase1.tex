@@ -21,32 +21,55 @@
     \section{Introdução}
 
     Este relatório tem como intuito abordar a primeira fase do projeto da UC Laboratórios 
-    de Informática III do ano letivo 2022/2023.\\
+    de Informática III do ano letivo 2022/2023.
     Nesta fase como objetivos o trabalho necessitava a implementação de \emph{parsing} dos
-    dados de entrada, funcionar através do modo de operação \emph{batch}, realizar pelo menos um terço das \emph{queries} (pelo menos 3 \emph{queries}) e deverá também considerar que o tamanho dos ficheiros de entrada (\emph{users.csv, drivers.csv} e \emph{rides.csv}), em linhas, terá 100.000, 10.000 e 1.000.000, respetivamente.
-    Ainda mais, no projeto, em geral, existe uma necessidade do uso de conceitos de encapsulamento e modularidade.
+    dados de entrada, funcionar através do modo de operação \emph{batch}, 
+    realizar pelo menos 3 das 9 \emph{queries} considerando que o 
+    tamanho dos ficheiros de entrada 
+    (\emph{users.csv, drivers.csv} e \emph{rides.csv}), terá 100.000, 10.000 e 
+    1.000.000 linhas, respetivamente. Ainda mais, no projeto, em geral, existe 
+    uma necessidade do uso de conceitos de encapsulamento e modularidade.
+    \\
     \\Este relatório irá abrangir as decisões tomadas pelo grupo tal como o método de raciocínio para desenvolvimento do mesmo.
     
 
     \section{Desenvolvimento}
 
         \subsection{Pipeline atual}
-            A nossa pipeline foi alvo de bastante discussão entre nós, porém conseguimos chegar a um consenso
-            com a pipeline atual. Neste momento a nossa pipeline funciona da seguinte maneira. A nossa main recebe dois argumentos, argumentos estes que serãos os \emph{paths} para os ficheiros necessários, a pasta do \emph{dataset}, onde se encontram os .csv, e o ficheiro de \emph{input}. De seguida, este abre os nosso ficheiros (ficheiros que se encontram na pasta \emph{dataset}) criando \emph{pointers} para os mesmos, assim podendo realizar o \emph{parsing} destes. No \emph{parsing} a função irá receber um argumento de \emph{stream} (o ficheiro que irá dar \emph{parse}) , uma função para o \emph{parse} linha a linha do ficheiro (Função que irá criar a estrutura que pretendemos através da linha), uma função \emph{register} que irá enviar a estrutura criada para um catálogo e por último um argumento, que do ponto de vista do código não sabemos o tipo do mesmo, porém podemos deduzir que será o catálogo para onde enviaremos as estruturas criadas pelo \emph{parser}.
-            \\ Após finalizar o \emph{parsing} dos ficheiros, este irá ordenar o nosso catálogo da maneira mais útil para a realização das queries (Irá ordenar o \emph{array} de condutores por score, o \emph{array} de utilizadores por distância total percorrida e o \emph{array} de viagens por data). Desta maneira a tornar as queries mais eficientes quando forem a ser realizadas.
-            \\Por último esta irá ler o ficheiro de \emph{input} e irá dar parse ao mesmo, realizando então as queries, através do nosso \emph{query manager} que gere as funções para a realização das queries de maneira a utilizar a query certa dependendo do \emph{input} passado. Assim, após libertarmos a memória alocada, concluindo o nosso pipeline atual.
-            
-        \subsection{Estratégias Seguidas}
-
-            Para a primeira fase do trabalho decidimos implementar as bases do projeto, como o parser e definir as estruturas dos dados que utilizaremos ao longo do projeto ( Como o catálogo para guardar os dados e os \emph{users, drivers} e \emph{rides} de forma a guardar os respetivos campos dos utilizadores, condutores e viagens). Ainda mais implementamos as \emph{queries} 1, 2, 3, 4 e 5. 
-        \subsubsection{Parser}
-            De maneira a tornar a leitura e o \emph{parsing} dos ficheiros de
-            entrada relativamente eficiente, decidimos percorrer o ficheiro linha a linha.
-            Sempre que este lê uma linha, de acordo com a função de \emph{parsing} passada
-            nesta, este irá dar \emph{parse} à linha que recebe, transformando o na respetiva estrutura de dados (\emph{users, drivers} e \emph{rides}). Ainda mais este insere a estrutura de dados no respetivo array do catálogo (argumento passado na chamada da função porém do ponto de vista do código argumento o qual não sabemos o tipo).
-            \\Futuramente poderemos otimizar o código de maneira a tornar a leitura do ficheiro mais rápido, visto que o tamanho dos ficheiros também  irá aumentar, tal como poderemos otimizar o registo das estruturas de dados para o catálogo.
-        \subsubsection{Query Manager}
-            Face a necessidade da gestão das queries, implementamos um \emph{Query Manager}.
+            Neste momento a nossa pipeline funciona da seguinte maneira: 
+            \begin{itemize}
+                \item Abre-se os ficheiros do dataset passados como parámetro do 
+                programa (\emph{drivers.csv, users.csv, rides.csv})
+                \item Cada linha desses ficheiros é passada para um parser genérico
+                com informações de como interpertar essa linha e o que fazer com
+                a estrutura \emph{parsed}.
+                \begin{itemize}
+                    \item A informação de como interpretar a linha é um pointer para
+                    a função de \emph{parse\_line\_user}, \emph{parse\_line\_driver} ou \emph{parse\_line\_driver},
+                    uma em cada ficheiro de cada estrutura.
+                    \item A informação de o que fazer com a estrutura \emph{parsed} é um pointer para
+                    a função de \emph{register\_user}, \emph{register\_driver} ou \emph{register\_ride}
+                    no \emph{catalog.c}.
+                \end{itemize}
+                \item Ao finalizar a leitura, \emph{parsing} e indexamento de
+                todas as linhas no catálogo, este irá ordenar as \emph{arrays} 
+                dentro do catálogo da maneira mais útil para a rápida execução das 
+                queries.
+                \item Depois do catálogo pronto, lemos o ficheiro de input.
+                Cada linha, em conjunto com o ficheiro de output correspondente criado,
+                é passado para o \emph{query\_manager.c}, um controlador
+                de queries, que irá verificar qual a query que está a ser pedida
+                e chamar a função correspondente, separando a linha por espaços
+                para a fácil interpretação dos parâmetros.
+                \item Por fim, os ficheiros são fechados, a memória é libertada 
+                e o programa termina.
+            \end{itemize}
+        \subsection{Estratégias Seguidas nas Queries}
+            Para a primeira fase do trabalho decidimos implementar as bases do 
+            projeto, como o parser e definir as estruturas dos dados que 
+            utilizaremos ao longo do projeto (Como o catálogo para guardar os 
+            dados e os \emph{users, drivers} e \emph{rides}). Foram 
+            implementadas as \emph{queries} 1, 2, 3, 4 e 5. 
             
         \subsubsection{Query 1}
             Para acesso rápido a perfis pelo \emph{id's} de condutores ou 
@@ -83,14 +106,14 @@
             tempo constante (agora é copiado os N elementos para uma array, mas
             poderá ser otimizado).
         \subsubsection{Query 3}
-            Para a query 3, tal como na query 2, foi feito um \emph{sorting} da
-            \emph{array} (presente no catálogo) de utilizadores, de maneira a 
-            otimizar o acesso aos users com maior distância total percorrida.
-            Tal como na query 2, o método de \emph{sorting} poderá ser otimizado
+            Para a query 3, tal como na query 2, foi feito \emph{sorting} da
+            \emph{array} (presente no catálogo) de utilizadores no fim da leitura
+            dos ficheiros, de maneira a otimizar o acesso aos users com maior 
+            distância total percorrida.
+            Por isso, durante a execução desta query o tempo de execução será praticamente
+            constante (também tendo em conta a cópia dos N elementos para uma array).
+            Tal como na query 2, o tópico de \emph{lazy sorting} poderá ser aplicado
             da mesma maneira.
-            Durante a execução desta query o tempo de execução será praticamente
-            constante, porém poderá vir a ser otimizado a maneira como os N
-            primeiros utilizadores são guardados.        
         \subsubsection{Query 4}
             Nesta query, o preço médio das viagens numa determinada cidade é 
             calculada (em tempo linear conforme o número de viagens por cidade)
@@ -135,11 +158,24 @@
         \subsection{Análise de desempenho}
             Comparando o desempenho da execução das queries 1, 2, 3, 4 e 5 para 
             os ficheiros de input do conjunto de testes expandido das pastas 
-            \emph{tests1} e \emph{tests2} (excluindo as queries não 
+            \emph{tests\_1} e \emph{tests\_2} (excluindo obviamente as queries não 
             implementadas) temos na Tabela 2 os resultados conforme as 
-            especificações dos computadores na Tabela 1.
-            \\
-            \\O programa foi compilado com as flags \emph{-O2 -flto}.
+            especificações dos computadores na Tabela 1. Ainda não existe um
+            \emph{standard} para a medição de desempenho dos programas, por isso,
+            medimos da seguinte forma:
+
+            \begin{itemize}
+                \item O programa foi compilado com as flags \emph{-O3 -flto -funroll-loops -march=native}.
+                \item \textbf{Loading time} é o tempo de leitura, \emph{parse} e indexamento dos 
+                ficheiros de input (incluindo o tempo de \emph{sorting} no fim).
+                Para já o loading é independente das queries executadas.
+                \item \textbf{Query time} é o tempo de execução de todas as queries no ficheiro,
+                incluindo a escrita do output nos ficheiros.
+                \item Não são considerados tempos de \emph{free} de memória (no fim da execução
+                do programa) em nenhum dos tempos.
+                \item O resultado é uma média de 3 execuções, após uma primeira execução de aquecimento. 
+                \item O tempo foi medido no código com o utilitário \emph{GTimer} do \emph{GLib}.
+            \end{itemize}
             
             \begin{table}[hbt!]
                 \centering
@@ -147,11 +183,11 @@
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U (8)  & - \\
-                    RAM        & 16GB RAM LPDDR5                 & 8GB RAM DDR4 2400MHz  & - \\
-                    Disco      & 500GB NVME                      & 500GB NVME & - \\
-                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel: 6.0.9-arch-1 & - \\
-                    Compilador & Apple Clang 14.0.0              & GCC 12.2.0  & - \\
+                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 8-core         & - \\
+                    RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz              & - \\
+                    Disco      & 500GB NVME                      & 500GB NVME                    & - \\
+                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9-arch-1 & - \\
+                    Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0                    & - \\
                     \hline
                 \end{tabular}
                 \caption{Performances em diferentes PCs}
@@ -163,17 +199,48 @@
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    tests 1.txt & - & - & - \\
-                    tests 2.txt & - & - & - \\
+                    Loading de ficheiros               & 806.9ms & - & - \\
+                    Execução de queries (tests\_1.txt) & 8.6ms   & - & - \\
+                    Execução de queries (tests\_2.txt) & 16.2ms  & - & - \\
                     \hline
                 \end{tabular}
                 \caption{Tempos de execução em diferentes PCs}
             \end{table}
 
         \subsection{Possíveis otimizações e futuras limitações}
-        \lipsum[1]
+        Como podemos ver na Tabela 2, o tempo de execução das queries é muito
+        pequeno, comparado com o tempo de loading dos ficheiros.
+        Após alguns simples testes, chegamos à conclusão que uma parte 
+        significativa do tempo de loading é do \emph{parsing} das linhas
+        das estruturas de dados e outra parte é da inserção, \emph{sorting} 
+        e indexamento das viagens, condutores e utilizadores nas estruturas
+        adequadas. Para melhorar este tempo, podemos implementar multi-threading
+        na leitura dos ficheiros de condutores e utilizadores, pois não há
+        dependências entre eles, e talvez rever a forma como as estruturas
+        estão a ser \emph{parsed}. Como as número de viagens, condutores e
+        utilizadores ainda vai aumentar exponencialmente na segunda fase
+        do projeto, será realmente necessário explorar possíveis melhorias
+        nesta parte.
+        \\A parte positiva é que parece que as escolhas de implementações
+        das \emph{queries} foram excelentes, pois o tempo de execução é
+        super rápido. Ainda assim, podemos melhorar a performance das queries
+        com, por exemplo, as otimizações de \emph{lazy sorting} referidas nas explicações
+        das implementações das \emph{queries}. Este \emph{lazy sorting} pode
+        também aliviar o tempo de loading dos ficheiros, já que este só será
+        feito quando necessário, ou seja, quando uma \emph{query} for executada. 
+        
     \section{Conclusão}
-        Para concluir, acreditamos que o desenvolvimento desta primeira fase foi uma boa maneira de consolidar tanto os nosso conhecimentos de C com conhecimentos mais avançados relacionadas a gestão de memória, encapsulamento e modularidade. Apesar de tudo, a nosso ver ainda existe espaço para melhorias
-        no uso destes conceitos e pretendemos desenvolve-los a um nível ainda mais avançado do que
+        Para concluir, acreditamos que o desenvolvimento desta primeira fase foi
+        muito satisfatória. Consolidamos os nosso conhecimentos de C com 
+        conhecimentos mais avançados relacionadas a performance, gestão de memória, 
+        encapsulamento e modularidade. 
+        \\Tópicos como o uso de \emph{getters com clone}
+        e o \emph{encapsulamento de estruturas} fizeram um pouco de confusão a 
+        serem aplicados numa linguagem de tão baixo nível sem suporte a objetos:
+        o código ficou  mais verboso e menos performante do que se não houvesse
+        essa "restrição".
+        \\Apesar de tudo, a nosso ver ainda existe 
+        espaço para melhorias nestes conceitos e pretendemos 
+        desenvolvê-los a um nível ainda mais avançado do que
         os apresentados na próxima fase do trabalho.
 \end{document}

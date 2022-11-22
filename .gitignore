@@ -20,8 +20,7 @@ Resultados-expected/
 programa-principal
 
 */build/*
-input.txt
-input2.txt
+input*.txt
 *.pdf
 
 # Ignore idea

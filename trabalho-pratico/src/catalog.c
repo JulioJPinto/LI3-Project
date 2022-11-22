@@ -49,9 +49,9 @@ void glib_wrapper_ptr_array_free_segment(gpointer array) {
 Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
-    catalog->users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
-    catalog->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
-    catalog->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
+    catalog->users_array = g_ptr_array_new_full(100000, glib_wrapper_free_user);
+    catalog->drivers_array = g_ptr_array_new_full(10000, glib_wrapper_free_driver);
+    catalog->rides_array = g_ptr_array_new_full(1000000, glib_wrapper_free_ride);
 
     catalog->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
     catalog->driver_from_id_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);

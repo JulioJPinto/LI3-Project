@@ -100,7 +100,7 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
         return;
     }
 
-    GPtrArray *result = g_ptr_array_sized_new(n + 100);
+    GPtrArray *result = g_ptr_array_sized_new(n);
 
     catalog_get_top_n_drivers(catalog, n, result);
 
@@ -130,7 +130,7 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
         return;
     }
 
-    GPtrArray *result = g_ptr_array_sized_new(n + 100);
+    GPtrArray *result = g_ptr_array_sized_new(n);
 
     catalog_get_longest_n_total_distance(catalog, n, result);
 
