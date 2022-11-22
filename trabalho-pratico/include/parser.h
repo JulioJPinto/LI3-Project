@@ -4,8 +4,18 @@
 
 #include <stdio.h>
 
+/**
+ * Function definition that parses a line from the file to user/driver/ride structure.
+ * char *line: line to parse
+ * char *delimiter: delimiter to use in parsing (";")
+ */
 typedef void *(ParserLineFunction) (char *, char *);
 
+/**
+ * Function definition to apply after the line is parsed.
+ * void *arg0: the first argument to pass to the function (the catalog as ApplyFunction is typically a register(Catalog*, User/Driver/Ride))
+ * void *arg1: the struct already parsed from the line (User, Driver or Ride)
+ */
 typedef void(ApplyFunction)(void *, void *);
 
 /**

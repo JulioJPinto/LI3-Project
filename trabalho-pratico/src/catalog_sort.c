@@ -1,18 +1,30 @@
 #include "catalog_sort.h"
 #include "catalog.h"
 
+/**
+ * Compare driver by activeness.
+ */
 int compare_driver_by_activeness(Driver *a, Driver *b) {
     return (int) driver_get_account_status(a) - (int) driver_get_account_status(b);
 }
 
+/**
+ * Compare driver by id.
+ */
 int compare_driver_by_id(Driver *a, Driver *b) {
     return driver_get_id(a) - driver_get_id(b);
 }
 
+/**
+ * Compare driver by last ride.
+ */
 int compare_driver_by_last_ride(Driver *a, Driver *b) {
     return date_compare(driver_get_last_ride_date(a), driver_get_last_ride_date(b));
 }
 
+/**
+ * Compare driver by average score.
+ */
 int compare_driver_by_score(Driver *a, Driver *b) {
     double average_score_a = driver_get_average_score(a);
     double average_score_b = driver_get_average_score(b);
@@ -20,6 +32,9 @@ int compare_driver_by_score(Driver *a, Driver *b) {
     return (average_score_a > average_score_b) - (average_score_a < average_score_b);
 }
 
+/**
+ * Compare user by total distance.
+ */
 int compare_user_by_total_distance(User *a, User *b) {
     int total_distance_a = user_get_total_distance(a);
     int total_distance_b = user_get_total_distance(b);
@@ -27,6 +42,9 @@ int compare_user_by_total_distance(User *a, User *b) {
     return total_distance_a - total_distance_b;
 }
 
+/**
+ * Compare user by last ride.
+ */
 int compare_user_by_last_ride(User *a, User *b) {
     Date last_ride_date_a = user_get_most_recent_ride(a);
     Date last_ride_date_b = user_get_most_recent_ride(b);
@@ -34,6 +52,9 @@ int compare_user_by_last_ride(User *a, User *b) {
     return date_compare(last_ride_date_a, last_ride_date_b);
 }
 
+/**
+ * Compare user by username.
+ */
 int compare_user_by_username(User *a, User *b) {
     char *user_username_a = user_get_username(a);
     char *user_username_b = user_get_username(b);
@@ -46,6 +67,9 @@ int compare_user_by_username(User *a, User *b) {
     return result;
 }
 
+/**
+ * Compare user by activeness.
+ */
 int compare_user_by_activeness(User *a, User *b) {
     return (int) user_get_account_status(a) - (int) user_get_account_status(b);
 }

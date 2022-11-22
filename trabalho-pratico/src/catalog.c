@@ -18,18 +18,30 @@ struct Catalog {
     GHashTable *rides_in_city_hashtable; // key: city (char*), value: GPtrArray of rides
 };
 
+/**
+ * Function that wraps free user to be used in GLib g_ptr_array free func.
+ */
 void glib_wrapper_free_user(gpointer user) {
     free_user(user);
 }
 
+/**
+ * Function that wraps free driver to be used in GLib g_ptr_array free func.
+ */
 void glib_wrapper_free_driver(gpointer driver) {
     free_driver(driver);
 }
 
+/**
+ * Function that wraps free ride to be used in GLib g_ptr_array free func.
+ */
 void glib_wrapper_free_ride(gpointer ride) {
     free_ride(ride);
 }
 
+/**
+ * Function that wraps free array to be used in GLib g_hash_table free func.
+ */
 void glib_wrapper_ptr_array_free_segment(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }

@@ -68,7 +68,6 @@ int main(int argc, char **argv) {
 
     g_timer_stop(query_timer);
 
-
     fclose(users_file);
     fclose(drivers_file);
     fclose(rides_file);
@@ -86,7 +85,6 @@ int main(int argc, char **argv) {
     g_timer_destroy(loading_timer);
     g_timer_destroy(query_timer);
     g_timer_destroy(global_timer);
-
 
     return 0;
 }
