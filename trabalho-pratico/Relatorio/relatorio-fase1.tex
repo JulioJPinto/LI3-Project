@@ -31,23 +31,23 @@
     \section{Desenvolvimento}
 
         \subsection{Pipeline atual}
-            O nosso pipeline funciona da seguinte maneira.
-            A main recebe primeiro os \emph{paths} do \emph{dataset} e do \emph{input}.
-            A seguir esta manda os ficheiros para a função de \emph{parsing}, esta função
-            recebe uma função de registo, uma função de \emph{parse} de linha e um argumento 
-            (do ponto de vista do código um argumento qualquer mas do ponto de vista do projeto um catálogo).
-            No fim da criação do catálogo este será ordenada de maneira a tornar as 
-            queries ainda mais efecientes.
+            A nossa pipeline foi alvo de bastante discussão entre nós, porém conseguimos chegar a um consenso
+            com a pipeline atual. Neste momento a nossa pipeline funciona da seguinte maneira. A nossa main recebe dois argumentos, argumentos estes que serãos os \emph{paths} para os ficheiros necessários, a pasta do \emph{dataset}, onde se encontram os .csv, e o ficheiro de \emph{input}. De seguida, este abre os nosso ficheiros (ficheiros que se encontram na pasta \emph{dataset}) criando \emph{pointers} para os mesmos, assim podendo realizar o \emph{parsing} destes. No \emph{parsing} a função irá receber um argumento de \emph{stream} (o ficheiro que irá dar \emph{parse}) , uma função para o \emph{parse} linha a linha do ficheiro (Função que irá criar a estrutura que pretendemos através da linha), uma função \emph{register} que irá enviar a estrutura criada para um catálogo e por último um argumento, que do ponto de vista do código não sabemos o tipo do mesmo, porém podemos deduzir que será o catálogo para onde enviaremos as estruturas criadas pelo \emph{parser}.
+            \\ Após finalizar o \emph{parsing} dos ficheiros, este irá ordenar o nosso catálogo da maneira mais útil para a realização das queries (Irá ordenar o \emph{array} de condutores por score, o \emph{array} de utilizadores por distância total percorrida e o \emph{array} de viagens por data). Desta maneira a tornar as queries mais eficientes quando forem a ser realizadas.
+            \\Por último esta irá ler o ficheiro de \emph{input} e irá dar parse ao mesmo, realizando então as queries, através do nosso \emph{query manager} que gere as funções para a realização das queries de maneira a utilizar a query certa dependendo do \emph{input} passado. Assim, após libertarmos a memória alocada, concluindo o nosso pipeline atual.
             
         \subsection{Estratégias Seguidas}
 
             Para a primeira fase do trabalho decidimos implementar as bases do projeto, como o parser e definir as estruturas dos dados que utilizaremos ao longo do projeto ( Como o catálogo para guardar os dados e os \emph{users, drivers} e \emph{rides} de forma a guardar os respetivos campos dos utilizadores, condutores e viagens). Ainda mais implementamos as \emph{queries} 1, 2, 3, 4 e 5. 
         \subsubsection{Parser}
             De maneira a tornar a leitura e o \emph{parsing} dos ficheiros de
-            entrada, relativamente rápidos, decidimos percorrer o ficheiro linha a linha.
+            entrada relativamente eficiente, decidimos percorrer o ficheiro linha a linha.
             Sempre que este lê uma linha, de acordo com a função de \emph{parsing} passada
-            nesta, este irá dar \emph{parse} à linha que recebe, transformando o na respetiva estrutura de dados (\emph{users, drivers} e \emph{rides}). Ainda mais este insere a estrutura de dados no respetivo catálogo.
+            nesta, este irá dar \emph{parse} à linha que recebe, transformando o na respetiva estrutura de dados (\emph{users, drivers} e \emph{rides}). Ainda mais este insere a estrutura de dados no respetivo array do catálogo (argumento passado na chamada da função porém do ponto de vista do código argumento o qual não sabemos o tipo).
             \\Futuramente poderemos otimizar o código de maneira a tornar a leitura do ficheiro mais rápido, visto que o tamanho dos ficheiros também  irá aumentar, tal como poderemos otimizar o registo das estruturas de dados para o catálogo.
+        \subsubsection{Query Manager}
+            Face a necessidade da gestão das queries, implementamos um \emph{Query Manager}.
+            
         \subsubsection{Query 1}
             Para acesso rápido a perfis pelo \emph{id's} de condutores ou 
             \emph{username's} de utilizadores foram utilizadas duas 
@@ -88,8 +88,8 @@
             otimizar o acesso aos users com maior distância total percorrida.
             Tal como na query 2, o método de \emph{sorting} poderá ser otimizado
             da mesma maneira.
-            Durante a execução destea query o tempo de execução será praticamente
-            contstante, porém poderá vir a ser otimizado a maneira como os N
+            Durante a execução desta query o tempo de execução será praticamente
+            constante, porém poderá vir a ser otimizado a maneira como os N
             primeiros utilizadores são guardados.        
         \subsubsection{Query 4}
             Nesta query, o preço médio das viagens numa determinada cidade é 
@@ -148,10 +148,10 @@
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
                     CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U (8)  & - \\
-                    RAM        & 16GB RAM LPDDR5                 & 8MB RAM LPDDR5  & - \\
+                    RAM        & 16GB RAM LPDDR5                 & 8GB RAM DDR4 2400MHz  & - \\
                     Disco      & 500GB NVME                      & 500GB NVME & - \\
                     OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel: 6.0.9-arch-1 & - \\
-                    Compilador & Apple Clang 14.0.0              & GCC 12.2.0 (GCC) & - \\
+                    Compilador & Apple Clang 14.0.0              & GCC 12.2.0  & - \\
                     \hline
                 \end{tabular}
                 \caption{Performances em diferentes PCs}
@@ -173,6 +173,7 @@
         \subsection{Possíveis otimizações e futuras limitações}
         \lipsum[1]
     \section{Conclusão}
-    \lipsum[1]
-
+        Para concluir, acreditamos que o desenvolvimento desta primeira fase foi uma boa maneira de consolidar tanto os nosso conhecimentos de C com conhecimentos mais avançados relacionadas a gestão de memória, encapsulamento e modularidade. Apesar de tudo, a nosso ver ainda existe espaço para melhorias
+        no uso destes conceitos e pretendemos desenvolve-los a um nível ainda mais avançado do que
+        os apresentados na próxima fase do trabalho.
 \end{document}
