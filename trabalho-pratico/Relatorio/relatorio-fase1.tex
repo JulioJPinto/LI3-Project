@@ -30,17 +30,17 @@
     1.000.000 linhas, respetivamente. Ainda mais, no projeto, em geral, existe 
     uma necessidade do uso de conceitos de encapsulamento e modularidade.
     \\
-    \\Este relatório irá abrangir as decisões tomadas pelo grupo tal como o método de raciocínio para desenvolvimento do mesmo.
+    \\Este relatório irá abranger as decisões tomadas pelo grupo tal como o método de raciocínio para desenvolvimento do mesmo.
     
     \section{Desenvolvimento}
 
         \subsection{Pipeline atual}
             Neste momento a nossa pipeline funciona da seguinte maneira: 
             \begin{itemize}
-                \item Abre-se os ficheiros do dataset passados como parámetro do 
+                \item Abre-se os ficheiros do dataset passados como parâmetro do 
                 programa (\emph{drivers.csv, users.csv, rides.csv}).
                 \item Cada linha desses ficheiros é passada para um parser genérico
-                com informações de como interpertar essa linha e o que fazer com
+                com informações de como interpretar essa linha e o que fazer com
                 a estrutura \emph{parsed}.
                 \begin{itemize}
                     \item A informação de como interpretar a linha é um pointer para
@@ -88,7 +88,7 @@
             \\
             \\Com isto é possível um acesso em tempo constante a essas
             informações, com o custo da leitura dos ficheiros ser um pouco maior
-            (devido ao calculo necessário de \emph{hashes} para cada \emph{key} 
+            (devido ao cálculo necessário de \emph{hashes} para cada \emph{key} 
             e não só). Como na segunda fase o número de perfis irá aumentar
             exponencialmente e é esperado múltiplos acessos a estas informações, 
             seja de várias queries destas ou do modo interativo ainda a 
@@ -101,7 +101,7 @@
             Isto poderá ser otimizado a fazer com que o \emph{sorting} seja
             \emph{lazy} (será abordado este tópico mais tarde).
             Durante a execução da query basta obter os N primeiros 
-            condutores da \emph{array} e temos a execução em práticamente em
+            condutores da \emph{array} e temos a execução em praticamente em
             tempo constante (agora é copiado os N elementos para uma array, mas
             poderá ser otimizado).
         \subsubsection{Query 3}
@@ -127,7 +127,7 @@
             acesso rápido a viagens conforme a sua cidade. 
             \\
             \\Futuramente, conforme a expansão do dataset, esta implementação 
-            poderá ter que ser reformulada, por causa do cálculo em execução mas
+            poderá ter de ser reformulada, por causa do cálculo em execução mas
             para já tivemos bom desempenho com a atual.
         
         \subsubsection{Query 5}
@@ -145,10 +145,10 @@
             organizada pela data das viagens.
             \\
             \\Para evitar percorrer a lista, podia ter sido pré-calculado uma \emph{array}
-            em que cada indíce tinha o somatório de preços para trás desse indíce
+            em que cada índice tinha o somatório de preços para trás desse índice
             e o preço médio era calculado subtraindo o \emph{upper\_bound}
             com o \emph{lower\_bound} do \emph{range} das datas e dividindo pelo 
-            número de elementos entre eles. Essa ideia foi rápidamente descartada
+            número de elementos entre eles. Essa ideia foi rapidamente descartada
             devido às datas dos argumentos serem relativamente perto, portanto
             são poucas as viagens a iterar. Esta solução também iria aumentar 
             consideravelmente o tempo de leitura dos ficheiros.
@@ -217,14 +217,14 @@
         adequadas. Para melhorar este tempo, podemos implementar multi-threading
         na leitura dos ficheiros de condutores e utilizadores, pois não há
         dependências entre eles, e talvez rever a forma como as estruturas
-        estão a ser \emph{parsed}. Como as número de viagens, condutores e
+        estão a ser \emph{parsed}. Como o número de viagens, condutores e
         utilizadores ainda vai aumentar exponencialmente na segunda fase
         do projeto, será realmente necessário explorar possíveis melhorias
         nesta parte.
         \\
         \\A parte positiva é que parece que as escolhas de implementações
         das \emph{queries} foram excelentes, pois o tempo de execução é
-        super rápido. Ainda assim, podemos melhorar a performance das queries
+        super-rápido. Ainda assim, podemos melhorar a performance das queries
         com, por exemplo, as otimizações de \emph{lazy sorting} referidas nas explicações
         das implementações das \emph{queries}. Este \emph{lazy sorting} pode
         também aliviar o tempo de loading dos ficheiros, já que este só será
@@ -239,15 +239,15 @@
         
     \section{Conclusão}
         Para concluir, acreditamos que o desenvolvimento desta primeira fase foi
-        muito satisfatória. Consolidamos os nosso conhecimentos de C com 
-        conhecimentos mais avançados relacionadas a performance, gestão de memória, 
+        muito satisfatória. Consolidamos os nossos conhecimentos de C com 
+        conhecimentos mais avançados relacionados a performance, gestão de memória, 
         encapsulamento e modularidade. 
         \\Tópicos como o uso de \emph{getters com clone}
         e o \emph{encapsulamento de estruturas} fizeram um pouco de confusão a 
         serem aplicados numa linguagem de tão baixo nível sem suporte a objetos:
-        o código ficou  mais verboso e menos performante do que se não houvesse
+        o código ficou mais verboso e menos performático do que se não houvesse
         essa "restrição".
-        \\Apesar de tudo, a nosso ver ainda existe 
+        \\Apesar de tudo, ainda existe 
         espaço para melhorias nestes conceitos e pretendemos 
         desenvolvê-los a um nível ainda mais avançado do que
         os apresentados na próxima fase do trabalho.
