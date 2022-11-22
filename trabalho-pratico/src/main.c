@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
 
     g_timer_stop(loading_timer);
 
-    GTimer *query_timer = g_timer_new();
-    g_timer_start(query_timer);
+    GTimer *total_query_time_timer = g_timer_new();
+    g_timer_start(total_query_time_timer);
 
     FILE *queries_file = open_file(queries_file_path);
 
@@ -54,19 +54,22 @@ int main(int argc, char **argv) {
 
     create_output_folder_if_not_exists();
 
+    GTimer *query_execution_timer = g_timer_new();
     while (fgets(line_buffer, 1024, queries_file)) {
+        g_timer_start(query_execution_timer);
         format_fgets_input_line(line_buffer);
-        log_info("Executing query '%s'\n", line_buffer);
+        log_info("Executing query '%s'", line_buffer);
 
         FILE *output_file = create_command_output_file(query_count + 1);
 
         parse_and_run_query(catalog, output_file, line_buffer);
         fclose(output_file);
 
+        log_info(" (%.3fms)\n", g_timer_elapsed(query_execution_timer, NULL) * 1000);
         query_count++;
     }
 
-    g_timer_stop(query_timer);
+    g_timer_stop(total_query_time_timer);
 
     fclose(users_file);
     fclose(drivers_file);
@@ -78,12 +81,13 @@ int main(int argc, char **argv) {
 
     g_timer_stop(global_timer);
 
-    log_info("Loading time: %lf seconds\n", g_timer_elapsed(loading_timer, NULL));
-    log_info("Execution time (%d queries): %lf seconds.\n", query_count, g_timer_elapsed(query_timer, NULL));
-    log_info("Total runtime: %lf seconds.\n", g_timer_elapsed(global_timer, NULL));
+    log_info("Loading time:                   %lfs\n", g_timer_elapsed(loading_timer, NULL));
+    log_info("Execution time (%d queries):    %lfs\n", query_count, g_timer_elapsed(total_query_time_timer, NULL));
+    log_info("Total runtime:                  %lfs\n", g_timer_elapsed(global_timer, NULL));
 
+    g_timer_destroy(query_execution_timer);
     g_timer_destroy(loading_timer);
-    g_timer_destroy(query_timer);
+    g_timer_destroy(total_query_time_timer);
     g_timer_destroy(global_timer);
 
     return 0;
