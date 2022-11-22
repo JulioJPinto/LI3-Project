@@ -192,22 +192,23 @@
                 \end{tabular}
                 \caption{Performances em diferentes PCs}
             \end{table}
-
+            
             \begin{table}[hbt!]
                 \centering
                 \begin{tabular}{|*{4}{c|}}
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    Loading de ficheiros                  & 767.1ms & - & - \\
-                    Execução de 13 queries (tests\_1.txt)    & 8.0ms   & - & - \\
-                    Execução de 29 queries (tests\_2.txt) & 14.1ms  & - & - \\
+                    Loading de ficheiros                  & 767.1ms & 1.44s & - \\
+                    Execução de 13 queries (tests\_1.txt)    & 8.0ms   & 23.3ms & - \\
+                    Execução de 29 queries (tests\_2.txt) & 14.1ms  & 192.4ms & - \\
                     \hline
                 \end{tabular}
                 \caption{Tempos de execução em diferentes PCs}
-            \end{table}
+            \end{table}            
             
             Sobre o uso de memória, o programa usa, em pico, próximo de um total de 168 MB.
+            \\\\Nota: O PC 2 tem tido problemas de desempenho nos últimos meses apesar das características do mesmo , estes problemas podem ser devido à idade do computador (6 anos) ou por motivos dos quais desconhecemos.
 
         \subsection{Possíveis otimizações e futuras limitações}
         Como podemos ver na Tabela 2, o tempo de execução das queries é muito
