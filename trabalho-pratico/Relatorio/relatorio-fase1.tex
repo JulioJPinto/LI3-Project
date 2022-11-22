@@ -32,14 +32,13 @@
     \\
     \\Este relatório irá abrangir as decisões tomadas pelo grupo tal como o método de raciocínio para desenvolvimento do mesmo.
     
-
     \section{Desenvolvimento}
 
         \subsection{Pipeline atual}
             Neste momento a nossa pipeline funciona da seguinte maneira: 
             \begin{itemize}
                 \item Abre-se os ficheiros do dataset passados como parámetro do 
-                programa (\emph{drivers.csv, users.csv, rides.csv})
+                programa (\emph{drivers.csv, users.csv, rides.csv}).
                 \item Cada linha desses ficheiros é passada para um parser genérico
                 com informações de como interpertar essa linha e o que fazer com
                 a estrutura \emph{parsed}.
@@ -178,19 +177,18 @@
             \end{itemize}
             
             \begin{table}[hbt!]
-                \centering
                 \begin{tabular}{|*{4}{c|}}
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 8-core         & Intel i7-1165G7 \\
-                    RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz              & 16GB RAM DDR4 3200 MHz \\
-                    Disco      & 500GB NVME                      & 500GB NVME                    & 1TB SSD \\
-                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9-arch-1 & Windows 11 WSL 1.0 (Ubuntu 20.04) \\
-                    Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0                    & GCC 9.2.0 \\
+                    CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 4-core  & Intel i7-1165G7 4-core\\
+                    RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz       & 16GB DDR4 3200MHz \\
+                    Disco      & 500GB NVME                      & 500GB NVME             & 1TB SSD \\
+                    OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9 & Windows 11 WSL 1.0 \\
+                    Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0             & GCC 9.2.0 (Ubuntu 20.04)\\
                     \hline
                 \end{tabular}
-                \caption{Performances em diferentes PCs}
+                \caption{Especificações dos PCs}
             \end{table}
             
             \begin{table}[hbt!]
@@ -210,8 +208,8 @@
             Sobre o uso de memória, o programa usa, em pico, próximo de um total de 168 MB.
 
         \subsection{Possíveis otimizações e futuras limitações}
-        Como podemos ver na Tabela 2, o tempo de execução das queries é muito
-        pequeno, comparado com o tempo de loading dos ficheiros.
+        Como podemos ver na Tabela 2, o tempo de loading dos ficheiros é muito
+        grande comparado com o tempo de execução das queries.
         Após alguns simples testes, chegamos à conclusão que uma parte 
         significativa do tempo de loading é do \emph{parsing} das linhas
         das estruturas de dados e outra parte é da inserção, \emph{sorting} 
