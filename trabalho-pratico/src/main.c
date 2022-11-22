@@ -20,8 +20,11 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    GTimer *timer = g_timer_new();
-    g_timer_start(timer);
+    GTimer *global_timer = g_timer_new();
+    g_timer_start(global_timer);
+
+    GTimer *loading_timer = g_timer_new();
+    g_timer_start(loading_timer);
 
     char *dataset_folder_path = argv[1];
     char *queries_file_path = argv[2];
@@ -39,6 +42,11 @@ int main(int argc, char **argv) {
     read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
 
     notify_stop_registering(catalog);
+
+    g_timer_stop(loading_timer);
+
+    GTimer *query_timer = g_timer_new();
+    g_timer_start(query_timer);
 
     FILE *queries_file = open_file(queries_file_path);
 
@@ -58,9 +66,8 @@ int main(int argc, char **argv) {
         query_count++;
     }
 
-    g_timer_stop(timer);
+    g_timer_stop(query_timer);
 
-    log_info("Executed %d queries in %lf seconds.\n", query_count, g_timer_elapsed(timer, NULL));
 
     fclose(users_file);
     fclose(drivers_file);
@@ -70,7 +77,16 @@ int main(int argc, char **argv) {
     fclose(queries_file);
     free_catalog(catalog);
 
-    g_timer_destroy(timer);
+    g_timer_stop(global_timer);
+
+    log_info("Loading time: %lf seconds\n", g_timer_elapsed(loading_timer, NULL));
+    log_info("Execution time (%d queries): %lf seconds.\n", query_count, g_timer_elapsed(query_timer, NULL));
+    log_info("Total runtime: %lf seconds.\n", g_timer_elapsed(global_timer, NULL));
+
+    g_timer_destroy(loading_timer);
+    g_timer_destroy(query_timer);
+    g_timer_destroy(global_timer);
+
 
     return 0;
 }
