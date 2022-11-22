@@ -71,6 +71,7 @@ Ride *parse_line_ride(char *line, char *delim) {
 
 void free_ride(Ride *ride) {
     free(ride->user_username);
+    free(ride->city);
     free(ride);
 }
 

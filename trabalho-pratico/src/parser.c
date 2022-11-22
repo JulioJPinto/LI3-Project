@@ -1,10 +1,9 @@
 #include "parser.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunction *apply_function, void *apply_function_first_arg) {
-    char *line_buffer = malloc(1024 * sizeof(char));
+    char line_buffer[1024];
 
     if (fgets(line_buffer, 1024, stream) == NULL) {
         return;

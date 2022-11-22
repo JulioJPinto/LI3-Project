@@ -60,7 +60,7 @@ copy-build-release-to-main-folder: build-release
 
 # TODO: add support for valgrind
 leaks: build-debug
-	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input.txt
+	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
 
 test-results:
 	@diff -yr Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0

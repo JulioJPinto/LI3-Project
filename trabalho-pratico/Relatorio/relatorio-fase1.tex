@@ -199,13 +199,15 @@
                     \hline
                     & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    Loading de ficheiros               & 806.9ms & - & - \\
-                    Execução de queries (tests\_1.txt) & 8.6ms   & - & - \\
-                    Execução de queries (tests\_2.txt) & 16.2ms  & - & - \\
+                    Loading de ficheiros                  & 767.1ms & - & - \\
+                    Execução de 13 queries (tests\_1.txt)    & 8.0ms   & - & - \\
+                    Execução de 29 queries (tests\_2.txt) & 14.1ms  & - & - \\
                     \hline
                 \end{tabular}
                 \caption{Tempos de execução em diferentes PCs}
             \end{table}
+            
+            Sobre o uso de memória, o programa usa, em pico, próximo de um total de 168 MB.
 
         \subsection{Possíveis otimizações e futuras limitações}
         Como podemos ver na Tabela 2, o tempo de execução das queries é muito
@@ -221,6 +223,7 @@
         utilizadores ainda vai aumentar exponencialmente na segunda fase
         do projeto, será realmente necessário explorar possíveis melhorias
         nesta parte.
+        \\
         \\A parte positiva é que parece que as escolhas de implementações
         das \emph{queries} foram excelentes, pois o tempo de execução é
         super rápido. Ainda assim, podemos melhorar a performance das queries
@@ -228,6 +231,13 @@
         das implementações das \emph{queries}. Este \emph{lazy sorting} pode
         também aliviar o tempo de loading dos ficheiros, já que este só será
         feito quando necessário, ou seja, quando uma \emph{query} for executada. 
+        \\
+        \\Sobre o uso de memória, também estamos confiantes para a segunda fase
+        já que para o dataset atual de 93.8 MB, apesar do nosso programa usar
+        1.8 vezes mais (168 MB), ainda conseguimos fazer várias otimizações nas 
+        estruturas de dados para a reduzir. Se esse rácio se mantiver, ainda podemos
+        lidar com um dataset de 1 GB sem atingir o limite estipulado de 2 GB de 
+        uso de memória.
         
     \section{Conclusão}
         Para concluir, acreditamos que o desenvolvimento desta primeira fase foi
