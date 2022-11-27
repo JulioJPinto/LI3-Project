@@ -101,6 +101,6 @@ void user_register_ride_date(User *user, Date date);
 /**
  * Parses a string of the User File. 
  */
-User *parse_line_user(char *line, char *delim);
+User *parse_line_user(char *line, char delim);
 
 #endif //LI3_USER_H

@@ -10,7 +10,7 @@ void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunct
     }
 
     while (fgets(line_buffer, 1024, stream) != NULL) {
-        void *parsed_line = parse_line_function(line_buffer, ";");
+        void *parsed_line = parse_line_function(line_buffer, ';');
         apply_function(apply_function_first_arg, parsed_line);
     }
 }

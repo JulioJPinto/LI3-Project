@@ -5,15 +5,15 @@
 
 static const Date reference_date = {9, 10, 2022};
 
-int parse_int(char *string) {
+inline int parse_int(char *string) {
     return (int) strtol(string, NULL, 10);
 }
 
-double parse_double(char *string) {
+inline double parse_double(char *string) {
     return strtod(string, NULL);
 }
 
-Date parse_date(char *string) {
+inline Date parse_date(char *string) {
     if (strlen(string) != 10) {
         return (Date){0, 0, 0};
     }
@@ -29,19 +29,19 @@ Date parse_date(char *string) {
     return (Date){day, month, year};
 }
 
-Gender parse_gender(const char *string) {
+inline Gender parse_gender(const char *string) {
     return (string[0] == 'F' ? F : M);
 }
 
-CarClass parse_car_class(const char *string) {
+inline CarClass parse_car_class(const char *string) {
     return (string[0] == 'g' ? GREEN : (string[0] == 'p' ? PREMIUM : BASIC));
 }
 
-AccountStatus parse_acc_status(const char *string) {
+inline AccountStatus parse_acc_status(const char *string) {
     return (string[0] == 'a' ? ACTIVE : INACTIVE);
 }
 
-PaymentMethod parse_pay_method(const char *string) {
+inline PaymentMethod parse_pay_method(const char *string) {
     return (string[1] == 'a' ? CASH : (string[1] == 'r' ? CREDIT : DEBIT));
 }
 

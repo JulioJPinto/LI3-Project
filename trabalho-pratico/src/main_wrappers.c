@@ -9,21 +9,21 @@
 /**
  * Function to wrap parse_line_user in void pointers
  */
-void *wrapper_voidp_parse_user(char *arg, char* delimiter) {
+void *wrapper_voidp_parse_user(char *arg, char delimiter) {
     return parse_line_user(arg, delimiter);
 }
 
 /**
  * Function to wrap parse_line_driver in void pointers
  */
-void *wrapper_voidp_parse_driver(char *arg, char* delimiter) {
+void *wrapper_voidp_parse_driver(char *arg, char delimiter) {
     return parse_line_driver(arg, delimiter);
 }
 
 /**
  * Function to wrap parse_line_ride in void pointers
  */
-void *wrapper_voidp_parse_ride(char *arg, char* delimiter) {
+void *wrapper_voidp_parse_ride(char *arg, char delimiter) {
     return parse_line_ride(arg, delimiter);
 }
 

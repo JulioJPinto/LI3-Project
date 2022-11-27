@@ -2,6 +2,7 @@
 
 #include <glib.h>
 #include "struct_util.h"
+#include "string_util.h"
 
 /**
  * Struct that represents a ride.
@@ -38,30 +39,30 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
     return ride;
 }
 
-Ride *parse_line_ride(char *line, char *delim) {
-    char *id_string = strtok(line, delim);
+Ride *parse_line_ride(char *line, char delim) {
+    char *id_string = split_line(&line, delim);
     int id = parse_int(id_string);
 
-    char *date_string = strtok(NULL, delim);
+    char *date_string = split_line(&line, delim);
     Date date = parse_date(date_string);
 
-    char *driver_string = strtok(NULL, delim);
+    char *driver_string = split_line(&line, delim);
     int driver_id = parse_int(driver_string);
 
-    char *user = strtok(NULL, delim);
+    char *user = split_line(&line, delim);
 
-    char *city = strtok(NULL, delim);
+    char *city = split_line(&line, delim);
 
-    char *distance_string = strtok(NULL, delim);
+    char *distance_string = split_line(&line, delim);
     int distance = parse_int(distance_string);
 
-    char *user_score_string = strtok(NULL, delim);
+    char *user_score_string = split_line(&line, delim);
     int user_score = parse_int(user_score_string);
 
-    char *driver_score_string = strtok(NULL, delim);
+    char *driver_score_string = split_line(&line, delim);
     int driver_score = parse_int(driver_score_string);
 
-    char *tip_string = strtok(NULL, delim);
+    char *tip_string = split_line(&line, delim);
     double tip = parse_double(tip_string);
 
     //    char *comment = strtok(NULL, delim);;

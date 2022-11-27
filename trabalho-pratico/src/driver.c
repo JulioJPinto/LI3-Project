@@ -1,6 +1,7 @@
 #include "driver.h"
 
 #include <glib.h>
+#include "string_util.h"
 
 /**
  * Struct that represents a driver.
@@ -44,29 +45,29 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     return driver;
 }
 
-Driver *parse_line_driver(char *line, char *delim) {
-    char *id_string = strtok(line, delim);
+Driver *parse_line_driver(char *line, char delim) {
+    char *id_string = split_line(&line, delim);
     int id = parse_int(id_string);
 
-    char *name = strtok(NULL, delim);
+    char *name = split_line(&line, delim);
 
-    char *date_string = strtok(NULL, delim);
+    char *date_string = split_line(&line, delim);
     Date date = parse_date(date_string);
 
-    char *gender_string = strtok(NULL, delim);
+    char *gender_string = split_line(&line, delim);
     Gender gender = parse_gender(gender_string);
 
-    char *car_class_string = strtok(NULL, delim);
+    char *car_class_string = split_line(&line, delim);
     CarClass car_class = parse_car_class(car_class_string);
 
-    char *license_plate = strtok(NULL, delim);
+    char *license_plate = split_line(&line, delim);
 
-    char *city = strtok(NULL, delim);
+    char *city = split_line(&line, delim);
 
-    char *creation_date_string = strtok(NULL, delim);
+    char *creation_date_string = split_line(&line, delim);
     Date creation_date = parse_date(creation_date_string);
 
-    char *acc_status_string = strtok(NULL, delim);
+    char *acc_status_string = split_line(&line, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);

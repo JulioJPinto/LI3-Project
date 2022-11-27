@@ -1,6 +1,7 @@
 #include "user.h"
 
 #include <glib.h>
+#include "string_util.h"
 
 /**
  * Struct that represents a user.
@@ -42,24 +43,24 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char *line, char *delim) {
-    char *username = strtok(line, delim);
+User *parse_line_user(char *line, char delim) {
+    char *username = split_line(&line, delim);
 
-    char *name = strtok(NULL, delim);
+    char *name = split_line(&line, delim);
 
-    char *gender_string = strtok(NULL, delim);
+    char *gender_string = split_line(&line, delim);
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = strtok(NULL, delim);
+    char *birth_date_string = split_line(&line, delim);
     Date birth_date = parse_date(birth_date_string);
 
-    char *acc_creation_string = strtok(NULL, delim);
+    char *acc_creation_string = split_line(&line, delim);
     Date acc_creation = parse_date(acc_creation_string);
 
-    char *pay_method_string = strtok(NULL, delim);
+    char *pay_method_string = split_line(&line, delim);
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = strtok(NULL, delim);
+    char *acc_status_string = split_line(&line, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);

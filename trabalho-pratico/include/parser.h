@@ -7,9 +7,9 @@
 /**
  * Function definition that parses a line from the file to user/driver/ride structure.
  * char *line: line to parse
- * char *delimiter: delimiter to use in parsing (";")
+ * char *delimiter: delimiter to use in parsing (';')
  */
-typedef void *(ParserLineFunction) (char *, char *);
+typedef void *(ParserLineFunction) (char *, char);
 
 /**
  * Function definition to apply after the line is parsed.
