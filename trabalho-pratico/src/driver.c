@@ -46,28 +46,28 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 }
 
 Driver *parse_line_driver(char *line, char delim) {
-    char *id_string = split_line(&line, delim);
+    char *id_string = next_token(&line, delim);
     int id = parse_int(id_string);
 
-    char *name = split_line(&line, delim);
+    char *name = next_token(&line, delim);
 
-    char *date_string = split_line(&line, delim);
+    char *date_string = next_token(&line, delim);
     Date date = parse_date(date_string);
 
-    char *gender_string = split_line(&line, delim);
+    char *gender_string = next_token(&line, delim);
     Gender gender = parse_gender(gender_string);
 
-    char *car_class_string = split_line(&line, delim);
+    char *car_class_string = next_token(&line, delim);
     CarClass car_class = parse_car_class(car_class_string);
 
-    char *license_plate = split_line(&line, delim);
+    char *license_plate = next_token(&line, delim);
 
-    char *city = split_line(&line, delim);
+    char *city = next_token(&line, delim);
 
-    char *creation_date_string = split_line(&line, delim);
+    char *creation_date_string = next_token(&line, delim);
     Date creation_date = parse_date(creation_date_string);
 
-    char *acc_status_string = split_line(&line, delim);
+    char *acc_status_string = next_token(&line, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);

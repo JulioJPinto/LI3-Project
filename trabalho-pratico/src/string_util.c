@@ -1,6 +1,6 @@
 #include "string_util.h"
 
-inline char *split_line(char **line, char delim) {
+inline char *next_token(char **line, char delim) {
     char *start = *line;
 
     while (**line != delim && **line != '\0') {

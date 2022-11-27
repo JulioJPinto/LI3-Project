@@ -44,23 +44,23 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
 }
 
 User *parse_line_user(char *line, char delim) {
-    char *username = split_line(&line, delim);
+    char *username = next_token(&line, delim);
 
-    char *name = split_line(&line, delim);
+    char *name = next_token(&line, delim);
 
-    char *gender_string = split_line(&line, delim);
+    char *gender_string = next_token(&line, delim);
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = split_line(&line, delim);
+    char *birth_date_string = next_token(&line, delim);
     Date birth_date = parse_date(birth_date_string);
 
-    char *acc_creation_string = split_line(&line, delim);
+    char *acc_creation_string = next_token(&line, delim);
     Date acc_creation = parse_date(acc_creation_string);
 
-    char *pay_method_string = split_line(&line, delim);
+    char *pay_method_string = next_token(&line, delim);
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = split_line(&line, delim);
+    char *acc_status_string = next_token(&line, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);

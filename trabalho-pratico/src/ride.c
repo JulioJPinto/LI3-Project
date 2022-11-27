@@ -40,29 +40,29 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 }
 
 Ride *parse_line_ride(char *line, char delim) {
-    char *id_string = split_line(&line, delim);
+    char *id_string = next_token(&line, delim);
     int id = parse_int(id_string);
 
-    char *date_string = split_line(&line, delim);
+    char *date_string = next_token(&line, delim);
     Date date = parse_date(date_string);
 
-    char *driver_string = split_line(&line, delim);
+    char *driver_string = next_token(&line, delim);
     int driver_id = parse_int(driver_string);
 
-    char *user = split_line(&line, delim);
+    char *user = next_token(&line, delim);
 
-    char *city = split_line(&line, delim);
+    char *city = next_token(&line, delim);
 
-    char *distance_string = split_line(&line, delim);
+    char *distance_string = next_token(&line, delim);
     int distance = parse_int(distance_string);
 
-    char *user_score_string = split_line(&line, delim);
+    char *user_score_string = next_token(&line, delim);
     int user_score = parse_int(user_score_string);
 
-    char *driver_score_string = split_line(&line, delim);
+    char *driver_score_string = next_token(&line, delim);
     int driver_score = parse_int(driver_score_string);
 
-    char *tip_string = split_line(&line, delim);
+    char *tip_string = next_token(&line, delim);
     double tip = parse_double(tip_string);
 
     //    char *comment = strtok(NULL, delim);;
