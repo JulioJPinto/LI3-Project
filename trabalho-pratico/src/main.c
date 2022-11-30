@@ -37,9 +37,22 @@ int main(int argc, char **argv) {
 
     char *line_buffer = malloc(1024 * sizeof(char));
 
+    GTimer *load_timer = g_timer_new();
+
+    g_timer_start(load_timer);
     read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
+    g_timer_stop(load_timer);
+    log_info("Loaded users in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
+
+    g_timer_start(load_timer);
     read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
+    g_timer_stop(load_timer);
+    log_info("Loaded drivers in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
+
+    g_timer_start(load_timer);
     read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
+    g_timer_stop(load_timer);
+    log_info("Loaded rides in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
 
     notify_stop_registering(catalog);
 
@@ -85,6 +98,7 @@ int main(int argc, char **argv) {
     log_info("Execution time (%d queries):    %lfs\n", query_count, g_timer_elapsed(total_query_time_timer, NULL));
     log_info("Total runtime:                  %lfs\n", g_timer_elapsed(global_timer, NULL));
 
+    g_timer_destroy(load_timer);
     g_timer_destroy(query_execution_timer);
     g_timer_destroy(loading_timer);
     g_timer_destroy(total_query_time_timer);
