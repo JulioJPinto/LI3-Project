@@ -9,6 +9,14 @@
 
 #define OUTPUT_FOLDER "Resultados"
 
+#define BENCHMARK_START(timer_name)                \
+    g_autofree GTimer *timer_name = g_timer_new(); \
+    g_timer_start(timer_name)
+
+#define BENCHMARK_END(timer_name, log_string) \
+    g_timer_stop(timer_name);                 \
+    log_info(log_string, g_timer_elapsed(timer_name, NULL))
+
 /**
  * Main entry point
  */
@@ -20,11 +28,8 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    GTimer *global_timer = g_timer_new();
-    g_timer_start(global_timer);
-
-    GTimer *loading_timer = g_timer_new();
-    g_timer_start(loading_timer);
+    BENCHMARK_START(global_timer);
+    BENCHMARK_START(loading_timer);
 
     char *dataset_folder_path = argv[1];
     char *queries_file_path = argv[2];
@@ -37,29 +42,23 @@ int main(int argc, char **argv) {
 
     char *line_buffer = malloc(1024 * sizeof(char));
 
-    GTimer *load_timer = g_timer_new();
-
-    g_timer_start(load_timer);
+    BENCHMARK_START(load_timer);
     read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
-    g_timer_stop(load_timer);
-    log_info("Loaded users in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
+    BENCHMARK_END(load_timer, "Loaded users in %f seconds\n");
 
     g_timer_start(load_timer);
     read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
-    g_timer_stop(load_timer);
-    log_info("Loaded drivers in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
+    BENCHMARK_END(load_timer, "Loaded drivers in %f seconds\n");
 
     g_timer_start(load_timer);
     read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
-    g_timer_stop(load_timer);
-    log_info("Loaded rides in %lfs seconds\n", g_timer_elapsed(load_timer, NULL));
+    BENCHMARK_END(load_timer, "Loaded rides in %f seconds\n");
 
     notify_stop_registering(catalog);
 
     g_timer_stop(loading_timer);
 
-    GTimer *total_query_time_timer = g_timer_new();
-    g_timer_start(total_query_time_timer);
+    BENCHMARK_START(total_query_time_timer);
 
     FILE *queries_file = open_file(queries_file_path);
 
@@ -67,7 +66,7 @@ int main(int argc, char **argv) {
 
     create_output_folder_if_not_exists();
 
-    GTimer *query_execution_timer = g_timer_new();
+    BENCHMARK_START(query_execution_timer);
     while (fgets(line_buffer, 1024, queries_file)) {
         g_timer_start(query_execution_timer);
         format_fgets_input_line(line_buffer);
@@ -97,12 +96,6 @@ int main(int argc, char **argv) {
     log_info("Loading time:                   %lfs\n", g_timer_elapsed(loading_timer, NULL));
     log_info("Execution time (%d queries):    %lfs\n", query_count, g_timer_elapsed(total_query_time_timer, NULL));
     log_info("Total runtime:                  %lfs\n", g_timer_elapsed(global_timer, NULL));
-
-    g_timer_destroy(load_timer);
-    g_timer_destroy(query_execution_timer);
-    g_timer_destroy(loading_timer);
-    g_timer_destroy(total_query_time_timer);
-    g_timer_destroy(global_timer);
 
     return 0;
 }
