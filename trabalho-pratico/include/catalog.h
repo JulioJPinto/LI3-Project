@@ -90,4 +90,6 @@ double catalog_get_average_price_in_city(Catalog *p_catalog, char *city);
  */
 double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
 
+double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
+
 #endif //LI3_CATALOG_H

@@ -224,9 +224,6 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
         current_ride = g_ptr_array_index(rides, current_value_index);
         current_ride_date = ride_get_date(current_ride);
 
-        if (date_compare(current_ride_date, end_date) > 0)
-            break;
-
         total_price += ride_get_price(current_ride);
         rides_count++;
 
@@ -235,6 +232,29 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
 
     // divide by zero check
     return rides_count != 0 ? total_price / rides_count : 0;
+}
+
+double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city) {
+    GPtrArray *rides = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
+    if (rides == NULL) return 0;
+
+    double total_distance = 0;
+    int ride_counter = 0;
+
+    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
+
+    for (ride_counter = current_value_index; ride_counter < rides->len ; ride_counter++) {
+        Ride *current_ride = g_ptr_array_index(rides, current_value_index);
+        Date current_ride_date = ride_get_date(current_ride);
+
+        if (date_compare(current_ride_date, end_date) > 0) break;
+
+        Ride *ride = g_ptr_array_index(rides, ride_counter);
+        total_distance += ride_get_distance(ride);
+        
+    }
+
+    return total_distance / ride_counter;
 }
 
 void notify_stop_registering(Catalog *catalog) {
