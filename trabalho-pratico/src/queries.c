@@ -198,4 +198,4 @@ void execute_average_distance_per_city_per_date(Catalog *catalog, FILE *output, 
  /**
   * Query 7
   */
-void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output);
+void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output)
