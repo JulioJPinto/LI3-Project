@@ -60,10 +60,10 @@ copy-build-release-to-main-folder: build-release
 
 # TODO: add support for valgrind
 leaks: build-debug
-ifeq ($(UNAME), Linux)
-	valgrind --leak-check=full --show-leak-kinds=all ./programa-principal dataset input2.txt 
-else
+ifeq ($(UNAME), Darwin)
 	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
+else
+	valgrind --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
 endif
 
 test-results:
