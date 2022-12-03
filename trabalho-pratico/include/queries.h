@@ -38,6 +38,9 @@ void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **
  */
 void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, char **args);
 
-void execute_average_distance_per_city_per_date(Catalog *catalog, FILE *output, char **args);
+/**
+ * Executes the query number 6.
+ */
+void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args);
 
 #endif //LI3_QUERIES_H
