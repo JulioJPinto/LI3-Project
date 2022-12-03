@@ -44,17 +44,19 @@ int main(int argc, char **argv) {
 
     BENCHMARK_START(load_timer);
     read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
-    BENCHMARK_END(load_timer, "Loaded users in %f seconds\n");
+    BENCHMARK_END(load_timer, "Load users time:        %f seconds\n");
 
     g_timer_start(load_timer);
     read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
-    BENCHMARK_END(load_timer, "Loaded drivers in %f seconds\n");
+    BENCHMARK_END(load_timer, "Load drivers time:      %f seconds\n");
 
     g_timer_start(load_timer);
     read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
-    BENCHMARK_END(load_timer, "Loaded rides in %f seconds\n");
+    BENCHMARK_END(load_timer, "Load rides time:        %f seconds\n");
 
+    g_timer_start(load_timer);
     notify_stop_registering(catalog);
+    BENCHMARK_END(load_timer, "Final indexing time:    %f seconds\n");
 
     g_timer_stop(loading_timer);
 
@@ -70,20 +72,21 @@ int main(int argc, char **argv) {
     while (fgets(line_buffer, 1024, queries_file)) {
         g_timer_start(query_execution_timer);
         format_fgets_input_line(line_buffer);
-        log_info("Executing query '%s'", line_buffer);
+
+        query_count++;
+        log_info("Executing query (%d) '%s'", query_count, line_buffer);
 
         if (*line_buffer == '#') {
             log_info(" (skipped)\n");
             continue;
         }
 
-        FILE *output_file = create_command_output_file(query_count + 1);
+        FILE *output_file = create_command_output_file(query_count);
 
         parse_and_run_query(catalog, output_file, line_buffer);
         fclose(output_file);
 
         log_info(" (%.3fms)\n", g_timer_elapsed(query_execution_timer, NULL) * 1000);
-        query_count++;
     }
 
     g_timer_stop(total_query_time_timer);

@@ -45,3 +45,4 @@ input*.txt
 # Doxygen
 
 */doxygen-output/
+/venv/
