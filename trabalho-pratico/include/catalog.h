@@ -66,18 +66,20 @@ Driver *catalog_get_driver(Catalog *catalog, int id);
  * Drivers are sorted by their score, date of last ride and id.
  * The drivers are not copied, their pointers are inserted.
  * The GPtrArray should be empty and pre-allocated with N elements.
+ * Returns the number of drivers inserted. This number can be less than N if there are less than N drivers.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result);
+int catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result);
 
 /**
  * Inserts the top N users in the given GPtrArray.
  * Users are sorted by their total distance, date of last ride and username.
  * The users are not copied, their pointers are inserted.
  * The GPtrArray should be empty and pre-allocated with N elements.
+ * Returns the number of users inserted. This number can be less than N if there are less than N users.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-void catalog_get_longest_n_total_distance(Catalog *catalog, int n, GPtrArray *result);
+int catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
 
 /**
  * Returns the average price of rides in the given city.

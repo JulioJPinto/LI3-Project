@@ -102,9 +102,9 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
 
     GPtrArray *result = g_ptr_array_sized_new(n);
 
-    catalog_get_top_n_drivers(catalog, n, result);
+    int result_size = catalog_get_top_drivers_with_best_score(catalog, n, result);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < result_size; i++) {
         Driver *driver = g_ptr_array_index(result, i);
 
         int id = driver_get_id(driver);
@@ -132,9 +132,9 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
 
     GPtrArray *result = g_ptr_array_sized_new(n);
 
-    catalog_get_longest_n_total_distance(catalog, n, result);
+    int result_size = catalog_get_top_users_with_longest_total_distance(catalog, n, result);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < result_size; i++) {
         User *user = g_ptr_array_index(result, i);
 
         char *username = user_get_username(user);

@@ -147,19 +147,27 @@ Driver *catalog_get_driver(Catalog *catalog, int id) {
     return g_hash_table_lookup(catalog->driver_from_id_hashtable, &id);
 }
 
-void catalog_get_top_n_drivers(Catalog *catalog, int n, GPtrArray *result) {
-    // TODO: todo in catalog_get_longest_n_total_distance
-    for (int i = 0; i < n; i++) {
+int catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result) {
+    // TODO: todo in catalog_get_top_users_with_longest_total_distance
+    int length = MIN(n, (int) catalog->drivers_array->len);
+
+    for (int i = 0; i < length; i++) {
         g_ptr_array_add(result, g_ptr_array_index(catalog->drivers_array, i));
     }
+
+    return length;
 }
 
 
-void catalog_get_longest_n_total_distance(Catalog *catalog, int n, GPtrArray *result) {
+int catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result) {
     // TODO: This can be improved, no need to copy the array, just create a new one pointing to the users_array with the length of n
+    int length = MIN(n, (int) catalog->users_array->len);
+
     for (int i = 0; i < n; i++) {
         g_ptr_array_add(result, g_ptr_array_index(catalog->users_array, i));
     }
+
+    return length;
 }
 
 double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
