@@ -217,12 +217,9 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
     double total_price = 0;
     int rides_count = 0;
 
-    Ride *current_ride;
-    Date current_ride_date;
-
     while (current_value_index < rides->len) {
-        current_ride = g_ptr_array_index(rides, current_value_index);
-        current_ride_date = ride_get_date(current_ride);
+        Ride *current_ride = g_ptr_array_index(rides, current_value_index);
+        Date current_ride_date = ride_get_date(current_ride);
 
         if (date_compare(current_ride_date, end_date) > 0)
             break;
@@ -237,8 +234,53 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
     return rides_count != 0 ? total_price / rides_count : 0;
 }
 
+double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city) {
+    GPtrArray *rides_in_city = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
+    if (rides_in_city == NULL) return 0;
+
+    double total_distance = 0;
+    int ride_count = 0;
+
+    long current_value_index = ride_array_find_date_lower_bound(rides_in_city, start_date);
+
+    while (current_value_index < rides_in_city->len) {
+        Ride *current_ride = g_ptr_array_index(rides_in_city, current_value_index);
+        Date current_ride_date = ride_get_date(current_ride);
+
+        if (date_compare(current_ride_date, end_date) > 0)
+            break;
+
+        total_distance += ride_get_distance(current_ride);
+        ride_count++;
+
+        current_value_index++;
+    }
+
+    // divide by zero check
+    return ride_count != 0 ? total_distance / ride_count : 0;
+}
+
+/**
+ * Sorts the value by date.
+ * This is used to sort a hash table with value: array of rides.
+ * @param key unused
+ * @param value the array to be sorted
+ * @param user_data unused
+ */
+void hash_table_sort_array_values_by_date(gpointer key, gpointer value, gpointer user_data) {
+    (void) key;
+    (void) user_data;
+
+    g_ptr_array_sort(value, glib_wrapper_compare_rides_by_date);
+}
+
 void notify_stop_registering(Catalog *catalog) {
     g_ptr_array_sort(catalog->drivers_array, glib_wrapper_compare_drivers_by_score);
     g_ptr_array_sort(catalog->users_array, glib_wrapper_compare_users_by_total_distance);
+    // Sort rides by date for faster query 5 that requires lookup in a date range
     g_ptr_array_sort(catalog->rides_array, glib_wrapper_compare_rides_by_date);
+
+    // Sort each rides array in the rides_in_city_hashtable by date for faster query 6 that requires date range
+    // TODO: Maybe make so the sort for each city is only done when a query for that city is called
+    g_hash_table_foreach(catalog->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
 }

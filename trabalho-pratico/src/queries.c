@@ -175,3 +175,24 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
 
     fprintf(output, "%.3f\n", average_price);
 }
+
+/**
+ * Query 6
+ */
+void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args) {
+    char *city_string = args[0];
+    char *start_date_string = args[1];
+    char *end_date_string = args[2];
+
+    Date start_date = parse_date(start_date_string);
+    Date end_date = parse_date(end_date_string);
+
+    double average_distance = catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city_string);
+
+    fprintf(output, "%.3f\n", average_distance);
+}
+
+/**
+  * Query 7
+  */
+void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output);

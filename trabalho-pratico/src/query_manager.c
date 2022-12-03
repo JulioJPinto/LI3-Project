@@ -10,6 +10,7 @@ static const QueryFunction query_functions[] = {
         execute_query_longest_n_total_distance,
         execute_query_average_price_in_city,
         execute_query_average_price_in_date_range,
+        execute_query_average_distance_in_city_in_date_range,
 };
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);
