@@ -72,6 +72,11 @@ int main(int argc, char **argv) {
         format_fgets_input_line(line_buffer);
         log_info("Executing query '%s'", line_buffer);
 
+        if (*line_buffer == '#') {
+            log_info(" (skipped)\n");
+            continue;
+        }
+
         FILE *output_file = create_command_output_file(query_count + 1);
 
         parse_and_run_query(catalog, output_file, line_buffer);
