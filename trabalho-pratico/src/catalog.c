@@ -1,6 +1,7 @@
 #include <printf.h>
 #include "catalog.h"
 #include "price_util.h"
+#include <stdio.h>
 
 #include "catalog_sort.h"
 
@@ -16,6 +17,7 @@ struct Catalog {
     GHashTable *driver_from_id_hashtable;     // key: driver id (int), value: Driver*
 
     GHashTable *rides_in_city_hashtable; // key: city (char*), value: GPtrArray of rides
+    GHashTable *drivers_in_city; // key: city (char*), value: DriverbyCity           
 };
 
 /**
@@ -50,13 +52,14 @@ Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
     catalog->users_array = g_ptr_array_new_full(100000, glib_wrapper_free_user);
-    catalog->drivers_array = g_ptr_array_new_full(10000, glib_wrapper_free_driver);
+    catalog->drivers_array = g_ptr_array_new_full(10000, glib_wrapper_free_driver); 
     catalog->rides_array = g_ptr_array_new_full(1000000, glib_wrapper_free_ride);
 
     catalog->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
     catalog->driver_from_id_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
 
     catalog->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free_segment);
+    catalog->drivers_in_city = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 
     return catalog;
 }
@@ -69,6 +72,7 @@ void free_catalog(Catalog *catalog) {
     g_hash_table_destroy(catalog->user_from_username_hashtable);
     g_hash_table_destroy(catalog->driver_from_id_hashtable);
     g_hash_table_destroy(catalog->rides_in_city_hashtable);
+    g_hash_table_destroy(catalog->drivers_in_city);
 
     free(catalog);
 }
@@ -108,10 +112,24 @@ static void catalog_ride_index_city(Catalog *catalog, Ride *ride) {
     }
 
     g_ptr_array_add(rides_in_city, ride);
+
+}
+
+void insert_new_driver_city(Ride *ride, GPtrArray *driver_by_city, Catalog* catalog){
+    int driver_id = ride_get_driver_id(ride)
+    DriverbyCity *new_driver = create_driver_by_city(driver_id, catalog_get_driver(catalog,driver_id));
+    g_ptr_array_add(driver_by_city, new_driver);
+}
+
+void add_score_to_driver_city(int score, int index, GPtrArray *driver_by_city){
+    DriverbyCity *driver = g_ptr_array_index(driver_by_city, index);
+    driver->accumulated_score += score ;
+    driver->amount_rides++;
 }
 
 void register_ride(Catalog *catalog, Ride *ride) {
     g_ptr_array_add(catalog->rides_array, ride);
+    char* city = ride_get_city(ride);
 
     Driver *driver = catalog_get_driver(catalog, ride_get_driver_id(ride));
     double price = compute_price(ride_get_distance(ride), driver_get_car_class(driver));
@@ -136,6 +154,18 @@ void register_ride(Catalog *catalog, Ride *ride) {
     free(username);
 
     catalog_ride_index_city(catalog, ride);
+
+    GPtrArray *driver_by_city = g_hash_table_lookup(catalog->drivers_in_city, city);
+    guint* index = NULL;
+    int id = ride_get_driver_id(ride);
+
+    g_ptr_array_find(driver_by_city, &id, index);
+
+    if(index == NULL) {
+        insert_new_driver_city(ride, driver_by_city, catalog);
+    } else {
+        add_score_to_driver_city(ride_get_score_driver(ride), (int) index, driver_by_city);
+    }
 }
 
 
@@ -307,6 +337,13 @@ void hash_table_sort_array_values_by_date(gpointer key, gpointer value, gpointer
     g_ptr_array_sort(value, glib_wrapper_compare_rides_by_date);
 }
 
+void hash_table_sort_array_values_by_values(gpointer key, gpointer value, gpointer user_data) {
+    (void) key;
+    (void) user_data;
+
+    g_ptr_array_sort(value, glib_wrapper_compare_drivers_in_city_by_score);
+}
+
 void notify_stop_registering(Catalog *catalog) {
     g_ptr_array_sort(catalog->drivers_array, glib_wrapper_compare_drivers_by_score);
     g_ptr_array_sort(catalog->users_array, glib_wrapper_compare_users_by_total_distance);
@@ -316,4 +353,16 @@ void notify_stop_registering(Catalog *catalog) {
     // Sort each rides array in the rides_in_city_hashtable by date for faster query 6 that requires date range
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
     g_hash_table_foreach(catalog->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
+    g_hash_table_foreach(catalog->drivers_in_city, hash_table_sort_array_values_by_score, NULL);
+}
+
+void catalog_get_top_n_drivers_in_city(Catalog *catalog,int n, char *city, GPtrArray *result) {
+    GPtrArray *top_n_drivers = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
+    if (top_n_drivers == NULL) return;
+
+    for (guint i = 0; i < n ; i++) {
+        DriverbyCity *driver = g_ptr_array_index(top_n_drivers, i);
+        g_ptr_array_add(result, driver);
+    }
+
 }

@@ -8,6 +8,8 @@
 #include "ride.h"
 #include "user.h"
 
+typedef struct DriverbyCit DriverbyCity;
+
 /**
  * Struct that represents a catalog.
  */
