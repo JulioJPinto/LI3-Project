@@ -24,12 +24,7 @@ struct Driver {
     Date last_ride_date;
 };
 
-struct DriverbyCity {
-    int id;
-    char* name;
-    int accumulated_score;
-    int amount_rides;
-};
+
 
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
                       char *city, Date account_creation_date, AccountStatus account_status) {
@@ -50,15 +45,6 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->last_ride_date = (Date){0, 0, 0};
 
     return driver;
-}
-
-DriverbyCity *create_driver_by_city(int id, char* name) {
-    DriverbyCity *driver_by_city = malloc(sizeof(DriverbyCity));
-    driver_by_city->id = id;
-    driver_by_city->name = g_strdup(name);
-
-    driver_by_city->accumulated_score = 0;
-    driver_by_city->amount_rides = 0;
 }
 
 Driver *parse_line_driver(char *line, char delim) {
@@ -93,16 +79,8 @@ int driver_get_id(Driver *driver) {
     return driver->id;
 }
 
-int driver_by_city_get_id(DriverbyCity *driver) {
-    return driver->driver_id;
-}
-
 char *driver_get_name(Driver *driver) {
     return g_strdup(driver->name);
-}
-
-char *driver_by_city_get_name(DriverbyCity *driver) {
-    return driver->name;
 }
 
 Date driver_get_birthdate(Driver *driver) {
@@ -129,15 +107,7 @@ void driver_increment_number_of_rides(Driver *driver) {
     driver->rides_amount++;
 }
 
-void driver_by_city_increment_number_of_rides(DriverbyCity *driver) {
-    driver->amount_rides++;
-}
-
 void driver_add_score(Driver *driver, int score) {
-    driver->accumulated_score += score;
-}
-
-void driver_by_city_add_score(DriverbyCity *driver, int score) {
     driver->accumulated_score += score;
 }
 

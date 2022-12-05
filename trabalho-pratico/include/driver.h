@@ -9,15 +9,11 @@
  */
 typedef struct Driver Driver;
 
-typedef struct DriverbyCity DriverbyCity;
-
 /**
  * Creates a new Driver.
  */
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
                       char *city, Date account_creation_date, AccountStatus account_status);
-
-DriverbyCity *create_driver_by_city(int id, char* name);
 
 /**
  + Parses a line of the CSV to a driver   
@@ -34,15 +30,11 @@ void free_driver(Driver *driver);
  */
 int driver_get_id(Driver *driver);
 
-int driver_by_city_get_id(DriverbyCity *driver);
-
 /**
  * Returns a copy of the name of the Driver
  * The caller is responsible for freeing the memory allocated for the name
  */
 char *driver_get_name(Driver *driver);
-
-char *driver_by_city_get_name(DriverbyCity *driver);
 
 /**
  * Returns the birthdate of the Driver
@@ -74,15 +66,10 @@ Date driver_get_last_ride_date(Driver *driver);
  */
 void driver_increment_number_of_rides(Driver *driver);
 
-void driver_by_city_increment_number_of_rides(DriverbyCity *driver);
-
-
 /**
  * Increments the accumulated score of the Driver
  */
 void driver_add_score(Driver *driver, int score);
-
-void driver_by_city_add_score(DriverbyCity *driver, int score)
 
 /**
  * Increments the total money earned by the Driver

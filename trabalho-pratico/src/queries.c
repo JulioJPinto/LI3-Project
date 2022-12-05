@@ -1,6 +1,4 @@
 #include "queries.h"
-#include <glib.h>
-#include "catalog_sort.h"
 
 #define UNUSED(x) (void) (x)
 
@@ -197,7 +195,24 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
 /**
   * Query 7
   */
-void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output);
+void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output) {
+    char *end_ptr;
+    int n = (int) strtol(args[0], &end_ptr, 10);
+    char *city = args[1];
+    GPtrArray *result;
+
+    catalog_get_top_n_drivers_in_city(catalog, n, city, result);
+
+    for(guint i = 0; i < n; i++) {
+        DriverbyCity *driver = g_ptr_array_index(result, i);
+        int id = driver_by_city_get_id(driver);
+        char* name = driver_by_city_get_name(driver);
+        double average_score = driver_by_city_get_average_score(driver);
+
+        fprintf(output, "%d;%s;%.3f\n" , id, name, average_score);
+    }
+
+}
 
 /**
  * Query 9
