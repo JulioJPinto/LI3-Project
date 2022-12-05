@@ -33,4 +33,5 @@ int glib_wrapper_compare_drivers_in_city_by_score(gconstpointer a, gconstpointer
  * Used to sort the rides array for fast resolution of the query 9.
  */
 int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b);
+
 #endif //LI3_CATALOG_SORT_H

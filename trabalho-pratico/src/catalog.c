@@ -165,12 +165,15 @@ void add_score_to_driver_city(int score, int index, GPtrArray *driver_by_city){
 
 void catalog_add_driver_by_city(Catalog *catalog, Ride *ride, char* city) {
     GPtrArray *driver_by_city = g_hash_table_lookup(catalog->drivers_in_city, city);
-    guint* index;
+    guint index;
     int id = ride_get_driver_id(ride);
 
-    g_ptr_array_find(driver_by_city, &id, index);
-
-    if(index == NULL) {
+    if(driver_by_city != NULL) {
+        driver_by_city = g_ptr_array_new();
+        g_hash_table_insert(catalog->drivers_in_city, city, driver_by_city);
+    }
+    
+    if(g_ptr_array_find(driver_by_city, &id, &index)) {
         insert_new_driver_city(ride, driver_by_city, catalog);
     } else {
         add_score_to_driver_city(ride_get_score_driver(ride), (int) index, driver_by_city);

@@ -195,7 +195,7 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
 /**
   * Query 7
   */
-void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output) {
+void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output, char **args) {
     char *end_ptr;
     int n = (int) strtol(args[0], &end_ptr, 10);
     char *city = args[1];
