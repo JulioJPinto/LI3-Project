@@ -51,6 +51,7 @@ clean:
 	rm -rf Resultados
 	rm -f programa-principal
 	rm -rf doxygen-output
+	@$(MAKE) -C csv_generator clean
 
 format:
 	clang-format -i src/*.c include/*.h
@@ -78,3 +79,6 @@ generate-doxygen:
 	genhtml --no-function-coverage --no-branch-coverage doxygen-output/doc-coverage.info -o doxygen-output
 	realpath doxygen-output/index.html | sed 's/^/file:\/\//'
 
+generate-csv:
+	@$(MAKE) -C csv_generator build
+	@./csv_generator/csv_generator $(filter-out $@,$(MAKECMDGOALS))

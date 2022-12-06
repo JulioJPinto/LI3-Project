@@ -19,7 +19,7 @@ Resultados/
 Resultados-expected/
 programa-principal
 
-*/build/*
+*/build
 input*.txt
 *.pdf
 
@@ -45,4 +45,12 @@ input*.txt
 # Doxygen
 
 */doxygen-output/
+
+# Python
+
 /venv/
+
+# Rust
+
+Cargo.lock
+**/target/
