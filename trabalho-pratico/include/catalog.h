@@ -10,7 +10,7 @@
 
 typedef struct DriverbyCity DriverbyCity;
 
-DriverbyCity *create_driver_by_city(int id, char* name);
+DriverbyCity *create_driver_by_city(int id, char *name);
 
 int driver_by_city_get_id(DriverbyCity *driver);
 
@@ -110,7 +110,7 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
 
 double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
-void catalog_get_top_n_drivers_in_city(Catalog *catalog,int n, char *city, GPtrArray *result);
+void catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
 
 /**
  * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.

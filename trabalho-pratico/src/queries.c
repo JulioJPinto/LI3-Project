@@ -203,15 +203,14 @@ void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output
 
     catalog_get_top_n_drivers_in_city(catalog, n, city, result);
 
-    for(guint i = 0; i < n; i++) {
+    for (guint i = 0; i < n; i++) {
         DriverbyCity *driver = g_ptr_array_index(result, i);
         int id = driver_by_city_get_id(driver);
-        char* name = driver_by_city_get_name(driver);
+        char *name = driver_by_city_get_name(driver);
         double average_score = driver_by_city_get_average_score(driver);
 
-        fprintf(output, "%d;%s;%.3f\n" , id, name, average_score);
+        fprintf(output, "%d;%s;%.3f\n", id, name, average_score);
     }
-
 }
 
 /**
