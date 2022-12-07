@@ -268,6 +268,31 @@ double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start
     return ride_count != 0 ? total_distance / ride_count : 0;
 }
 
+void catalog_insert_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {
+    GPtrArray *rides = catalog->rides_array;
+
+    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
+
+    Ride *current_ride;
+    Date current_ride_date;
+
+    while (current_value_index < rides->len) {
+        current_ride = g_ptr_array_index(rides, current_value_index);
+        current_ride_date = ride_get_date(current_ride);
+
+        if (date_compare(current_ride_date, end_date) > 0)
+            break;
+
+        if (ride_get_tip(current_ride) > 0) {
+            g_ptr_array_add(result, current_ride);
+        }
+
+        current_value_index++;
+    }
+
+    g_ptr_array_sort(result, glib_wrapper_compare_rides_by_distance);
+}
+
 /**
  * Sorts the value by date.
  * This is used to sort a hash table with value: array of rides.
@@ -291,25 +316,4 @@ void notify_stop_registering(Catalog *catalog) {
     // Sort each rides array in the rides_in_city_hashtable by date for faster query 6 that requires date range
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
     g_hash_table_foreach(catalog->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
-}
-
-void catalog_get_passenger_gave_tip(Catalog *catalog, Date start_date, Date end_date) {
-    GPtrArray *rides = catalog->rides_array;
-
-    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
-
-    Ride *current_ride;
-    Date current_ride_date;
-
-    while (current_value_index < rides->len) {
-        current_ride = g_ptr_array_index(rides, current_value_index);
-        current_ride_date = ride_get_date(current_ride);
-
-        if (date_compare(current_ride_date, end_date) > 0)
-            break;
-
-        current_value_index++;
-    }
-
-    return current_ride_date;
 }

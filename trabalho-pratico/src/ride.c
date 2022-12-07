@@ -80,7 +80,7 @@ int ride_get_driver_id(Ride *ride) {
     return ride->driver_id;
 }
 
-int ride_get_id(Ride *ride){
+int ride_get_id(Ride *ride) {
     return ride->id;
 }
 

@@ -202,24 +202,25 @@ void execute_query_top_n_drivers_by_city_and_date(Catalog *catalog, FILE *output
 /**
  * Query 9
  */
-void execute_query_passanger_gave_tip(Catalog *catalog, FILE *output, char **args) {
+void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char **args) {
     char *start_date_string = args[0];
     char *end_date_string = args[1];
 
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
 
+    GPtrArray *result = g_ptr_array_new();
+    catalog_insert_passengers_that_gave_tip_in_date_range(catalog, result, start_date, end_date);
 
-    GPtrArray *result = catalog_get_passenger_gave_tip(catalog, start_date, end_date);
+    for (size_t i = 0; i < result->len; i++) {
+        Ride *ride = g_ptr_array_index(result, i);
+        int id = ride_get_id(ride);
+        Date date = ride_get_date(ride);
+        int distance = ride_get_distance(ride);
+        char *city = ride_get_city(ride);
+        double tip = ride_get_tip(ride);
 
-    g_ptr_array_sort(result, glib_wrapper_compare_rides_by_distance);
-
-    Ride *ride;
-    int id = ride_get_driver_id(ride);
-    Date date = ride_get_date(ride);
-    int distance = ride_get_distance(ride);
-    char city = ride_get_city(ride);
-    double tip = ride_get_tip(ride);
-
-    fprintf(output, "%012d;%d;%d;%d;%d;%s;%.3f\n", id, date.day, date.month, date.year, distance, city, tip);
+        fprintf(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, date.day, date.month, date.year, distance, city, tip);
+        free(city);
+    }
 }

@@ -125,26 +125,18 @@ int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b) {
     return date_compare(ride_get_date(a_ride), ride_get_date(b_ride));
 }
 
-int compare_ride_by_distance(int distance_a, int distance_b){
-    return distance_a-distance_b;
-}
-
-int compare_ride_by_id(int id_a,int id_b){
-    return id_a-id_b;
-}
-
-int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b){
+int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b) {
     Ride *a_ride = *(Ride **) a;
     Ride *b_ride = *(Ride **) b;
 
-    int by_distance = compare_ride_by_distance(ride_get_distance(a_ride),ride_get_distance(b_ride));
-    if (by_distance != 0){
+    int by_distance = ride_get_distance(b_ride) - ride_get_distance(a_ride);
+    if (by_distance != 0) {
         return by_distance;
     }
-    int by_date= date_compare(ride_get_date(a_ride),ride_get_date(a_ride));
-    if (by_date != 0){
+    int by_date = date_compare(ride_get_date(b_ride), ride_get_date(a_ride));
+    if (by_date != 0) {
         return by_date;
     }
-    int by_id= compare_ride_by_id(ride_get_id(a_ride),ride_get_id(b_ride));
-        return by_id;
+
+    return ride_get_id(b_ride) - ride_get_id(a_ride);
 }
