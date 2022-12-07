@@ -25,4 +25,5 @@ int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer 
  */
 int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b);
 
+int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b);
 #endif //LI3_CATALOG_SORT_H

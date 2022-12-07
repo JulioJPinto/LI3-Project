@@ -11,6 +11,9 @@ static const QueryFunction query_functions[] = {
         execute_query_average_price_in_city,
         execute_query_average_price_in_date_range,
         execute_query_average_distance_in_city_in_date_range,
+        NULL,
+        NULL,
+        execute_query_passenger_that_gave_tip,
 };
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);

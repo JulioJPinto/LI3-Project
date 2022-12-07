@@ -80,6 +80,10 @@ int ride_get_driver_id(Ride *ride) {
     return ride->driver_id;
 }
 
+int ride_get_id(Ride *ride) {
+    return ride->id;
+}
+
 Date ride_get_date(Ride *ride) {
     return ride->date;
 }

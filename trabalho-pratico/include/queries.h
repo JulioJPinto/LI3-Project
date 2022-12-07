@@ -43,4 +43,9 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
  */
 void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args);
 
+/*
+ * Executes the query number 9.
+ */
+void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char **args);
+
 #endif //LI3_QUERIES_H

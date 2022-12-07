@@ -25,6 +25,11 @@ Ride *parse_line_ride(char *line, char delim);
 int ride_get_driver_id(Ride *ride);
 
 /**
+ * Returns the id of the ride
+ */
+int ride_get_id(Ride *ride);
+
+/**
  * Returns the date of the ride
  */
 Date ride_get_date(Ride *ride);

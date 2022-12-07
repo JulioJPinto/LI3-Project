@@ -94,4 +94,13 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
 
 double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
+/**
+ * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.
+ * The rides are not copied, their pointers are inserted.
+ * The GPtrArray result should be empty.
+ * The array is sorted by ride's distance, date and then id.
+ * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ */
+void catalog_insert_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date);
+
 #endif //LI3_CATALOG_H
