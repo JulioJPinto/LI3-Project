@@ -34,9 +34,10 @@ void parse_and_run_query(Catalog *catalog, FILE *output, char *query) {
 }
 
 void run_query(Catalog *catalog, FILE *output, int query_id, char **args) {
-    if (query_id <= 0 || query_id > (int) query_functions_size) {
+    if (query_id <= 0 || query_id > (int) query_functions_size || query_functions[query_id - 1] == NULL) {
         fprintf(output, "Query %d not implemented\n", query_id);
         return;
     }
+
     query_functions[query_id - 1](catalog, output, args);
 }

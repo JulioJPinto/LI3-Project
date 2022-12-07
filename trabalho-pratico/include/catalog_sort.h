@@ -25,5 +25,10 @@ int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer 
  */
 int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b);
 
+/**
+ * Function that compares rides by total distance, date, and then id.
+ * This function is abstracted in gconstpointer's to be used in glib sort functions.
+ * Used to sort the rides array for fast resolution of the query 9.
+ */
 int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b);
 #endif //LI3_CATALOG_SORT_H
