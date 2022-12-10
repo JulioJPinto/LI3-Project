@@ -7,22 +7,7 @@
 #include "driver.h"
 #include "ride.h"
 #include "user.h"
-
-typedef struct DriverbyCity DriverbyCity;
-
-DriverbyCity *create_driver_by_city(int id, char *name);
-
-int driver_by_city_get_id(DriverbyCity *driver);
-
-char *driver_by_city_get_name(DriverbyCity *driver);
-
-void driver_by_city_increment_number_of_rides(DriverbyCity *driver);
-
-void driver_by_city_add_score(DriverbyCity *driver, int score);
-
-double driver_by_city_get_average_score(DriverbyCity *driver);
-
-int glib_wrapper_compare_drivers_in_city_by_score(gconstpointer a, gconstpointer b);
+#include "driver_city_info.h"
 
 /**
  * Struct that represents a catalog.
@@ -110,7 +95,7 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
 
 double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
-void catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
+int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
 
 /**
  * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.

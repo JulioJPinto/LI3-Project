@@ -1,47 +1,7 @@
-#include <printf.h>
 #include "catalog.h"
+
 #include "price_util.h"
-
 #include "catalog_sort.h"
-
-
-/*Structs and getter and setter functions for DriverbyCity*/
-struct DriverbyCity {
-    int id;
-    char *name;
-    int accumulated_score;
-    int amount_rides;
-};
-
-DriverbyCity *create_driver_by_city(int id, char *name) {
-    DriverbyCity *driver_by_city = malloc(sizeof(DriverbyCity));
-    driver_by_city->id = id;
-    driver_by_city->name = g_strdup(name);
-
-    driver_by_city->accumulated_score = 0;
-    driver_by_city->amount_rides = 0;
-    return driver_by_city;
-}
-
-int driver_by_city_get_id(DriverbyCity *driver) {
-    return driver->id;
-}
-
-char *driver_by_city_get_name(DriverbyCity *driver) {
-    return driver->name;
-}
-
-void driver_by_city_increment_number_of_rides(DriverbyCity *driver) {
-    driver->amount_rides++;
-}
-
-void driver_by_city_add_score(DriverbyCity *driver, int score) {
-    driver->accumulated_score += score;
-}
-
-double driver_by_city_get_average_score(DriverbyCity *driver) {
-    return (double) driver->accumulated_score / (double) driver->amount_rides;
-}
 
 //typedef enum {ARRAY, HASH} GHashArray_Type;
 typedef union {
@@ -164,14 +124,14 @@ static void catalog_ride_index_city(Catalog *catalog, Ride *ride) {
 /*Insertion functions for Query 7*/
 void insert_new_driver_city(int driver_id, GHashTable *driver_by_city, Catalog *catalog) {
     Driver *driver = catalog_get_driver(catalog, driver_id);
-    DriverbyCity *new_driver = create_driver_by_city(driver_id, driver_get_name(driver));
+    DriverCityInfo *new_driver = create_driver_by_city(driver_id, driver_get_name(driver));
     int *key = malloc(sizeof(int));
     *key = driver_id;
     g_hash_table_insert(driver_by_city, key, new_driver);
 }
 
 void add_score_to_driver_city(int score, int driver_id, GHashTable *driver_by_city, Catalog *catalog) {
-    DriverbyCity *driver = g_hash_table_lookup(driver_by_city, &driver_id);
+    DriverCityInfo *driver = g_hash_table_lookup(driver_by_city, &driver_id);
     if (driver == NULL) { 
         insert_new_driver_city(driver_id, driver_by_city, catalog);
         driver = g_hash_table_lookup(driver_by_city, &driver_id);
@@ -404,23 +364,23 @@ void notify_stop_registering(Catalog *catalog) {
 }
 
 /**Sort functions for Query 7*/
-int compare_driver_in_city_by_score(DriverbyCity *a, DriverbyCity *b) {
+int compare_driver_in_city_by_score(DriverCityInfo *a, DriverCityInfo *b) {
     double average_score_a = driver_by_city_get_average_score(a);
     double average_score_b = driver_by_city_get_average_score(b);
 
     return (average_score_a > average_score_b) - (average_score_a < average_score_b);
 }
 
-int compare_driver_in_city_by_id(DriverbyCity *a, DriverbyCity *b) {
+int compare_driver_in_city_by_id(DriverCityInfo *a, DriverCityInfo *b) {
     int a_driver_id = driver_by_city_get_id(a);
     int b_driver_id = driver_by_city_get_id(b);
 
     return a_driver_id - b_driver_id;
 }
 
-int glib_wrapper_compare_drivers_in_city_by_score(gconstpointer a, gconstpointer b) {
-    DriverbyCity *a_driver = *(DriverbyCity **) a;
-    DriverbyCity *b_driver = *(DriverbyCity **) b;
+int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b) {
+    DriverCityInfo *a_driver = *(DriverCityInfo **) a;
+    DriverCityInfo *b_driver = *(DriverCityInfo **) b;
 
     int by_score = compare_driver_in_city_by_score(b_driver, a_driver);
     if (by_score != 0) {
@@ -434,16 +394,16 @@ void hash_table_sort_array_values_by_score(gpointer key, gpointer value, gpointe
     (void) key;
     (void) user_data;
 
-    g_ptr_array_sort(value, glib_wrapper_compare_drivers_in_city_by_score);
+    g_ptr_array_sort(value, glib_wrapper_compare_driver_city_infos_by_average_score);
 }
 
-void free_driver_by_city(DriverbyCity *driver) {
+void free_driver_by_city(DriverCityInfo *driver) {
     free(driver->name);
     free(driver);
 }
 
 void glib_wrapper_free_driver_by_city(gpointer driver_by_city) {
-    free_driver_by_city(*(DriverbyCity **) (driver_by_city));
+    free_driver_by_city(*(DriverCityInfo **) (driver_by_city));
 }
 
 /**Alter HashTable to GPtrArray function*/
@@ -465,13 +425,13 @@ GPtrArray *alter_hash_to_gptr_array(GHashArray *ghasharray) {
 }
 
 /**Query 7 catalog function*/
-void catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result) {
-    GPtrArray *top_drivers_in_city = g_hash_table_lookup(catalog->rides_in_city_hashtable, city); //Aqui
-    if (top_drivers_in_city == NULL) return;
+int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result) {
+    GPtrArray *top_drivers_in_city = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
+    if (top_drivers_in_city == NULL) return 0;
 
 
-    for (guint i = 0; i < n; i++) {
-        DriverbyCity *driver = g_ptr_array_index(top_drivers_in_city, i);
+    for (int i = 0; i < n; i++) {
+        DriverCityInfo *driver = g_ptr_array_index(top_drivers_in_city, i);
         g_ptr_array_add(result, driver);
     }
 }

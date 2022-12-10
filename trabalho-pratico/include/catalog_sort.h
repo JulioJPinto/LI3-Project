@@ -25,7 +25,7 @@ int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer 
  */
 int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b);
 
-int glib_wrapper_compare_drivers_in_city_by_score(gconstpointer a, gconstpointer b);
+int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b);
 
 /**
  * Function that compares rides by total distance, date, and then id.
