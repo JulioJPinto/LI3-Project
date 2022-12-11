@@ -14,7 +14,7 @@ struct Catalog {
     GHashTable *user_from_username_hashtable; // key: username (char*), value: User*
     GHashTable *driver_from_id_hashtable;     // key: driver id (int), value: Driver*
 
-    GHashTable *rides_in_city_hashtable;   // key: city (char*), value: GPtrArray of rides
+    GHashTable *rides_in_city_hashtable;               // key: city (char*), value: GPtrArray of rides
     GHashTable *driver_city_info_collection_hashtable; // key: city (char*), value: DriverCityInfoCollection
     //GHashTable <City, Struct<GHashTable<driver_id, DriverCityInfo>, GPtrArray<DriverCityInfo>>
 };
@@ -47,6 +47,33 @@ void glib_wrapper_ptr_array_free_segment(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }
 
+typedef struct {
+    /**
+     * Array of all DriverCityInfo structs for the city.
+     * This will be sorted by the driver's score once all the rides are registered.
+     * This is used to get the best drivers in O(1).
+     */
+    GPtrArray *driver_city_info_array;
+    /**
+     * Hash table that maps driver ids to DriverCityInfo structs.
+     * This is used to get the DriverCityInfo of a driver id in O(1) for faster insertions.
+     * This hashtable is only valid during the insertion of rides, and is freed after the insertion.
+     * You can't use this hashtable after the insertion ends (when `notify_stop_registering` is called).
+     */
+    GHashTable *driver_city_info_hashtable;
+} DriverCityInfoCollection;
+
+void free_driver_city_info_collection(DriverCityInfoCollection *collection) {
+    // We don't need to free the hashtable because it is already freed in `notify_stop_registering` (in the end of the rides insertions).
+    g_ptr_array_free(collection->driver_city_info_array, TRUE);
+
+    free(collection);
+}
+
+void glib_wrapper_free_driver_city_info_collection(gpointer collection) {
+    free_driver_city_info_collection(collection);
+}
+
 Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
@@ -59,7 +86,7 @@ Catalog *create_catalog(void) {
 
     catalog->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free_segment);
     // TODO: replace NULL with free DriverCityInfoCollection
-    catalog->driver_city_info_collection_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
+    catalog->driver_city_info_collection_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_driver_city_info_collection);
 
     return catalog;
 }
@@ -114,29 +141,14 @@ static void catalog_ride_index_city(Catalog *catalog, Ride *ride) {
     g_ptr_array_add(rides_in_city, ride);
 }
 
-typedef struct {
-    /**
-     * Array of all DriverCityInfo structs for the city.
-     * This will be sorted by the driver's score once all the rides are registered.
-     * This is used to get the best drivers in O(1).
-     */
-    GPtrArray *driver_city_info_array;
-    /**
-     * Hash table that maps driver ids to DriverCityInfo structs.
-     * This is used to get the DriverCityInfo of a driver in O(1) for faster insertions.
-     * This hashtable is only valid during the insertion of rides, and is freed after the insertion.
-     * You can't use this hashtable after the insertion ends (when `notify_stop_registering` is called).
-     */
-    GHashTable *driver_city_info_hashtable;
-} DriverCityInfoCollection;
 
-void catalog_driver_city_info_register(Catalog *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city) {
+static void catalog_driver_city_info_register(Catalog *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city) {
     DriverCityInfoCollection *driver_city_collection = g_hash_table_lookup(catalog->driver_city_info_collection_hashtable, ride_city);
 
     DriverCityInfo *target;
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
         driver_city_collection = malloc(sizeof(DriverCityInfoCollection));
-        driver_city_collection->driver_city_info_array = g_ptr_array_new();
+        driver_city_collection->driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
 
         g_hash_table_insert(catalog->driver_city_info_collection_hashtable, g_strdup(ride_city), driver_city_collection);
@@ -187,7 +199,7 @@ void register_ride(Catalog *catalog, Ride *ride) {
 
     catalog_ride_index_city(catalog, ride);
 
-    if(driver_get_account_status(driver) == ACTIVE) { // We only need to index for query 7 if the driver is active
+    if (driver_get_account_status(driver) == ACTIVE) { // We only need to index for query 7 if the driver is active
         char *city = ride_get_city(ride);
         char *driver_name = driver_get_name(driver);
         catalog_driver_city_info_register(catalog, driver_id, driver_name, driver_score, city);

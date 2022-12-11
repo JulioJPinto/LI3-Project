@@ -14,6 +14,6 @@ void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int 
 
 double driver_city_info_get_average_score(DriverCityInfo *driver_city_info);
 
-void free_driver_city_info(DriverCityInfo *driver_city_info);
+void free_driver_city_info_voidp(void *driver_city_info);
 
 #endif //LI3_DRIVER_CITY_INFO_H

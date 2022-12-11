@@ -40,3 +40,7 @@ void free_driver_city_info(DriverCityInfo *driver_city_info) {
     free(driver_city_info->name);
     free(driver_city_info);
 }
+
+void free_driver_city_info_voidp(void *driver_city_info) {
+    free_driver_city_info(driver_city_info);
+}
