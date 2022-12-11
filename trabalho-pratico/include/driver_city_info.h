@@ -12,9 +12,7 @@ char *driver_city_info_get_name(DriverCityInfo *driver_city_info);
 
 void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int score);
 
-int driver_city_info_get_accumulated_score(DriverCityInfo *driver);
-
-double driver_city_info_get_average_score(DriverCityInfo *driver);
+double driver_city_info_get_average_score(DriverCityInfo *driver_city_info);
 
 void free_driver_city_info(DriverCityInfo *driver_city_info);
 

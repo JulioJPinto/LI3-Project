@@ -214,7 +214,7 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
         char *name = driver_city_info_get_name(driver);
         double average_score = driver_city_info_get_average_score(driver);
 
-        fprintf(output, "%d;%s;%.3f\n", id, name, average_score);
+        fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
     }
 }
 

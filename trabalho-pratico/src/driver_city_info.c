@@ -32,8 +32,8 @@ void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int 
     driver_city_info->amount_rides++;
 }
 
-double driver_city_info_get_average_score(DriverCityInfo *driver) {
-    return (double) driver->accumulated_score / (double) driver->amount_rides;
+double driver_city_info_get_average_score(DriverCityInfo *driver_city_info) {
+    return (double) driver_city_info->accumulated_score / (double) driver_city_info->amount_rides;
 }
 
 void free_driver_city_info(DriverCityInfo *driver_city_info) {

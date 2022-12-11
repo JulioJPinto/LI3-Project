@@ -142,8 +142,8 @@ int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b) {
 }
 
 int compare_driver_city_info_by_score(DriverCityInfo *a, DriverCityInfo *b) {
-    int score_a = driver_city_info_get_accumulated_score(a);
-    int score_b = driver_city_info_get_accumulated_score(b);
+    double score_a = driver_city_info_get_average_score(a);
+    double score_b = driver_city_info_get_average_score(b);
 
     return (score_a > score_b) - (score_a < score_b);
 }
