@@ -135,3 +135,7 @@ void user_register_ride_date(User *user, Date date) {
         user->most_recent_ride = date;
     }
 }
+
+Date user_get_account_creation_date(User *user) {
+    return user->account_create_date;
+}

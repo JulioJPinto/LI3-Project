@@ -177,6 +177,28 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
 }
 
 /**
+  * Query 8 
+  */
+void execute_query_users_and_drivers_by_gender_and_account_creation(Catalog *catalog, FILE *output, char **args){
+    char *gender = args[0];
+
+    char gender = parse_gender(gender);
+
+    GPtrArray *resultM = g_ptr_array_new();
+    GPtrArray *resultF = g_ptr_array_new();
+    catalog_get_drivers_and_users_by_gender(catalog, resultM, resultF);
+
+    for (size_t i = 0; i < result->len; i++) {
+        Ride *ride = g_ptr_array_index(result, i);
+        int id = ride_get_driver_id(ride);
+        char *driver_name = ride_get_driver_name(ride);
+        char *username = ride_get_user_username(ride);
+        char *user_name = ride_get_user_name(ride);
+
+        fprintf(output, "%d;%s;%s;%s\n", id, name_driver, username,name_user);
+}
+
+/**
  * Query 6
  */
 void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args) {
@@ -216,6 +238,27 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
 
         fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
     }
+}
+
+/**
+  * Query 8 
+  */
+void execute_query_users_and_drivers_by_gender_and_account_creation(Catalog *catalog, FILE *output, char **args){
+    char *gender = args[0];
+
+    char gender = parse_gender(gender);
+
+    GPtrArray *result = g_ptr_array_new();
+    catalog_get_drivers_and_users_by_gender(catalog, result, gender);
+
+    for (size_t i = 0; i < result->len; i++) {
+        Ride *ride = g_ptr_array_index(result, i);
+        int id = ride_get_driver_id(ride);
+        char *driver_name = ride_get_driver_name(ride);
+        char *username = ride_get_user_username(ride);
+        char *user_name = ride_get_user_name(ride);
+
+        fprintf(output, "%d;%s;%s;%s\n", id, name_driver, username,name_user);
 }
 
 /**

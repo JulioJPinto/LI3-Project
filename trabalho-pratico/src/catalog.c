@@ -416,3 +416,23 @@ int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrA
 
     return size;
 }
+
+void catalog_get_drivers_and_users_by_gender(Catalog *catalog, GPtrArray *result, char gender){
+    GPtrArray *drivers = catalog->drivers_array;
+    GPtrArray *users = catalog->users_array;
+
+    while (current_value_index < drivers->len && users->len) {
+        current_id_driver = g_ptr_array_index(drivers, current_value_index);
+        current_id_user = g_ptr_array_index(users,current_value_index);
+
+        if (driver_get_gender(current_id_driver) ==  gender) {
+            g_ptr_array_add(result, current_id_driver);
+        }
+      
+        if (user_get_gender(current_id_user) == gender) {
+            g_ptr_array_add(result, current_id_user);
+        }
+        current_value_index++;
+    }
+    g_ptr_array_sort(result, glib_wrapper_compare_by_account_creation);  
+}

@@ -159,3 +159,24 @@ int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gco
 
     return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
 }
+
+int glib_wrraper_compare_by_account_creation(gconstpointer a, gconstpointer b) {
+    Driver *a_driver = *(Driver **) a;
+    Driver *b_driver = *(Driver **) b;
+    User *a_user = *(User **) a;
+    User *b_driver = *(User **) b;
+    Ride *a_ride = *(Ride **) a;
+    Ride *b_ride = *(Ride **) b;
+
+    int by_account_creation_driver = date_compare (driver_get_account_creation_date(a_driver), driver_get_account_creation_date(b_driver));
+    if (by_account_creation_driver != 0)  {
+        return by_account_creation_driver;
+    }
+
+    int by_account_creation_user = date_compare (user_get_account_creation_date(a_user), user_get_account_creation_date(b_user));
+    if (by_account_creation_user != 0){
+        return by_account_creation_user;
+    }
+
+    return ride_get_id(a_ride) - ride_get_id(b_ride);
+}

@@ -131,6 +131,10 @@ void driver_register_ride_date(Driver *driver, Date date) {
     }
 }
 
+Date driver_get_account_creation_date(Driver *driver) {
+    return driver->account_creation_date;
+}
+
 void free_driver(Driver *driver) {
     free(driver->name);
     free(driver->license_plate);
