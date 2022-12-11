@@ -9,7 +9,7 @@ struct DriverCityInfo {
     int amount_rides;
 };
 
-DriverCityInfo *create_driver_by_city(int id, char *name) {
+DriverCityInfo *create_driver_city_info(int id, char *name) {
     DriverCityInfo *driver_by_city = malloc(sizeof(struct DriverCityInfo));
     driver_by_city->id = id;
     driver_by_city->name = g_strdup(name);
@@ -19,22 +19,24 @@ DriverCityInfo *create_driver_by_city(int id, char *name) {
     return driver_by_city;
 }
 
-int driver_by_city_get_id(DriverCityInfo *driver) {
-    return driver->id;
+int driver_city_info_get_id(DriverCityInfo *driver_city_info) {
+    return driver_city_info->id;
 }
 
-char *driver_by_city_get_name(DriverCityInfo *driver) {
-    return driver->name;
+char *driver_city_info_get_name(DriverCityInfo *driver_city_info) {
+    return driver_city_info->name;
 }
 
-void driver_by_city_increment_number_of_rides(DriverCityInfo *driver) {
-    driver->amount_rides++;
+void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int score) {
+    driver_city_info->accumulated_score += score;
+    driver_city_info->amount_rides++;
 }
 
-void driver_by_city_add_score(DriverCityInfo *driver, int score) {
-    driver->accumulated_score += score;
-}
-
-double driver_by_city_get_average_score(DriverCityInfo *driver) {
+double driver_city_info_get_average_score(DriverCityInfo *driver) {
     return (double) driver->accumulated_score / (double) driver->amount_rides;
+}
+
+void free_driver_city_info(DriverCityInfo *driver_city_info) {
+    free(driver_city_info->name);
+    free(driver_city_info);
 }

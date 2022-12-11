@@ -4,14 +4,18 @@
 
 typedef struct DriverCityInfo DriverCityInfo;
 
-int driver_by_city_get_id(DriverCityInfo *driver);
+DriverCityInfo *create_driver_city_info(int id, char *name);
 
-char *driver_by_city_get_name(DriverCityInfo *driver);
+int driver_city_info_get_id(DriverCityInfo *driver_city_info);
 
-void driver_by_city_increment_number_of_rides(DriverCityInfo *driver);
+char *driver_city_info_get_name(DriverCityInfo *driver_city_info);
 
-void driver_by_city_add_score(DriverCityInfo *driver, int score);
+void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int score);
 
-double driver_by_city_get_average_score(DriverCityInfo *driver);
+int driver_city_info_get_accumulated_score(DriverCityInfo *driver);
+
+double driver_city_info_get_average_score(DriverCityInfo *driver);
+
+void free_driver_city_info(DriverCityInfo *driver_city_info);
 
 #endif //LI3_DRIVER_CITY_INFO_H
