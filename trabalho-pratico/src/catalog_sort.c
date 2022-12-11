@@ -140,3 +140,22 @@ int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b) {
 
     return ride_get_id(b_ride) - ride_get_id(a_ride);
 }
+
+int compare_driver_city_info_by_score(DriverCityInfo *a, DriverCityInfo *b) {
+    double score_a = driver_city_info_get_average_score(a);
+    double score_b = driver_city_info_get_average_score(b);
+
+    return (score_a > score_b) - (score_a < score_b);
+}
+
+int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b) {
+    DriverCityInfo *a_driver = *(DriverCityInfo **) a;
+    DriverCityInfo *b_driver = *(DriverCityInfo **) b;
+
+    int by_score = compare_driver_city_info_by_score(b_driver, a_driver);
+    if (by_score != 0) {
+        return by_score;
+    }
+
+    return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
+}
