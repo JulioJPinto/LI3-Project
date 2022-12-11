@@ -59,10 +59,9 @@ format:
 copy-build-release-to-main-folder: build-release
 	cp $(BUILD_DIR_PATH)/$(EXEC) programa-principal
 
-# TODO: add support for valgrind
 leaks: build-debug
-ifeq ($(UNAME), Darwin)
-	@leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
+ifeq ($(shell uname), Darwin)
+	leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
 else
 	valgrind --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
 endif

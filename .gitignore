@@ -54,3 +54,4 @@ input*.txt
 
 Cargo.lock
 **/target/
+csv_generator
