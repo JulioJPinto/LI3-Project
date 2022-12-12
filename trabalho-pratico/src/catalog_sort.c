@@ -93,7 +93,7 @@ int glib_wrapper_compare_drivers_by_score(gconstpointer a, gconstpointer b) {
         return by_last_ride;
     }
 
-    return compare_driver_by_id(b_driver, a_driver);
+    return compare_driver_by_id(a_driver, b_driver);
 }
 
 int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer b) {

@@ -262,8 +262,12 @@ int catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, G
     return length;
 }
 
-double catalog_get_average_price_in_city(Catalog *p_catalog, char *city) {
-    GPtrArray *rides = g_hash_table_lookup(p_catalog->rides_in_city_hashtable, city);
+gboolean catalog_city_exists(Catalog *catalog, char *city) {
+    return g_hash_table_contains(catalog->rides_in_city_hashtable, city);
+}
+
+double catalog_get_average_price_in_city(Catalog *catalog, char *city) {
+    GPtrArray *rides = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
     if (rides == NULL) return 0;
 
     double total_price = 0;
@@ -331,7 +335,7 @@ double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date
     }
 
     // divide by zero check
-    return rides_count != 0 ? total_price / rides_count : 0;
+    return rides_count != 0 ? total_price / rides_count : -1;
 }
 
 double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city) {
@@ -357,7 +361,7 @@ double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start
     }
 
     // divide by zero check
-    return ride_count != 0 ? total_distance / ride_count : 0;
+    return ride_count != 0 ? total_distance / ride_count : -1;
 }
 
 void catalog_insert_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {

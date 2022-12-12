@@ -156,6 +156,11 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
 void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **args) {
     char *city = args[0];
 
+    if (!catalog_city_exists(catalog, city)) {
+        fprintf_debug(output, "City %s not found\n", city);
+        return;
+    }
+
     double average_price = catalog_get_average_price_in_city(catalog, city);
 
     fprintf(output, "%.3f\n", average_price);
@@ -173,6 +178,11 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
 
     double average_price = catalog_get_average_price_in_date_range(catalog, start_date, end_date);
 
+    if (average_price == -1) {
+        fprintf_debug(output, "No rides in date range\n");
+        return;
+    }
+
     fprintf(output, "%.3f\n", average_price);
 }
 
@@ -180,14 +190,20 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
  * Query 6
  */
 void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args) {
-    char *city_string = args[0];
+    char *city = args[0];
+
+    if (!catalog_city_exists(catalog, city)) {
+        fprintf_debug(output, "City %s not found\n", city);
+        return;
+    }
+
     char *start_date_string = args[1];
     char *end_date_string = args[2];
 
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
 
-    double average_distance = catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city_string);
+    double average_distance = catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
 
     fprintf(output, "%.3f\n", average_distance);
 }

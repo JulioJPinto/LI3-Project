@@ -83,16 +83,28 @@ int catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *
 int catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
 
 /**
+ * Returns true if the city is registered in the catalog.
+ * False otherwise.
+ */
+gboolean catalog_city_exists(Catalog *catalog, char *city);
+
+/**
  * Returns the average price of rides in the given city.
  */
-double catalog_get_average_price_in_city(Catalog *p_catalog, char *city);
+double catalog_get_average_price_in_city(Catalog *catalog, char *city);
 
 /**
  * Returns the average price of rides between the given dates.
+ * If there are no rides between the given dates, returns -1.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
 double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
 
+/**
+ * Returns the average distance of rides in the given city between the given dates.
+ * If there are no rides in the city between the given dates, returns -1.
+ * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ */
 double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
 int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
