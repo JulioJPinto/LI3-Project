@@ -63,7 +63,7 @@ leaks: build-debug
 ifeq ($(shell uname), Darwin)
 	leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
 else
-	valgrind --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
+	valgrind --suppressions=/usr/share/glib-2.0/valgrind/glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
 endif
 
 test-results:

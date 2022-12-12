@@ -232,6 +232,8 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
 
         fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
     }
+    
+    g_ptr_array_free(result, TRUE);
 }
 
 /**
@@ -268,6 +270,8 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
         free(user_username);
         free(user_name);
     }
+
+    g_ptr_array_free(result, TRUE);
 }
 
 /**
@@ -294,4 +298,6 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char 
         fprintf(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, date.day, date.month, date.year, distance, city, tip);
         free(city);
     }
+
+    g_ptr_array_free(result, TRUE);
 }
