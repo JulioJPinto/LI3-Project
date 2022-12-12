@@ -219,6 +219,42 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
 }
 
 /**
+  * Query 8 
+  */
+void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_age(Catalog *catalog, FILE *output, char **args) {
+    char *gender_string = args[0];
+    Gender gender = parse_gender(gender_string);
+
+    char *end_ptr;
+    int min_account_age = (int) strtol(args[1], &end_ptr, 10);
+    if (*end_ptr != '\0') {
+        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+        return;
+    }
+
+    GPtrArray *result = g_ptr_array_new();
+    catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(catalog, result, gender, min_account_age);
+
+    for (size_t i = 0; i < result->len; i++) {
+        Ride *ride = g_ptr_array_index(result, i);
+
+        int driver_id = ride_get_driver_id(ride);
+        Driver *driver = catalog_get_driver(catalog, driver_id);
+        char *driver_name = driver_get_name(driver);
+
+        char *user_username = ride_get_user_username(ride);
+        User *user = catalog_get_user(catalog, user_username);
+        char *user_name = user_get_name(user);
+
+        fprintf(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);
+
+        free(driver_name);
+        free(user_username);
+        free(user_name);
+    }
+}
+
+/**
  * Query 9
  */
 void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char **args) {

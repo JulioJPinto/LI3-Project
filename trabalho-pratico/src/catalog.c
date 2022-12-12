@@ -17,6 +17,9 @@ struct Catalog {
     GHashTable *rides_in_city_hashtable;               // key: city (char*), value: GPtrArray of rides
     GHashTable *driver_city_info_collection_hashtable; // key: city (char*), value: DriverCityInfoCollection
     //GHashTable <City, Struct<GHashTable<driver_id, DriverCityInfo>, GPtrArray<DriverCityInfo>>
+
+    GPtrArray *rides_with_gender_male;
+    GPtrArray *rides_with_gender_female;
 };
 
 /**
@@ -87,6 +90,9 @@ Catalog *create_catalog(void) {
     catalog->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free_segment);
     catalog->driver_city_info_collection_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_driver_city_info_collection);
 
+    catalog->rides_with_gender_male = g_ptr_array_new();
+    catalog->rides_with_gender_female = g_ptr_array_new();
+
     return catalog;
 }
 
@@ -99,6 +105,9 @@ void free_catalog(Catalog *catalog) {
     g_hash_table_destroy(catalog->driver_from_id_hashtable);
     g_hash_table_destroy(catalog->rides_in_city_hashtable);
     g_hash_table_destroy(catalog->driver_city_info_collection_hashtable);
+
+    g_ptr_array_free(catalog->rides_with_gender_male, TRUE);
+    g_ptr_array_free(catalog->rides_with_gender_female, TRUE);
 
     free(catalog);
 }
@@ -169,6 +178,15 @@ static void catalog_driver_city_info_register(Catalog *catalog, int driver_id, c
     driver_city_info_register_ride_score(target, driver_score);
 }
 
+void catalog_ride_index_by_gender(Catalog *catalog, Ride *ride, User *user, Driver *driver) {
+    Gender user_gender = user_get_gender(user);
+    Gender driver_gender = driver_get_gender(driver);
+    if (user_gender != driver_gender) return;
+
+    GPtrArray *rides_with_gender_array = user_gender == M ? catalog->rides_with_gender_male : catalog->rides_with_gender_female;
+    g_ptr_array_add(rides_with_gender_array, ride);
+}
+
 void register_ride(Catalog *catalog, Ride *ride) {
     g_ptr_array_add(catalog->rides_array, ride);
 
@@ -198,12 +216,19 @@ void register_ride(Catalog *catalog, Ride *ride) {
 
     catalog_ride_index_city(catalog, ride);
 
-    if (driver_get_account_status(driver) == ACTIVE) { // We only need to index for query 7 if the driver is active
+    AccountStatus driver_account_status = driver_get_account_status(driver);
+    AccountStatus user_account_status = user_get_account_status(user);
+
+    if (driver_account_status == ACTIVE) { // We only need to index for query 7 if the driver is active
         char *city = ride_get_city(ride);
         char *driver_name = driver_get_name(driver);
         catalog_driver_city_info_register(catalog, driver_id, driver_name, driver_score, city);
         free(driver_name);
         free(city);
+    }
+
+    if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
+        catalog_ride_index_by_gender(catalog, ride, user, driver);
     }
 }
 
@@ -398,6 +423,9 @@ void notify_stop_registering(Catalog *catalog) {
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
     g_hash_table_foreach(catalog->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
 
+    g_ptr_array_sort_with_data(catalog->rides_with_gender_male, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);
+    g_ptr_array_sort_with_data(catalog->rides_with_gender_female, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);
+
     prepare_driver_city_info_collection_for_queries(catalog);
 }
 
@@ -415,4 +443,39 @@ int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrA
     }
 
     return size;
+}
+
+int catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age) {
+    GPtrArray *rides_with_gender = gender == M ? catalog->rides_with_gender_male : catalog->rides_with_gender_female;
+
+    int i = 0;
+    while (i < (int) rides_with_gender->len) {
+        Ride *ride = g_ptr_array_index(rides_with_gender, i);
+
+        char *user_username = ride_get_user_username(ride);
+        int driver_id = ride_get_driver_id(ride);
+
+        User *user = catalog_get_user(catalog, user_username);
+        Driver *driver = catalog_get_driver(catalog, driver_id);
+
+        free(user_username);
+
+        Date user_account_creation_date = user_get_account_creation_date(user);
+        Date driver_account_creation_date = driver_get_account_creation_date(driver);
+
+        int user_age = get_age(user_account_creation_date);
+        int driver_age = get_age(driver_account_creation_date);
+
+        if (user_age >= min_account_age && driver_age >= min_account_age) {
+            g_ptr_array_add(result, ride);
+        }
+
+        if (driver_age < min_account_age) {
+            // Since the array is sorted by driver birthdate, we can skip all the rides with driver_age < min_account_age
+            break;
+        }
+
+        i++;
+    }
+    return i;
 }

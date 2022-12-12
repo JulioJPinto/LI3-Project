@@ -21,11 +21,18 @@ int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer 
 /**
  * Function that compares rides by activeness, total distance, last ride and username.
  * This function is abstracted in gconstpointer's to be used in glib sort functions.
- * Used to sort the rides array for fast resolution of the query 5.
+ * Used to sort the rides array for fast resolution of the query 5 and 6.
  */
 int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b);
 
 int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b);
+
+/**
+ * Function that compares rides by driver account creation date, user account creation date and then ride id.
+ * This function is abstracted in gconstpointer's to be used in glib sort functions.
+ * Used to sort the rides array for fast resolution of the query 8.
+ */
+int glib_wrapper_compare_ride_by_driver_and_user_account_creation_date(gconstpointer a, gconstpointer b, gpointer user_data);
 
 /**
  * Function that compares rides by total distance, date, and then id.

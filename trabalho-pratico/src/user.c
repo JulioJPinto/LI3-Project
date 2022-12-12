@@ -88,6 +88,10 @@ Date user_get_birthdate(User *user) {
     return user->birthdate;
 }
 
+Date user_get_account_creation_date(User *user) {
+    return user->account_create_date;
+}
+
 AccountStatus user_get_account_status(User *user) {
     return user->account_status;
 }

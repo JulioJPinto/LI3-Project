@@ -48,6 +48,11 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
  */
 void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *output, char **args);
 
+/**
+ * Executes the query number 8.
+ */
+void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_age(Catalog *catalog, FILE *output, char **args);
+
 /*
  * Executes the query number 9.
  */

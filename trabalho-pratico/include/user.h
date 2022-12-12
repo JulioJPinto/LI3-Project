@@ -43,6 +43,11 @@ Gender user_get_gender(User *user);
 Date user_get_birthdate(User *user);
 
 /**
+ * Returns the account creation date of the User
+ */
+Date user_get_account_creation_date(User *user);
+
+/**
  * Returns the account status of the User
  */
 AccountStatus user_get_account_status(User *user);

@@ -93,6 +93,10 @@ CarClass driver_get_car_class(Driver *driver) {
     return driver->car_class;
 }
 
+Date driver_get_account_creation_date(Driver *driver) {
+    return driver->account_creation_date;
+}
+
 AccountStatus driver_get_account_status(Driver *driver) {
     return driver->account_status;
 }
