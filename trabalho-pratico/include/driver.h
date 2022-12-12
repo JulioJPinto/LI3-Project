@@ -52,6 +52,11 @@ Gender driver_get_gender(Driver *driver);
 CarClass driver_get_car_class(Driver *driver);
 
 /**
+ * Returns the account creation date of the Driver
+ */
+Date driver_get_account_creation_date(Driver *driver);
+
+/**
  * Returns the account status of the Driver
  */
 AccountStatus driver_get_account_status(Driver *driver);

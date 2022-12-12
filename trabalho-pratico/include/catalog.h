@@ -97,6 +97,8 @@ double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start
 
 int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
 
+int catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
+
 /**
  * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.
  * The rides are not copied, their pointers are inserted.

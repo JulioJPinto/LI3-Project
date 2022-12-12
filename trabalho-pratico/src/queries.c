@@ -177,28 +177,6 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
 }
 
 /**
-  * Query 8 
-  */
-void execute_query_users_and_drivers_by_gender_and_account_creation(Catalog *catalog, FILE *output, char **args){
-    char *gender = args[0];
-
-    char gender = parse_gender(gender);
-
-    GPtrArray *resultM = g_ptr_array_new();
-    GPtrArray *resultF = g_ptr_array_new();
-    catalog_get_drivers_and_users_by_gender(catalog, resultM, resultF);
-
-    for (size_t i = 0; i < result->len; i++) {
-        Ride *ride = g_ptr_array_index(result, i);
-        int id = ride_get_driver_id(ride);
-        char *driver_name = ride_get_driver_name(ride);
-        char *username = ride_get_user_username(ride);
-        char *user_name = ride_get_user_name(ride);
-
-        fprintf(output, "%d;%s;%s;%s\n", id, name_driver, username,name_user);
-}
-
-/**
  * Query 6
  */
 void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args) {
@@ -243,22 +221,37 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
 /**
   * Query 8 
   */
-void execute_query_users_and_drivers_by_gender_and_account_creation(Catalog *catalog, FILE *output, char **args){
-    char *gender = args[0];
+void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_age(Catalog *catalog, FILE *output, char **args) {
+    char *gender_string = args[0];
+    Gender gender = parse_gender(gender_string);
 
-    char gender = parse_gender(gender);
+    char *end_ptr;
+    int min_account_age = (int) strtol(args[1], &end_ptr, 10);
+    if (*end_ptr != '\0') {
+        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+        return;
+    }
 
     GPtrArray *result = g_ptr_array_new();
-    catalog_get_drivers_and_users_by_gender(catalog, result, gender);
+    catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(catalog, result, gender, min_account_age);
 
     for (size_t i = 0; i < result->len; i++) {
         Ride *ride = g_ptr_array_index(result, i);
-        int id = ride_get_driver_id(ride);
-        char *driver_name = ride_get_driver_name(ride);
-        char *username = ride_get_user_username(ride);
-        char *user_name = ride_get_user_name(ride);
 
-        fprintf(output, "%d;%s;%s;%s\n", id, name_driver, username,name_user);
+        int driver_id = ride_get_driver_id(ride);
+        Driver *driver = catalog_get_driver(catalog, driver_id);
+        char *driver_name = driver_get_name(driver);
+
+        char *user_username = ride_get_user_username(ride);
+        User *user = catalog_get_user(catalog, user_username);
+        char *user_name = user_get_name(user);
+
+        fprintf(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);
+
+        free(driver_name);
+        free(user_username);
+        free(user_name);
+    }
 }
 
 /**

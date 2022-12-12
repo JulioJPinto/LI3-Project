@@ -88,6 +88,10 @@ Date user_get_birthdate(User *user) {
     return user->birthdate;
 }
 
+Date user_get_account_creation_date(User *user) {
+    return user->account_create_date;
+}
+
 AccountStatus user_get_account_status(User *user) {
     return user->account_status;
 }
@@ -134,8 +138,4 @@ void user_register_ride_date(User *user, Date date) {
     if (date_compare(user_last_ride, date) < 0) {
         user->most_recent_ride = date;
     }
-}
-
-Date user_get_account_creation_date(User *user) {
-    return user->account_create_date;
 }

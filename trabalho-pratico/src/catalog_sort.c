@@ -160,23 +160,36 @@ int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gco
     return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
 }
 
-int glib_wrraper_compare_by_account_creation(gconstpointer a, gconstpointer b) {
-    Driver *a_driver = *(Driver **) a;
-    Driver *b_driver = *(Driver **) b;
-    User *a_user = *(User **) a;
-    User *b_driver = *(User **) b;
-    Ride *a_ride = *(Ride **) a;
-    Ride *b_ride = *(Ride **) b;
+/* TODO:
+ * this compare function is too costly because we need to fetch data from catalog for each ride
+ * Maybe we should already have this data passed to this function.
+ */
+int glib_wrapper_compare_ride_by_driver_and_user_account_creation_date(gconstpointer a, gconstpointer b, gpointer user_data) {
+    Ride *ride_a = *(Ride **) a;
+    Ride *ride_b = *(Ride **) b;
+    Catalog *catalog = (Catalog *) user_data;
 
-    int by_account_creation_driver = date_compare (driver_get_account_creation_date(a_driver), driver_get_account_creation_date(b_driver));
-    if (by_account_creation_driver != 0)  {
+    Driver *driver_a = catalog_get_driver(catalog, ride_get_driver_id(ride_a));
+    Driver *driver_b = catalog_get_driver(catalog, ride_get_driver_id(ride_b));
+
+    int by_account_creation_driver = date_compare(driver_get_account_creation_date(driver_a), driver_get_account_creation_date(driver_b));
+    if (by_account_creation_driver != 0) {
         return by_account_creation_driver;
     }
 
-    int by_account_creation_user = date_compare (user_get_account_creation_date(a_user), user_get_account_creation_date(b_user));
-    if (by_account_creation_user != 0){
+    char *user_username_a = ride_get_user_username(ride_a);
+    char *user_username_b = ride_get_user_username(ride_b);
+
+    User *user_a = catalog_get_user(catalog, user_username_a);
+    User *user_b = catalog_get_user(catalog, user_username_b);
+
+    free(user_username_a);
+    free(user_username_b);
+
+    int by_account_creation_user = date_compare(user_get_account_creation_date(user_a), user_get_account_creation_date(user_b));
+    if (by_account_creation_user != 0) {
         return by_account_creation_user;
     }
 
-    return ride_get_id(a_ride) - ride_get_id(b_ride);
+    return ride_get_id(ride_a) - ride_get_id(ride_b);
 }

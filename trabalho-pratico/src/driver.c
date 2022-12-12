@@ -93,6 +93,10 @@ CarClass driver_get_car_class(Driver *driver) {
     return driver->car_class;
 }
 
+Date driver_get_account_creation_date(Driver *driver) {
+    return driver->account_creation_date;
+}
+
 AccountStatus driver_get_account_status(Driver *driver) {
     return driver->account_status;
 }
@@ -129,10 +133,6 @@ void driver_register_ride_date(Driver *driver, Date date) {
     if (date_compare(date, driver->last_ride_date) > 0) {
         driver->last_ride_date = date;
     }
-}
-
-Date driver_get_account_creation_date(Driver *driver) {
-    return driver->account_creation_date;
 }
 
 void free_driver(Driver *driver) {
