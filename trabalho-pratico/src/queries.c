@@ -205,6 +205,11 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
 
     double average_distance = catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
 
+    if (average_distance == -1) {
+        fprintf_debug(output, "No rides in date range\n");
+        return;
+    }
+
     fprintf(output, "%.3f\n", average_distance);
 }
 
