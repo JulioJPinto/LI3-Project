@@ -70,7 +70,7 @@ Driver *catalog_get_driver(Catalog *catalog, int id);
  * Returns the number of drivers inserted. This number can be less than N if there are less than N drivers.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-int catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result);
+int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result);
 
 /**
  * Inserts the top N users in the given GPtrArray.
@@ -80,7 +80,7 @@ int catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *
  * Returns the number of users inserted. This number can be less than N if there are less than N users.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-int catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
+int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
 
 /**
  * Returns true if the city is registered in the catalog.
@@ -91,25 +91,25 @@ gboolean catalog_city_exists(Catalog *catalog, char *city);
 /**
  * Returns the average price of rides in the given city.
  */
-double catalog_get_average_price_in_city(Catalog *catalog, char *city);
+double query_4_catalog_get_average_price_in_city(Catalog *catalog, char *city);
 
 /**
  * Returns the average price of rides between the given dates.
  * If there are no rides between the given dates, returns -1.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-double catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
+double query_5_catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
 
 /**
  * Returns the average distance of rides in the given city between the given dates.
  * If there are no rides in the city between the given dates, returns -1.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-double catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
+double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
-int catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
+int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
 
-int catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
+int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
 
 /**
  * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.
@@ -118,6 +118,6 @@ int catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Ca
  * The array is sorted by ride's distance, date and then id.
  * `notify_stop_registering(Catalog*)` should be called before calling this function.
  */
-void catalog_insert_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date);
+void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date);
 
 #endif //LI3_CATALOG_H

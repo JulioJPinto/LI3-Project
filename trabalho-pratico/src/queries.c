@@ -102,7 +102,7 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
 
     GPtrArray *result = g_ptr_array_sized_new(n);
 
-    int result_size = catalog_get_top_drivers_with_best_score(catalog, n, result);
+    int result_size = query_2_catalog_get_top_drivers_with_best_score(catalog, n, result);
 
     for (int i = 0; i < result_size; i++) {
         Driver *driver = g_ptr_array_index(result, i);
@@ -132,7 +132,7 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
 
     GPtrArray *result = g_ptr_array_sized_new(n);
 
-    int result_size = catalog_get_top_users_with_longest_total_distance(catalog, n, result);
+    int result_size = query_3_catalog_get_top_users_with_longest_total_distance(catalog, n, result);
 
     for (int i = 0; i < result_size; i++) {
         User *user = g_ptr_array_index(result, i);
@@ -161,7 +161,7 @@ void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **
         return;
     }
 
-    double average_price = catalog_get_average_price_in_city(catalog, city);
+    double average_price = query_4_catalog_get_average_price_in_city(catalog, city);
 
     fprintf(output, "%.3f\n", average_price);
 }
@@ -176,7 +176,7 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
 
-    double average_price = catalog_get_average_price_in_date_range(catalog, start_date, end_date);
+    double average_price = query_5_catalog_get_average_price_in_date_range(catalog, start_date, end_date);
 
     if (average_price == -1) {
         fprintf_debug(output, "No rides in date range\n");
@@ -203,7 +203,7 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
 
-    double average_distance = catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
+    double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
 
     if (average_distance == -1) {
         fprintf_debug(output, "No rides in date range\n");
@@ -227,7 +227,7 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
     char *city = args[1];
 
     GPtrArray *result = g_ptr_array_sized_new(n);
-    int size = catalog_get_top_n_drivers_in_city(catalog, n, city, result);
+    int size = query_7_catalog_get_top_n_drivers_in_city(catalog, n, city, result);
 
     for (int i = 0; i < size; i++) {
         DriverCityInfo *driver = g_ptr_array_index(result, i);
@@ -256,7 +256,7 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
     }
 
     GPtrArray *result = g_ptr_array_new();
-    catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(catalog, result, gender, min_account_age);
+    query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(catalog, result, gender, min_account_age);
 
     for (size_t i = 0; i < result->len; i++) {
         Ride *ride = g_ptr_array_index(result, i);
@@ -290,7 +290,7 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char 
     Date end_date = parse_date(end_date_string);
 
     GPtrArray *result = g_ptr_array_new();
-    catalog_insert_passengers_that_gave_tip_in_date_range(catalog, result, start_date, end_date);
+    query_9_catalog_get_passengers_that_gave_tip_in_date_range(catalog, result, start_date, end_date);
 
     for (size_t i = 0; i < result->len; i++) {
         Ride *ride = g_ptr_array_index(result, i);
