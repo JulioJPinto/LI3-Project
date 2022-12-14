@@ -112,7 +112,9 @@ void free_catalog(Catalog *catalog) {
     free(catalog);
 }
 
-void register_user(Catalog *catalog, User *user) {
+static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
+    User *user = parse_line_user(line, separator);
+
     g_ptr_array_add(catalog->users_array, user);
 
     char *key = user_get_username(user);
@@ -121,7 +123,13 @@ void register_user(Catalog *catalog, User *user) {
     g_hash_table_insert(catalog->user_from_username_hashtable, key, user);
 }
 
-void register_driver(Catalog *catalog, Driver *driver) {
+void parse_and_register_user(void *catalog, char *line, char separator) {
+    internal_parse_and_register_user(catalog, line, separator);
+}
+
+static inline void internal_parse_and_register_driver(Catalog *catalog, char *line, char separator) {
+    Driver *driver = parse_line_driver(line, separator);
+
     g_ptr_array_add(catalog->drivers_array, driver);
 
     int *key = malloc(sizeof(int));
@@ -131,8 +139,12 @@ void register_driver(Catalog *catalog, Driver *driver) {
     g_hash_table_insert(catalog->driver_from_id_hashtable, key, driver);
 }
 
+void parse_and_register_driver(void *catalog, char *line, char separator) {
+    internal_parse_and_register_driver(catalog, line, separator);
+}
+
 /**
- * Internal function of register_ride that indexes the city of the ride.
+ * Internal function of internal_parse_and_register_ride that indexes the city of the ride.
  */
 static void query_6_catalog_ride_index_city(Catalog *catalog, Ride *ride) {
     char *city = ride_get_city(ride); // Only needs to be freed if the city is already in the hashtable
@@ -187,7 +199,9 @@ void query_8_catalog_ride_index_by_gender(Catalog *catalog, Ride *ride, User *us
     g_ptr_array_add(rides_with_gender_array, ride);
 }
 
-void register_ride(Catalog *catalog, Ride *ride) {
+static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
+    Ride *ride = parse_line_ride(line, separator);
+
     g_ptr_array_add(catalog->rides_array, ride);
 
     int driver_id = ride_get_driver_id(ride);
@@ -230,6 +244,10 @@ void register_ride(Catalog *catalog, Ride *ride) {
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
         query_8_catalog_ride_index_by_gender(catalog, ride, user, driver);
     }
+}
+
+void parse_and_register_ride(void *catalog, char *line, char separator) {
+    internal_parse_and_register_ride(catalog, line, separator);
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {

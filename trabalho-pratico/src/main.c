@@ -5,7 +5,6 @@
 #include "logger.h"
 #include "query_manager.h"
 #include "parser.h"
-#include "main_wrappers.h"
 
 #define OUTPUT_FOLDER "Resultados"
 
@@ -43,15 +42,15 @@ int main(int argc, char **argv) {
     char *line_buffer = malloc(1024 * sizeof(char));
 
     BENCHMARK_START(load_timer);
-    read_file(users_file, wrapper_voidp_parse_user, wrapper_voidp_register_user, catalog);
+    read_file(users_file, parse_and_register_user, catalog);
     BENCHMARK_END(load_timer, "Load users time:        %f seconds\n");
 
     g_timer_start(load_timer);
-    read_file(drivers_file, wrapper_voidp_parse_driver, wrapper_voidp_register_driver, catalog);
+    read_file(drivers_file, parse_and_register_driver, catalog);
     BENCHMARK_END(load_timer, "Load drivers time:      %f seconds\n");
 
     g_timer_start(load_timer);
-    read_file(rides_file, wrapper_voidp_parse_ride, wrapper_voidp_register_ride, catalog);
+    read_file(rides_file, parse_and_register_ride, catalog);
     BENCHMARK_END(load_timer, "Load rides time:        %f seconds\n");
 
     g_timer_start(load_timer);

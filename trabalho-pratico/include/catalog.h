@@ -26,20 +26,23 @@ void free_catalog(Catalog *catalog);
 
 /**
  * Registers a user in the catalog.
+ * Receives a catalog as void pointer to be used as a generic function.
  */
-void register_user(Catalog *catalog, User *user);
+void parse_and_register_user(void *catalog, char *line, char separator);
 
 /**
  * Registers a driver in the catalog.
+ * Receives a catalog as void pointer to be used as a generic function.
  */
-void register_driver(Catalog *catalog, Driver *driver);
+void parse_and_register_driver(void *catalog, char *line, char separator);
 
 /**
  * Registers a ride in the catalog.
  * The user and driver linked to the ride must be already registered in the catalog
  * as it updates the user and driver information related to this ride.
+ * Receives a catalog as void pointer to be used as a generic function.
  */
-void register_ride(Catalog *catalog, Ride *ride);
+void parse_and_register_ride(void *catalog, char *line, char separator);
 
 /**
  * Notifies the catalog that the program won't register any more data.

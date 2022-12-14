@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunction *apply_function, void *apply_function_first_arg) {
+void read_file(FILE *stream, ApplyLineFunction *apply_line_function, void *apply_function_first_arg) {
     char line_buffer[1024];
 
     if (fgets(line_buffer, 1024, stream) == NULL) {
@@ -10,7 +10,6 @@ void read_file(FILE *stream, ParserLineFunction *parse_line_function, ApplyFunct
     }
 
     while (fgets(line_buffer, 1024, stream) != NULL) {
-        void *parsed_line = parse_line_function(line_buffer, ';');
-        apply_function(apply_function_first_arg, parsed_line);
+        apply_line_function(apply_function_first_arg, line_buffer, ';');
     }
 }
