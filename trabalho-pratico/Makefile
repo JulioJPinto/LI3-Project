@@ -13,7 +13,7 @@ ifeq ($(DEBUG), 1)
     EXEC := $(EXEC)-debug
     BUILD_DIR_PATH := build/debug
 else
-    CFLAGS += -O3 -flto -funroll-loops -march=native
+    CFLAGS += -O3 -flto -funroll-loops
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := build/release
 endif
