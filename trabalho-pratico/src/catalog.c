@@ -80,12 +80,12 @@ void glib_wrapper_free_driver_city_info_collection(gpointer collection) {
 Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
-    catalog->users_array = g_ptr_array_new_full(100000, glib_wrapper_free_user);
-    catalog->drivers_array = g_ptr_array_new_full(10000, glib_wrapper_free_driver);
-    catalog->rides_array = g_ptr_array_new_full(1000000, glib_wrapper_free_ride);
+    catalog->users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
+    catalog->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
+    catalog->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
 
     catalog->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
-    catalog->driver_from_id_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
+    catalog->driver_from_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     catalog->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free_segment);
     catalog->driver_city_info_collection_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_driver_city_info_collection);
@@ -132,11 +132,7 @@ static inline void internal_parse_and_register_driver(Catalog *catalog, char *li
 
     g_ptr_array_add(catalog->drivers_array, driver);
 
-    int *key = malloc(sizeof(int));
-    *key = driver_get_id(driver);
-    // No need to free the key, it will be freed when the Driver is freed
-
-    g_hash_table_insert(catalog->driver_from_id_hashtable, key, driver);
+    g_hash_table_insert(catalog->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
 }
 
 void parse_and_register_driver(void *catalog, char *line, char separator) {
@@ -169,22 +165,20 @@ static void query_7_catalog_driver_city_info_register(Catalog *catalog, int driv
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
         driver_city_collection = malloc(sizeof(DriverCityInfoCollection));
         driver_city_collection->driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
-        driver_city_collection->driver_city_info_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, free, NULL);
+        driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
         g_hash_table_insert(catalog->driver_city_info_collection_hashtable, g_strdup(ride_city), driver_city_collection);
         goto register_driver_city_info; // We can skip the lookup because we know it's not in the hashtable
     }
 
-    target = g_hash_table_lookup(driver_city_collection->driver_city_info_hashtable, &driver_id);
+    target = g_hash_table_lookup(driver_city_collection->driver_city_info_hashtable, GINT_TO_POINTER(driver_id));
 
     if (target == NULL) { // driver is not yet registered in city
     register_driver_city_info:
         target = create_driver_city_info(driver_id, driver_name);
 
         g_ptr_array_add(driver_city_collection->driver_city_info_array, target);
-        int *key = malloc(sizeof(int));
-        *key = driver_id;
-        g_hash_table_insert(driver_city_collection->driver_city_info_hashtable, key, target);
+        g_hash_table_insert(driver_city_collection->driver_city_info_hashtable, GINT_TO_POINTER(driver_id), target);
     }
 
     driver_city_info_register_ride_score(target, driver_score);
@@ -255,7 +249,7 @@ User *catalog_get_user(Catalog *catalog, char *username) {
 }
 
 Driver *catalog_get_driver(Catalog *catalog, int id) {
-    return g_hash_table_lookup(catalog->driver_from_id_hashtable, &id);
+    return g_hash_table_lookup(catalog->driver_from_id_hashtable, GINT_TO_POINTER(id));
 }
 
 gboolean catalog_city_exists(Catalog *catalog, char *city) {
