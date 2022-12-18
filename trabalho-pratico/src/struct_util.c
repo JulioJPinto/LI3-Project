@@ -30,7 +30,7 @@ double parse_double_safe(char *string, int *error) {
 }
 
 inline int is_date_valid(Date date) {
-    return date.day != -1;
+    return date.day >= 1 && date.day <= 31 && date.month >= 1 && date.month <= 12;
 }
 
 inline Date parse_date(char *string) {
@@ -49,7 +49,7 @@ inline Date parse_date(char *string) {
     int month = parse_int_safe(string + 3, &error);
     int year = parse_int_safe(string + 6, &error);
 
-    if (error || day < 1 || day > 31 || month < 1 || month > 12) {
+    if (error) {
         return invalid_date;
     }
 
