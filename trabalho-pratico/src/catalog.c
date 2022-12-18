@@ -114,6 +114,7 @@ void free_catalog(Catalog *catalog) {
 
 static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
     User *user = parse_line_user(line, separator);
+    if (user == NULL) return;
 
     g_ptr_array_add(catalog->users_array, user);
 
@@ -129,6 +130,7 @@ void parse_and_register_user(void *catalog, char *line, char separator) {
 
 static inline void internal_parse_and_register_driver(Catalog *catalog, char *line, char separator) {
     Driver *driver = parse_line_driver(line, separator);
+    if (driver == NULL) return;
 
     g_ptr_array_add(catalog->drivers_array, driver);
 
@@ -195,6 +197,7 @@ void query_8_catalog_ride_index_by_gender(Catalog *catalog, Ride *ride, User *us
 
 static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
     Ride *ride = parse_line_ride(line, separator);
+    if (ride == NULL) return;
 
     g_ptr_array_add(catalog->rides_array, ride);
 
@@ -271,7 +274,7 @@ int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, 
     // TODO: This can be improved, no need to copy the array, just create a new one pointing to the users_array with the length of n
     int length = MIN(n, (int) catalog->users_array->len);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < length; i++) {
         g_ptr_array_add(result, g_ptr_array_index(catalog->users_array, i));
     }
 

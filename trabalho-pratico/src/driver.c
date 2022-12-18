@@ -47,28 +47,39 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 
 Driver *parse_line_driver(char *line, char delim) {
     char *id_string = next_token(&line, delim);
-    int id = parse_int(id_string);
+    if (IS_EMPTY(id_string)) return NULL;
+
+    int id = parse_int_unsafe(id_string);
 
     char *name = next_token(&line, delim);
+    if (IS_EMPTY(name)) return NULL;
 
     char *date_string = next_token(&line, delim);
     Date date = parse_date(date_string);
+    if (!is_date_valid(date)) return NULL;
 
     char *gender_string = next_token(&line, delim);
+    if (IS_EMPTY(gender_string)) return NULL;
     Gender gender = parse_gender(gender_string);
 
     char *car_class_string = next_token(&line, delim);
     CarClass car_class = parse_car_class(car_class_string);
+    if (car_class == INVALID_CAR_CLASS) return NULL;
 
     char *license_plate = next_token(&line, delim);
+    if (IS_EMPTY(license_plate)) return NULL;
 
     char *city = next_token(&line, delim);
+    if (IS_EMPTY(city)) return NULL;
 
     char *creation_date_string = next_token(&line, delim);
     Date creation_date = parse_date(creation_date_string);
+    if (!is_date_valid(creation_date)) return NULL;
 
     char *acc_status_string = next_token(&line, delim);
+
     AccountStatus acc_status = parse_acc_status(acc_status_string);
+    if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
     return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
 }

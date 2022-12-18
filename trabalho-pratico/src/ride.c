@@ -41,31 +41,38 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 
 Ride *parse_line_ride(char *line, char delim) {
     char *id_string = next_token(&line, delim);
-    int id = parse_int(id_string);
+    if (IS_EMPTY(id_string)) return NULL;
+    int id = parse_int_unsafe(id_string);
 
     char *date_string = next_token(&line, delim);
     Date date = parse_date(date_string);
+    if (!is_date_valid(date)) return NULL;
 
     char *driver_string = next_token(&line, delim);
-    int driver_id = parse_int(driver_string);
+    if (IS_EMPTY(driver_string)) return NULL;
+    int driver_id = parse_int_unsafe(driver_string);
 
     char *user = next_token(&line, delim);
+    if (IS_EMPTY(user)) return NULL;
 
     char *city = next_token(&line, delim);
+    if (IS_EMPTY(city)) return NULL;
+
+    int error = 0;
 
     char *distance_string = next_token(&line, delim);
-    int distance = parse_int(distance_string);
+    int distance = parse_int_safe(distance_string, &error);
 
     char *user_score_string = next_token(&line, delim);
-    int user_score = parse_int(user_score_string);
+    int user_score = parse_int_safe(user_score_string, &error);
 
     char *driver_score_string = next_token(&line, delim);
-    int driver_score = parse_int(driver_score_string);
+    int driver_score = parse_int_safe(driver_score_string, &error);
 
     char *tip_string = next_token(&line, delim);
-    double tip = parse_double(tip_string);
+    double tip = parse_double_safe(tip_string, &error);
 
-    //    char *comment = strtok(NULL, delim);;
+    if (error) return NULL;
 
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }

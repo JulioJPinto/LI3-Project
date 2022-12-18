@@ -30,8 +30,9 @@ typedef enum payment_method {
  * Struct that represents an account status (Active and Inactive)
  */
 typedef enum account_status {
+    INVALID_ACCOUNT_STATUS = -1, // only used for error handling in parsing
     ACTIVE,
-    INACTIVE
+    INACTIVE,
 } AccountStatus;
 
 
@@ -39,9 +40,10 @@ typedef enum account_status {
  * Struct that represents a car class (Basic, Green and Premium)
  */
 typedef enum car_class {
+    INVALID_CAR_CLASS = -1, // only used for error handling in parsing
     BASIC,
     GREEN,
-    PREMIUM
+    PREMIUM,
 } CarClass;
 
 /**
@@ -60,16 +62,32 @@ int date_compare(Date date_1, Date date_2);
 
 /**
  * Parses a string into an int
+ * Returns the int value of the string
+ * Sets error to 1 if the string is not a valid int
  */
-int parse_int(char *string);
+int parse_int_safe(char *string, int *error);
 
 /**
- * Parses a string into a double 
+ * Parses a string into an int assuming it is a valid int
  */
-double parse_double(char *string);
+int parse_int_unsafe(char *string);
 
 /**
- * Parses a string into a date struct 
+ * Parses a string into an int
+ * Returns the int value of the string
+ * Sets error to 1 if the string is not a valid int
+ */
+double parse_double_safe(char *string, int *error);
+
+/**
+ * Returns 1 if the date is valid, 0 otherwise
+ */
+int is_date_valid(Date date);
+
+/**
+ * Parses a string into a date struct
+ * Returns an invalid date if the string is not a valid date
+ * The date is considered valid if it is in the format dd/mm/yyyy (1<=dd<=12 && 1<=mm<=31)
  */
 Date parse_date(char *string);
 
@@ -79,17 +97,21 @@ Date parse_date(char *string);
 Gender parse_gender(const char *string);
 
 /**
- * Parses a string into a car class struct 
+ * Parses a string into a car class struct
+ * Returns INVALID_CAR_CLASS if the string is not a valid car class
+ * This will modify the string to be all uppercase
  */
-CarClass parse_car_class(const char *string);
+CarClass parse_car_class(char *string);
 
 /**
- * Parses a string into an account status struct 
+ * Parses a string into an account status struct
+ * Returns INVALID_ACCOUNT_STATUS if the string is not a valid account status
+ * This will modify the string to be all uppercase
  */
-AccountStatus parse_acc_status(const char *string);
+AccountStatus parse_acc_status(char *string);
 
 /**
- * Parses a string into a payment method struct 
+ * Parses a string into a payment method struct
  */
 PaymentMethod parse_pay_method(const char *string);
 

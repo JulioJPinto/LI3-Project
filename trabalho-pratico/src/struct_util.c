@@ -2,29 +2,56 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
+const Date invalid_date = {.day = -1};
 static const Date reference_date = {9, 10, 2022};
 
-inline int parse_int(char *string) {
+int parse_int_safe(char *string, int *error) {
+    char *end;
+    int result = (int) strtol(string, &end, 10);
+    if (*end != '\0') {
+        *error = 1;
+    }
+    return result;
+}
+
+inline int parse_int_unsafe(char *string) {
     return (int) strtol(string, NULL, 10);
 }
 
-inline double parse_double(char *string) {
-    return strtod(string, NULL);
+double parse_double_safe(char *string, int *error) {
+    char *end;
+    double result = strtod(string, &end);
+    if (*end != '\0') {
+        *error = 1;
+    }
+    return result;
+}
+
+inline int is_date_valid(Date date) {
+    return date.day != -1;
 }
 
 inline Date parse_date(char *string) {
-    if (strlen(string) != 10) {
-        return (Date){0, 0, 0};
+    // 18/12/2022
+    if (string[2] != '/' || string[5] != '/' || string[10] != '\0') {
+        return invalid_date;
     }
 
     string[2] = '\0';
     string[5] = '\0';
     string[10] = '\0';
 
-    int day = parse_int(string);
-    int month = parse_int(string + 3);
-    int year = parse_int(string + 6);
+    int error = 0;
+
+    int day = parse_int_safe(string, &error);
+    int month = parse_int_safe(string + 3, &error);
+    int year = parse_int_safe(string + 6, &error);
+
+    if (error || day < 1 || day > 31 || month < 1 || month > 12) {
+        return invalid_date;
+    }
 
     return (Date){day, month, year};
 }
@@ -33,12 +60,34 @@ inline Gender parse_gender(const char *string) {
     return (string[0] == 'F' ? F : M);
 }
 
-inline CarClass parse_car_class(const char *string) {
-    return (string[0] == 'g' ? GREEN : (string[0] == 'p' ? PREMIUM : BASIC));
+void to_upper(char *string) {
+    for (int i = 0; string[i] != '\0'; i++) {
+        string[i] = (char) toupper(string[i]);
+    }
 }
 
-inline AccountStatus parse_acc_status(const char *string) {
-    return (string[0] == 'a' ? ACTIVE : INACTIVE);
+inline CarClass parse_car_class(char *string) {
+    to_upper(string);
+    if (strcmp(string, "BASIC") == 0) {
+        return BASIC;
+    } else if (strcmp(string, "GREEN") == 0) {
+        return GREEN;
+    } else if (strcmp(string, "PREMIUM") == 0) {
+        return PREMIUM;
+    } else {
+        return INVALID_CAR_CLASS;
+    }
+}
+
+inline AccountStatus parse_acc_status(char *string) {
+    to_upper(string);
+    if (strcmp(string, "ACTIVE") == 0) {
+        return ACTIVE;
+    } else if (strcmp(string, "INACTIVE") == 0) {
+        return INACTIVE;
+    } else {
+        return INVALID_ACCOUNT_STATUS;
+    }
 }
 
 inline PaymentMethod parse_pay_method(const char *string) {

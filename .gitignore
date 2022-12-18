@@ -8,7 +8,6 @@ trabalho-pratico/src
 # Unignore all dirs
 !*/
 
-# Ignore default executable
 a.out
 *.o
 *.exe
@@ -17,6 +16,9 @@ a.out
 *rides*.csv
 Resultados/
 Resultados-expected/
+*/datasets/
+
+# Ignore default executable
 programa-principal
 
 */build
@@ -30,13 +32,8 @@ input*.txt
 # LaTeX
 
 !relatorio-fase1.pdf
-*/Relatorio/*.aux
-*/Relatorio/*.fdb_latexmk
-*/Relatorio/*.fls
-*/Relatorio/*.log
-*/Relatorio/*.out
-*/Relatorio/*.pdf
-*/Relatorio/*.synctex.gz
+*/Relatorio/*
+!*/Relatorio/*.tex
 
 # MacOS
 

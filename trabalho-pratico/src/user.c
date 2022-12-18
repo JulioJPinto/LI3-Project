@@ -45,23 +45,30 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
 
 User *parse_line_user(char *line, char delim) {
     char *username = next_token(&line, delim);
+    if (IS_EMPTY(username)) return NULL;
 
     char *name = next_token(&line, delim);
+    if (IS_EMPTY(name)) return NULL;
 
     char *gender_string = next_token(&line, delim);
+    if (IS_EMPTY(gender_string)) return NULL;
     Gender gender = parse_gender(gender_string);
 
     char *birth_date_string = next_token(&line, delim);
     Date birth_date = parse_date(birth_date_string);
+    if (!is_date_valid(birth_date)) return NULL;
 
     char *acc_creation_string = next_token(&line, delim);
     Date acc_creation = parse_date(acc_creation_string);
+    if (!is_date_valid(acc_creation)) return NULL;
 
     char *pay_method_string = next_token(&line, delim);
+    if (IS_EMPTY(pay_method_string)) return NULL;
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
     char *acc_status_string = next_token(&line, delim);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
+    if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
     return create_user(username, name, gender, birth_date, acc_creation, pay_method, acc_status);
 }
