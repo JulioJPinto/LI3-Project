@@ -12,7 +12,7 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
 
     char *line = malloc(sizeof(char) * 1000);
 
-    gboolean failed = FALSE;
+    int failed = 0;
 
     fgets(line, 1000, users_file); // skip first line
     while (fgets(line, 1000, users_file) != NULL) {
@@ -21,7 +21,7 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
         User *user = parse_line_user(line_copy, ';');
         if (user != NULL) {
             printf("User should've been NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
             free_user(user);
         }
         free(line_copy);
@@ -34,7 +34,7 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
         Driver *driver = parse_line_driver(line_copy, ';');
         if (driver != NULL) {
             printf("Driver should've been NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
             free_driver(driver);
         }
         free(line_copy);
@@ -47,14 +47,14 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
         Ride *ride = parse_line_ride(line_copy, ';');
         if (ride != NULL) {
             printf("Ride should've been NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
             free_ride(ride);
         }
         free(line_copy);
     }
 
     if (failed) {
-        g_test_fail();
+        g_test_fail_printf("Failed for %d lines", failed);
     }
 }
 
@@ -75,7 +75,7 @@ void assert_valid_csv_loads_everything_regular(void) {
 
     char *line = malloc(sizeof(char) * 1000);
 
-    gboolean failed = FALSE;
+    int failed = 0;
 
     fgets(line, 1000, users_file); // skip first line
     while (fgets(line, 1000, users_file) != NULL) {
@@ -84,7 +84,7 @@ void assert_valid_csv_loads_everything_regular(void) {
         User *user = parse_line_user(line_copy, ';');
         if (user == NULL) {
             g_test_message("User should've been non-NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
         }
         free_user(user);
         free(line_copy);
@@ -97,7 +97,7 @@ void assert_valid_csv_loads_everything_regular(void) {
         Driver *driver = parse_line_driver(line_copy, ';');
         if (driver == NULL) {
             g_test_message("Driver should've been non-NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
         }
         free_driver(driver);
         free(line_copy);
@@ -110,14 +110,14 @@ void assert_valid_csv_loads_everything_regular(void) {
         Ride *ride = parse_line_ride(line_copy, ';');
         if (ride == NULL) {
             g_test_message("Ride should've been non-NULL for line '%s'\n", line);
-            failed = TRUE;
+            failed++;
         }
         free_ride(ride);
         free(line_copy);
     }
 
     if (failed) {
-        g_test_fail();
+        g_test_fail_printf("Failed for %d lines", failed);
     }
 }
 
