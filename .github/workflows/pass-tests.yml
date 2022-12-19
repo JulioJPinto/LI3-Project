@@ -1,0 +1,23 @@
+name: Pass tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Prepare dataset
+        run: |
+          wget -O ${GITHUB_WORKSPACE}/trabalho-pratico/datasets.zip "https://drive.google.com/uc?export=download&id=1iqyj-YSEs3kpmiPhLBF7y6PTvcuyAIc-&confirm=t&uuid=271b37f4-8002-4735-9a90-642080a1896f"
+          unzip ${GITHUB_WORKSPACE}/trabalho-pratico/datasets.zip -d ${GITHUB_WORKSPACE}/trabalho-pratico/datasets
+      - name: Run tests
+        run: |
+          cd trabalho-pratico
+          make test

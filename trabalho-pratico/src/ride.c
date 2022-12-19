@@ -61,18 +61,22 @@ Ride *parse_line_ride(char *line, char delim) {
     int error = 0;
 
     char *distance_string = next_token(&line, delim);
+    if (IS_EMPTY(distance_string)) return NULL;
     int distance = parse_int_safe(distance_string, &error);
 
     char *user_score_string = next_token(&line, delim);
+    if (IS_EMPTY(user_score_string)) return NULL;
     int user_score = parse_int_safe(user_score_string, &error);
 
     char *driver_score_string = next_token(&line, delim);
+    if (IS_EMPTY(driver_score_string)) return NULL;
     int driver_score = parse_int_safe(driver_score_string, &error);
 
     char *tip_string = next_token(&line, delim);
+    if (IS_EMPTY(tip_string)) return NULL;
     double tip = parse_double_safe(tip_string, &error);
 
-    if (error) return NULL;
+    if (error || distance < 1 || user_score < 1 || driver_score < 1 || tip < 0 || tip != tip) return NULL;
 
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }
