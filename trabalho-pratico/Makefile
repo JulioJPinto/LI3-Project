@@ -2,26 +2,36 @@ CC := gcc
 
 EXEC := li3
 CFLAGS := -std=c11 -Wall -Wextra -Wdouble-promotion -Werror=pedantic -Werror=vla -pedantic-errors -Wfatal-errors
-CFLAGS += -Iinclude/
 
 CFLAGS += $(shell pkg-config --cflags glib-2.0)
 LIBS := $(shell pkg-config --libs glib-2.0)
 
-DEBUG ?= 0
-ifeq ($(DEBUG), 1)
+BUILD_TYPE ?= release
+ifeq ($(BUILD_TYPE), debug)
     CFLAGS += -O0 -g -DDEBUG=1
     EXEC := $(EXEC)-debug
     BUILD_DIR_PATH := build/debug
-else
+    SRC_FOLDER := src
+    CFLAGS += -Iinclude/
+else ifeq ($(BUILD_TYPE), release)
     CFLAGS += -O3 -flto -funroll-loops
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := build/release
+    SRC_FOLDER := src
+    CFLAGS += -Iinclude/
+else ifeq ($(BUILD_TYPE), test)
+	CFLAGS += -O0 -g -DDEBUG=1
+	EXEC := $(EXEC)-test
+	BUILD_DIR_PATH := build/test
+	SRC_FOLDER := test
+	SRC += $(filter-out src/main.c,$(wildcard src/*.c))
+	CFLAGS += -Iinclude/
+else
+	$(error Invalid build type: $(BUILD_TYPE))
 endif
 
-BUILD_DIR := $(shell mkdir -p $(BUILD_DIR_PATH))
-
-SRC := $(wildcard src/*.c)
-OBJ := $(SRC:src/%.c=$(BUILD_DIR_PATH)/%.o)
+SRC += $(wildcard $(SRC_FOLDER)/*.c)
+OBJ := $(addprefix $(BUILD_DIR_PATH)/, $(SRC:.c=.o))
 
 WHITE := \033[0m
 YELLOW := \033[1;33m
@@ -30,10 +40,13 @@ YELLOW := \033[1;33m
 all: build-release copy-build-release-to-main-folder
 
 build-debug:
-	@$(MAKE) DEBUG=1 build
+	@$(MAKE) BUILD_TYPE=debug build
 
 build-release:
-	@$(MAKE) DEBUG=0 build
+	@$(MAKE) BUILD_TYPE=release build
+
+build-test:
+	@$(MAKE) BUILD_TYPE=test build
 
 build: $(BUILD_DIR_PATH)/$(EXEC)
 
@@ -41,7 +54,8 @@ $(BUILD_DIR_PATH)/$(EXEC): $(OBJ)
 	@$(CC) -o $@ $^ $(CFLAGS) -lm $(LIBS)
 	@printf "$(YELLOW)$(EXEC) $(WHITE)compiled.\n"
 
-$(BUILD_DIR_PATH)/%.o: src/%.c
+$(BUILD_DIR_PATH)/%.o: %.c
+	@mkdir -p $(dir $@)
 	@printf "Compiling $(YELLOW)$<$(WHITE)...\n"
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -54,7 +68,7 @@ clean:
 	@$(MAKE) -C csv_generator clean
 
 format:
-	clang-format -i src/*.c include/*.h
+	clang-format -i src/*.c include/*.h test/*.c
 
 copy-build-release-to-main-folder: build-release
 	cp $(BUILD_DIR_PATH)/$(EXEC) programa-principal
@@ -66,8 +80,8 @@ else
 	valgrind --suppressions=/usr/share/glib-2.0/valgrind/glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
 endif
 
-test-results:
-	@diff -yr Resultados/ Resultados-expected/ | grep -v "Only in Resultados-expected" || exit 0
+test: build-test
+	./build/test/li3-test
 
 compile-latex:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../
