@@ -1,5 +1,9 @@
 #include "catalog.h"
 
+#include "catalog/catalog_user.h"
+#include "catalog/catalog_driver.h"
+#include "catalog/catalog_ride.h"
+
 #include "price_util.h"
 #include "catalog_sort.h"
 
@@ -7,48 +11,16 @@
  * Struct that represents a catalog.
  */
 struct Catalog {
-    GPtrArray *users_array;
-    GPtrArray *drivers_array;
-    GPtrArray *rides_array;
+    CatalogUser *catalog_user;
+    CatalogDriver *catalog_driver;
+    CatalogRide *catalog_ride;
 
-    GHashTable *user_from_username_hashtable; // key: username (char*), value: User*
-    GHashTable *driver_from_id_hashtable;     // key: driver id (int), value: Driver*
-
-    GHashTable *rides_in_city_hashtable;               // key: city (char*), value: GPtrArray of rides
     GHashTable *driver_city_info_collection_hashtable; // key: city (char*), value: DriverCityInfoCollection
     //GHashTable <City, Struct<GHashTable<driver_id, DriverCityInfo>, GPtrArray<DriverCityInfo>>
 
     GPtrArray *rides_with_gender_male;
     GPtrArray *rides_with_gender_female;
 };
-
-/**
- * Function that wraps free user to be used in GLib g_ptr_array free func.
- */
-void glib_wrapper_free_user(gpointer user) {
-    free_user(user);
-}
-
-/**
- * Function that wraps free driver to be used in GLib g_ptr_array free func.
- */
-void glib_wrapper_free_driver(gpointer driver) {
-    free_driver(driver);
-}
-
-/**
- * Function that wraps free ride to be used in GLib g_ptr_array free func.
- */
-void glib_wrapper_free_ride(gpointer ride) {
-    free_ride(ride);
-}
-
-/**
- * Function that wraps free array to be used in GLib g_hash_table free func.
- */
-void glib_wrapper_ptr_array_free_segment(gpointer array) {
-    g_ptr_array_free(array, TRUE);
-}
 
 typedef struct {
     /**
@@ -80,14 +52,10 @@ void glib_wrapper_free_driver_city_info_collection(gpointer collection) {
 Catalog *create_catalog(void) {
     Catalog *catalog = malloc(sizeof(struct Catalog));
 
-    catalog->users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
-    catalog->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
-    catalog->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
+    catalog->catalog_user = create_catalog_user();
+    catalog->catalog_driver = create_catalog_driver();
+    catalog->catalog_ride = create_catalog_ride();
 
-    catalog->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
-    catalog->driver_from_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
-
-    catalog->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free_segment);
     catalog->driver_city_info_collection_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_driver_city_info_collection);
 
     catalog->rides_with_gender_male = g_ptr_array_new();
@@ -97,13 +65,10 @@ Catalog *create_catalog(void) {
 }
 
 void free_catalog(Catalog *catalog) {
-    g_ptr_array_free(catalog->users_array, TRUE);
-    g_ptr_array_free(catalog->drivers_array, TRUE);
-    g_ptr_array_free(catalog->rides_array, TRUE);
+    free_catalog_user(catalog->catalog_user);
+    free_catalog_driver(catalog->catalog_driver);
+    free_catalog_ride(catalog->catalog_ride);
 
-    g_hash_table_destroy(catalog->user_from_username_hashtable);
-    g_hash_table_destroy(catalog->driver_from_id_hashtable);
-    g_hash_table_destroy(catalog->rides_in_city_hashtable);
     g_hash_table_destroy(catalog->driver_city_info_collection_hashtable);
 
     g_ptr_array_free(catalog->rides_with_gender_male, TRUE);
@@ -116,12 +81,7 @@ static inline void internal_parse_and_register_user(Catalog *catalog, char *line
     User *user = parse_line_user(line, separator);
     if (user == NULL) return;
 
-    g_ptr_array_add(catalog->users_array, user);
-
-    char *key = user_get_username(user);
-    // No need to free the key, it's freed by the hashtable when the user is removed
-
-    g_hash_table_insert(catalog->user_from_username_hashtable, key, user);
+    catalog_user_register_user(catalog->catalog_user, user);
 }
 
 void parse_and_register_user(void *catalog, char *line, char separator) {
@@ -132,33 +92,12 @@ static inline void internal_parse_and_register_driver(Catalog *catalog, char *li
     Driver *driver = parse_line_driver(line, separator);
     if (driver == NULL) return;
 
-    g_ptr_array_add(catalog->drivers_array, driver);
-
-    g_hash_table_insert(catalog->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
+    catalog_driver_register_driver(catalog->catalog_driver, driver);
 }
 
 void parse_and_register_driver(void *catalog, char *line, char separator) {
     internal_parse_and_register_driver(catalog, line, separator);
 }
-
-/**
- * Internal function of internal_parse_and_register_ride that indexes the city of the ride.
- */
-static void query_6_catalog_ride_index_city(Catalog *catalog, Ride *ride) {
-    char *city = ride_get_city(ride); // Only needs to be freed if the city is already in the hashtable
-
-    GPtrArray *rides_in_city;
-    if (g_hash_table_contains(catalog->rides_in_city_hashtable, city)) {
-        rides_in_city = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
-        free(city);
-    } else {
-        rides_in_city = g_ptr_array_new();
-        g_hash_table_insert(catalog->rides_in_city_hashtable, city, rides_in_city);
-    }
-
-    g_ptr_array_add(rides_in_city, ride);
-}
-
 
 static void query_7_catalog_driver_city_info_register(Catalog *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city) {
     DriverCityInfoCollection *driver_city_collection = g_hash_table_lookup(catalog->driver_city_info_collection_hashtable, ride_city);
@@ -199,8 +138,6 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     Ride *ride = parse_line_ride(line, separator);
     if (ride == NULL) return;
 
-    g_ptr_array_add(catalog->rides_array, ride);
-
     int driver_id = ride_get_driver_id(ride);
     Driver *driver = catalog_get_driver(catalog, driver_id);
     double price = compute_price(ride_get_distance(ride), driver_get_car_class(driver));
@@ -225,7 +162,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
 
     free(username);
 
-    query_6_catalog_ride_index_city(catalog, ride);
+    catalog_ride_register_ride(catalog->catalog_ride, ride);
 
     AccountStatus driver_account_status = driver_get_account_status(driver);
     AccountStatus user_account_status = user_get_account_status(user);
@@ -248,136 +185,35 @@ void parse_and_register_ride(void *catalog, char *line, char separator) {
 }
 
 User *catalog_get_user(Catalog *catalog, char *username) {
-    return g_hash_table_lookup(catalog->user_from_username_hashtable, username);
+    return catalog_user_get_user(catalog->catalog_user, username);
 }
 
 Driver *catalog_get_driver(Catalog *catalog, int id) {
-    return g_hash_table_lookup(catalog->driver_from_id_hashtable, GINT_TO_POINTER(id));
+    return catalog_driver_get_driver(catalog->catalog_driver, id);
 }
 
 gboolean catalog_city_exists(Catalog *catalog, char *city) {
-    return g_hash_table_contains(catalog->rides_in_city_hashtable, city);
+    return catalog_ride_city_has_rides(catalog->catalog_ride, city);
 }
 
 int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result) {
-    // TODO: todo in query_3_catalog_get_top_users_with_longest_total_distance
-    int length = MIN(n, (int) catalog->drivers_array->len);
-
-    for (int i = 0; i < length; i++) {
-        g_ptr_array_add(result, g_ptr_array_index(catalog->drivers_array, i));
-    }
-
-    return length;
+    return catalog_driver_get_top_n_drivers_with_best_score(catalog->catalog_driver, n, result);
 }
 
 int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result) {
-    // TODO: This can be improved, no need to copy the array, just create a new one pointing to the users_array with the length of n
-    int length = MIN(n, (int) catalog->users_array->len);
-
-    for (int i = 0; i < length; i++) {
-        g_ptr_array_add(result, g_ptr_array_index(catalog->users_array, i));
-    }
-
-    return length;
+    return catalog_user_get_top_n_users(catalog->catalog_user, n, result);
 }
-
 
 double query_4_catalog_get_average_price_in_city(Catalog *catalog, char *city) {
-    GPtrArray *rides = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
-    if (rides == NULL) return 0;
-
-    double total_price = 0;
-
-    // Performance impact of this loop is negligible, even with ~200000 rides per city.
-    // We also assume that the user won't ask this query twice for the same city, so no need to cache.
-
-    for (guint i = 0; i < rides->len; i++) {
-        Ride *ride = g_ptr_array_index(rides, i);
-        total_price += ride_get_price(ride);
-    }
-
-    return total_price / rides->len;
+    return catalog_ride_get_average_price_in_city(catalog->catalog_ride, city);
 }
 
-/**
- * Returns the index of the lowest ride whose date is greater than the given date.
- */
-guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
-    guint mid;
-
-    guint low = 0;
-    guint high = array->len;
-
-    while (low < high) {
-        mid = low + (high - low) / 2;
-
-        if (date_compare(date, ride_get_date(g_ptr_array_index(array, mid))) <= 0) {
-            high = mid;
-        } else {
-            low = mid + 1;
-        }
-    }
-
-    // TODO: maybe stop binary search when finds a date that is equal to
-    //  the given date and then do a linear search backwards to find the lower bound
-
-    return low;
-}
-
-/*
- * This can also be done with a hashtable that keeps the accumulated price for each date,
- * do two binary searches for the lower and upper bounds and return the difference.
- * (maybe not worth it)
- */
 double query_5_catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date) {
-    GPtrArray *rides = catalog->rides_array;
-
-    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
-
-    double total_price = 0;
-    int rides_count = 0;
-
-    while (current_value_index < rides->len) {
-        Ride *current_ride = g_ptr_array_index(rides, current_value_index);
-        Date current_ride_date = ride_get_date(current_ride);
-
-        if (date_compare(current_ride_date, end_date) > 0)
-            break;
-
-        total_price += ride_get_price(current_ride);
-        rides_count++;
-
-        current_value_index++;
-    }
-
-    // divide by zero check
-    return rides_count != 0 ? total_price / rides_count : -1;
+    return catalog_ride_get_average_distance_in_date_range(catalog->catalog_ride, start_date, end_date);
 }
 
 double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city) {
-    GPtrArray *rides_in_city = g_hash_table_lookup(catalog->rides_in_city_hashtable, city);
-    if (rides_in_city == NULL) return 0;
-
-    double total_distance = 0;
-    int ride_count = 0;
-
-    long current_value_index = ride_array_find_date_lower_bound(rides_in_city, start_date);
-
-    while (current_value_index < rides_in_city->len) {
-        Ride *current_ride = g_ptr_array_index(rides_in_city, current_value_index);
-        Date current_ride_date = ride_get_date(current_ride);
-
-        if (date_compare(current_ride_date, end_date) > 0)
-            break;
-
-        total_distance += ride_get_distance(current_ride);
-        ride_count++;
-
-        current_value_index++;
-    }
-
-    // divide by zero check
-    return ride_count != 0 ? total_distance / ride_count : -1;
+    return catalog_ride_get_average_distance_in_city_and_date_range(catalog->catalog_ride, start_date, end_date, city);
 }
 
 int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result) {
@@ -432,42 +268,7 @@ int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_mi
 }
 
 void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {
-    GPtrArray *rides = catalog->rides_array;
-
-    long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
-
-    Ride *current_ride;
-    Date current_ride_date;
-
-    while (current_value_index < rides->len) {
-        current_ride = g_ptr_array_index(rides, current_value_index);
-        current_ride_date = ride_get_date(current_ride);
-
-        if (date_compare(current_ride_date, end_date) > 0)
-            break;
-
-        if (ride_get_tip(current_ride) > 0) {
-            g_ptr_array_add(result, current_ride);
-        }
-
-        current_value_index++;
-    }
-
-    g_ptr_array_sort(result, glib_wrapper_compare_rides_by_distance);
-}
-
-/**
- * Sorts the value by date.
- * This is used to sort a hash table with value: array of rides.
- * @param key unused
- * @param value the array to be sorted
- * @param user_data unused
- */
-void hash_table_sort_array_values_by_date(gpointer key, gpointer value, gpointer user_data) {
-    (void) key;
-    (void) user_data;
-
-    g_ptr_array_sort(value, glib_wrapper_compare_rides_by_date);
+    catalog_ride_get_passengers_that_gave_tip_in_date_range(catalog->catalog_ride, start_date, end_date, result);
 }
 
 void hash_table_prepare_driver_city_info_collection_for_queries(gpointer key, gpointer value, gpointer user_data) {
@@ -483,14 +284,9 @@ void hash_table_prepare_driver_city_info_collection_for_queries(gpointer key, gp
 }
 
 void notify_stop_registering(Catalog *catalog) {
-    g_ptr_array_sort(catalog->drivers_array, glib_wrapper_compare_drivers_by_score);
-    g_ptr_array_sort(catalog->users_array, glib_wrapper_compare_users_by_total_distance);
-    // Sort rides by date for faster query 5 that requires lookup in a date range
-    g_ptr_array_sort(catalog->rides_array, glib_wrapper_compare_rides_by_date);
-
-    // Sort each rides array in the rides_in_city_hashtable by date for faster query 6 that requires date range
-    // TODO: Maybe make so the sort for each city is only done when a query for that city is called
-    g_hash_table_foreach(catalog->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
+    catalog_driver_notify_stop_registering(catalog->catalog_driver);
+    catalog_user_notify_stop_registering(catalog->catalog_user);
+    catalog_ride_notify_stop_registering(catalog->catalog_ride);
 
     g_ptr_array_sort_with_data(catalog->rides_with_gender_male, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);
     g_ptr_array_sort_with_data(catalog->rides_with_gender_female, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);

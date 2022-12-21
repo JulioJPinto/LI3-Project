@@ -24,13 +24,13 @@ else ifeq ($(BUILD_TYPE), test)
 	EXEC := $(EXEC)-test
 	BUILD_DIR_PATH := build/test
 	SRC_FOLDER := test
-	SRC += $(filter-out src/main.c,$(wildcard src/*.c))
+	SRC += $(filter-out src/main.c,$(wildcard src/*.c src/*/*.c))
 	CFLAGS += -Iinclude/
 else
 	$(error Invalid build type: $(BUILD_TYPE))
 endif
 
-SRC += $(wildcard $(SRC_FOLDER)/*.c)
+SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 OBJ := $(addprefix $(BUILD_DIR_PATH)/, $(SRC:.c=.o))
 
 WHITE := \033[0m
