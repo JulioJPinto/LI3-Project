@@ -5,6 +5,7 @@
 #include <glib.h>
 
 #include "ride.h"
+#include "ride_driver_and_user_info.h"
 
 typedef struct CatalogRide CatalogRide;
 
@@ -13,6 +14,8 @@ CatalogRide *create_catalog_ride(void);
 void free_catalog_ride(CatalogRide *catalog_ride);
 
 void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride);
+
+void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride, Gender gender, RideDriverAndUserInfo *rduinfo);
 
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city);
 
@@ -23,6 +26,8 @@ double catalog_ride_get_average_distance_in_date_range(CatalogRide *catalog_ride
 double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, char *city);
 
 void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, GPtrArray *result);
+
+int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age);
 
 void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride);
 

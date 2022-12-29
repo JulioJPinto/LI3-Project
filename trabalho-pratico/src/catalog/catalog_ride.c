@@ -1,10 +1,14 @@
 #include "catalog/catalog_ride.h"
 
 #include "catalog_sort.h"
+#include "ride_driver_and_user_info.h"
 
 struct CatalogRide {
     GPtrArray *rides_array;
     GHashTable *rides_in_city_hashtable;
+
+    GPtrArray *rduinfo_male_array;
+    GPtrArray *rduinfo_female_array;
 };
 
 /**
@@ -26,12 +30,18 @@ CatalogRide *create_catalog_ride(void) {
     catalog_ride->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free);
 
+    catalog_ride->rduinfo_male_array = g_ptr_array_new_with_free_func(free_rduinfo);
+    catalog_ride->rduinfo_female_array = g_ptr_array_new_with_free_func(free_rduinfo);
+
     return catalog_ride;
 }
 
 void free_catalog_ride(CatalogRide *catalog_ride) {
     g_ptr_array_free(catalog_ride->rides_array, TRUE);
     g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
+
+    g_ptr_array_free(catalog_ride->rduinfo_male_array, TRUE);
+    g_ptr_array_free(catalog_ride->rduinfo_female_array, TRUE);
 
     free(catalog_ride);
 }
@@ -54,6 +64,13 @@ void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
     g_ptr_array_add(catalog_ride->rides_array, ride);
 
     catalog_ride_index_city(catalog_ride, ride);
+}
+
+void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride,
+                                               Gender gender,
+                                               RideDriverAndUserInfo *rduinfo) {
+    g_ptr_array_add(gender == M ? catalog_ride->rduinfo_male_array : catalog_ride->rduinfo_female_array,
+                    rduinfo);
 }
 
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
@@ -80,7 +97,7 @@ double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, char *c
 /**
  * Returns the index of the lowest ride whose date is greater than the given date.
  */
-guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
+static guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
     guint mid;
 
     guint low = 0;
@@ -179,6 +196,33 @@ void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalo
     g_ptr_array_sort(result, glib_wrapper_compare_rides_by_distance);
 }
 
+int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age) {
+    GPtrArray *rduinfo_array = gender == M ? catalog_ride->rduinfo_male_array : catalog_ride->rduinfo_female_array;
+
+    int i = 0;
+    while (i < (int) rduinfo_array->len) {
+        RideDriverAndUserInfo *rduinfo = g_ptr_array_index(rduinfo_array, i);
+
+        Date user_account_creation_date = rduinfo_get_user_account_creation_date(rduinfo);
+        Date driver_account_creation_date = rduinfo_get_driver_account_creation_date(rduinfo);
+
+        int user_age = get_age(user_account_creation_date);
+        int driver_age = get_age(driver_account_creation_date);
+
+        if (user_age >= min_account_age && driver_age >= min_account_age) {
+            g_ptr_array_add(result, rduinfo);
+        }
+
+        if (driver_age < min_account_age) {
+            // Since the array is sorted by driver birthdate, we can skip all the rides with driver_age < min_account_age
+            break;
+        }
+
+        i++;
+    }
+    return i;
+}
+
 /**
  * Sorts the value by date.
  * This is used to sort a hash table with value: array of rides.
@@ -200,4 +244,7 @@ void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride) {
     // Sort each rides array in the rides_in_city_hashtable by date for queries that requires date range in a city
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
     g_hash_table_foreach(catalog_ride->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
+
+    g_ptr_array_sort(catalog_ride->rduinfo_male_array, glib_wrapper_compare_rduinfo_by_account_creation_date);
+    g_ptr_array_sort(catalog_ride->rduinfo_female_array, glib_wrapper_compare_rduinfo_by_account_creation_date);
 }
