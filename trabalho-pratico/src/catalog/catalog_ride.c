@@ -154,7 +154,7 @@ double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *cat
     return distance_sum / rides_count;
 }
 
-void catalog_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, GPtrArray *result) {
+void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, GPtrArray *result) {
     GPtrArray *rides = catalog_ride->rides_array;
 
     long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
