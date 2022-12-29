@@ -8,6 +8,7 @@
 #include "ride.h"
 #include "user.h"
 #include "driver_city_info.h"
+#include "ride_driver_and_user_info.h"
 
 /**
  * Struct that represents a catalog.
@@ -112,7 +113,7 @@ double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Da
 
 int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
 
-int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
+int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
 
 /**
  * Adds all the rides whose passengers gave a tip between start_date and end_date to GPtrArray result.

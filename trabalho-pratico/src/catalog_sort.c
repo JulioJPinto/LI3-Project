@@ -1,5 +1,6 @@
 #include "catalog_sort.h"
 #include "catalog.h"
+#include "ride_driver_and_user_info.h"
 
 /**
  * Compare driver by activeness.
@@ -160,36 +161,25 @@ int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gco
     return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
 }
 
-/* TODO:
- * this compare function is too costly because we need to fetch data from catalog for each ride
- * Maybe we should already have this data passed to this function.
- */
-int glib_wrapper_compare_ride_by_driver_and_user_account_creation_date(gconstpointer a, gconstpointer b, gpointer user_data) {
-    Ride *ride_a = *(Ride **) a;
-    Ride *ride_b = *(Ride **) b;
-    Catalog *catalog = (Catalog *) user_data;
+int glib_wrapper_compare_rduinfo_by_account_creation_date(gconstpointer a, gconstpointer b) {
+    RideDriverAndUserInfo *rdui_a = *(RideDriverAndUserInfo **) a;
+    RideDriverAndUserInfo *rdui_b = *(RideDriverAndUserInfo **) b;
 
-    Driver *driver_a = catalog_get_driver(catalog, ride_get_driver_id(ride_a));
-    Driver *driver_b = catalog_get_driver(catalog, ride_get_driver_id(ride_b));
+    Date driver_a_account_creation_date = rduinfo_get_driver_account_creation_date(rdui_a);
+    Date driver_b_account_creation_date = rduinfo_get_driver_account_creation_date(rdui_b);
 
-    int by_account_creation_driver = date_compare(driver_get_account_creation_date(driver_a), driver_get_account_creation_date(driver_b));
+    int by_account_creation_driver = date_compare(driver_a_account_creation_date, driver_b_account_creation_date);
     if (by_account_creation_driver != 0) {
         return by_account_creation_driver;
     }
 
-    char *user_username_a = ride_get_user_username(ride_a);
-    char *user_username_b = ride_get_user_username(ride_b);
+    Date user_a_account_creation_date = rduinfo_get_user_account_creation_date(rdui_a);
+    Date user_b_account_creation_date = rduinfo_get_user_account_creation_date(rdui_b);
 
-    User *user_a = catalog_get_user(catalog, user_username_a);
-    User *user_b = catalog_get_user(catalog, user_username_b);
-
-    free(user_username_a);
-    free(user_username_b);
-
-    int by_account_creation_user = date_compare(user_get_account_creation_date(user_a), user_get_account_creation_date(user_b));
+    int by_account_creation_user = date_compare(user_a_account_creation_date, user_b_account_creation_date);
     if (by_account_creation_user != 0) {
         return by_account_creation_user;
     }
 
-    return ride_get_id(ride_a) - ride_get_id(ride_b);
+    return rduinfo_get_ride_id(rdui_a) - rduinfo_get_ride_id(rdui_b);
 }

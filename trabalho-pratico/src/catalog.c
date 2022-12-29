@@ -14,11 +14,6 @@ struct Catalog {
     CatalogUser *catalog_user;
     CatalogDriver *catalog_driver;
     CatalogRide *catalog_ride;
-
-
-    // TODO: move this to catalog_ride
-    GPtrArray *rides_with_gender_male;
-    GPtrArray *rides_with_gender_female;
 };
 
 Catalog *create_catalog(void) {
@@ -28,9 +23,6 @@ Catalog *create_catalog(void) {
     catalog->catalog_driver = create_catalog_driver();
     catalog->catalog_ride = create_catalog_ride();
 
-    catalog->rides_with_gender_male = g_ptr_array_new();
-    catalog->rides_with_gender_female = g_ptr_array_new();
-
     return catalog;
 }
 
@@ -38,9 +30,6 @@ void free_catalog(Catalog *catalog) {
     free_catalog_user(catalog->catalog_user);
     free_catalog_driver(catalog->catalog_driver);
     free_catalog_ride(catalog->catalog_ride);
-
-    g_ptr_array_free(catalog->rides_with_gender_male, TRUE);
-    g_ptr_array_free(catalog->rides_with_gender_female, TRUE);
 
     free(catalog);
 }
@@ -67,15 +56,6 @@ void parse_and_register_driver(void *catalog, char *line, char separator) {
     internal_parse_and_register_driver(catalog, line, separator);
 }
 
-void query_8_catalog_ride_index_by_gender(Catalog *catalog, Ride *ride, User *user, Driver *driver) {
-    Gender user_gender = user_get_gender(user);
-    Gender driver_gender = driver_get_gender(driver);
-    if (user_gender != driver_gender) return;
-
-    GPtrArray *rides_with_gender_array = user_gender == M ? catalog->rides_with_gender_male : catalog->rides_with_gender_female;
-    g_ptr_array_add(rides_with_gender_array, ride);
-}
-
 static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
     Ride *ride = parse_line_ride(line, separator);
     if (ride == NULL) return;
@@ -93,16 +73,14 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     driver_add_earned(driver, total_price);
     driver_register_ride_date(driver, ride_get_date(ride));
 
-    char *username = ride_get_user_username(ride);
+    char *user_username = ride_get_user_username(ride);
 
-    User *user = catalog_get_user(catalog, username);
+    User *user = catalog_get_user(catalog, user_username);
     user_increment_number_of_rides(user);
     user_add_score(user, ride_get_score_user(ride));
     user_add_spent(user, total_price);
     user_add_total_distance(user, ride_get_distance(ride));
     user_register_ride_date(user, ride_get_date(ride));
-
-    free(username);
 
     catalog_ride_register_ride(catalog->catalog_ride, ride);
 
@@ -118,8 +96,26 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     }
 
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
-        query_8_catalog_ride_index_by_gender(catalog, ride, user, driver);
+        Gender user_gender = user_get_gender(user);
+        Gender driver_gender = driver_get_gender(driver);
+        if (user_gender != driver_gender) return;
+
+        int ride_id = ride_get_id(ride);
+
+        Date user_account_creation_date = user_get_account_creation_date(user);
+        Date driver_account_creation_date = driver_get_account_creation_date(driver);
+
+        RideDriverAndUserInfo *ride_driver_and_user_info =
+                create_rduinfo(ride_id,
+                               driver_id,
+                               user_username,
+                               user_account_creation_date,
+                               driver_account_creation_date);
+
+        catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
     }
+
+    free(user_username);
 }
 
 void parse_and_register_ride(void *catalog, char *line, char separator) {
@@ -162,39 +158,8 @@ int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *cit
     return catalog_driver_get_top_n_drivers_with_best_score_by_city(catalog->catalog_driver, city, n, result);
 }
 
-int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_min_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age) {
-    GPtrArray *rides_with_gender = gender == M ? catalog->rides_with_gender_male : catalog->rides_with_gender_female;
-
-    int i = 0;
-    while (i < (int) rides_with_gender->len) {
-        Ride *ride = g_ptr_array_index(rides_with_gender, i);
-
-        char *user_username = ride_get_user_username(ride);
-        int driver_id = ride_get_driver_id(ride);
-
-        User *user = catalog_get_user(catalog, user_username);
-        Driver *driver = catalog_get_driver(catalog, driver_id);
-
-        free(user_username);
-
-        Date user_account_creation_date = user_get_account_creation_date(user);
-        Date driver_account_creation_date = driver_get_account_creation_date(driver);
-
-        int user_age = get_age(user_account_creation_date);
-        int driver_age = get_age(driver_account_creation_date);
-
-        if (user_age >= min_account_age && driver_age >= min_account_age) {
-            g_ptr_array_add(result, ride);
-        }
-
-        if (driver_age < min_account_age) {
-            // Since the array is sorted by driver birthdate, we can skip all the rides with driver_age < min_account_age
-            break;
-        }
-
-        i++;
-    }
-    return i;
+int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age) {
+    return catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(catalog->catalog_ride, result, gender, min_account_age);
 }
 
 void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {
@@ -205,7 +170,4 @@ void notify_stop_registering(Catalog *catalog) {
     catalog_driver_notify_stop_registering(catalog->catalog_driver);
     catalog_user_notify_stop_registering(catalog->catalog_user);
     catalog_ride_notify_stop_registering(catalog->catalog_ride);
-
-    g_ptr_array_sort_with_data(catalog->rides_with_gender_male, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);
-    g_ptr_array_sort_with_data(catalog->rides_with_gender_female, glib_wrapper_compare_ride_by_driver_and_user_account_creation_date, catalog);
 }
