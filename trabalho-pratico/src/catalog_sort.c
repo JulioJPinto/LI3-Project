@@ -2,6 +2,10 @@
 #include "catalog.h"
 #include "ride_driver_and_user_info.h"
 
+void sort_array(GPtrArray* array, GCompareFunc compare_func) {
+    qsort(array->pdata, array->len, sizeof(gpointer), compare_func);
+}
+
 /**
  * Compare driver by activeness.
  */
@@ -75,7 +79,7 @@ int compare_user_by_activeness(User *a, User *b) {
     return (int) user_get_account_status(a) - (int) user_get_account_status(b);
 }
 
-int glib_wrapper_compare_drivers_by_score(gconstpointer a, gconstpointer b) {
+int compare_drivers_by_score(gconstpointer a, gconstpointer b) {
     Driver *a_driver = *((Driver **) a);
     Driver *b_driver = *((Driver **) b);
 
@@ -97,7 +101,7 @@ int glib_wrapper_compare_drivers_by_score(gconstpointer a, gconstpointer b) {
     return compare_driver_by_id(a_driver, b_driver);
 }
 
-int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer b) {
+int compare_users_by_total_distance(gconstpointer a, gconstpointer b) {
     User *a_user = *((User **) a);
     User *b_user = *((User **) b);
 
@@ -119,14 +123,14 @@ int glib_wrapper_compare_users_by_total_distance(gconstpointer a, gconstpointer 
     return compare_user_by_username(a_user, b_user);
 }
 
-int glib_wrapper_compare_rides_by_date(gconstpointer a, gconstpointer b) {
+int compare_rides_by_date(gconstpointer a, gconstpointer b) {
     Ride *a_ride = *(Ride **) a;
     Ride *b_ride = *(Ride **) b;
 
     return date_compare(ride_get_date(a_ride), ride_get_date(b_ride));
 }
 
-int glib_wrapper_compare_rides_by_distance(gconstpointer a, gconstpointer b) {
+int compare_rides_by_distance(gconstpointer a, gconstpointer b) {
     Ride *a_ride = *(Ride **) a;
     Ride *b_ride = *(Ride **) b;
 
@@ -149,7 +153,7 @@ int compare_driver_city_info_by_score(DriverCityInfo *a, DriverCityInfo *b) {
     return (score_a > score_b) - (score_a < score_b);
 }
 
-int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b) {
+int compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b) {
     DriverCityInfo *a_driver = *(DriverCityInfo **) a;
     DriverCityInfo *b_driver = *(DriverCityInfo **) b;
 
@@ -161,7 +165,7 @@ int glib_wrapper_compare_driver_city_infos_by_average_score(gconstpointer a, gco
     return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
 }
 
-int glib_wrapper_compare_rduinfo_by_account_creation_date(gconstpointer a, gconstpointer b) {
+int compare_rduinfo_by_account_creation_date(gconstpointer a, gconstpointer b) {
     RideDriverAndUserInfo *rdui_a = *(RideDriverAndUserInfo **) a;
     RideDriverAndUserInfo *rdui_b = *(RideDriverAndUserInfo **) b;
 
