@@ -83,7 +83,7 @@ void catalog_driver_city_info_notify_stop_registering(CatalogDriverCityInfo *cat
         g_hash_table_destroy(collection->driver_city_info_hashtable);
 
         // Sort the array by average score
-        g_ptr_array_sort(collection->driver_city_info_array, glib_wrapper_compare_driver_city_infos_by_average_score);
+        sort_array(collection->driver_city_info_array, compare_driver_city_infos_by_average_score);
         collection->driver_city_info_hashtable = NULL;
     }
 }

@@ -193,7 +193,7 @@ void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalo
         current_value_index++;
     }
 
-    g_ptr_array_sort(result, glib_wrapper_compare_rides_by_distance);
+    sort_array(result, compare_rides_by_distance);
 }
 
 int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age) {
@@ -223,28 +223,19 @@ int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(Cata
     return i;
 }
 
-/**
- * Sorts the value by date.
- * This is used to sort a hash table with value: array of rides.
- * @param key unused
- * @param value the array to be sorted
- * @param user_data unused
- */
-void hash_table_sort_array_values_by_date(gpointer key, gpointer value, gpointer user_data) {
-    (void) key;
-    (void) user_data;
-
-    g_ptr_array_sort(value, glib_wrapper_compare_rides_by_date);
-}
-
 void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride) {
     // Sort rides by date for queries that requires lookup in a date range
-    g_ptr_array_sort(catalog_ride->rides_array, glib_wrapper_compare_rides_by_date);
+    sort_array(catalog_ride->rides_array, compare_rides_by_date);
 
     // Sort each rides array in the rides_in_city_hashtable by date for queries that requires date range in a city
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
-    g_hash_table_foreach(catalog_ride->rides_in_city_hashtable, hash_table_sort_array_values_by_date, NULL);
+    GHashTableIter iter;
+    gpointer value;
+    g_hash_table_iter_init(&iter, catalog_ride->rides_in_city_hashtable);
+    while (g_hash_table_iter_next(&iter, NULL, &value)) {
+        sort_array(value, compare_rides_by_date);
+    }
 
-    g_ptr_array_sort(catalog_ride->rduinfo_male_array, glib_wrapper_compare_rduinfo_by_account_creation_date);
-    g_ptr_array_sort(catalog_ride->rduinfo_female_array, glib_wrapper_compare_rduinfo_by_account_creation_date);
+    sort_array(catalog_ride->rduinfo_male_array, compare_rduinfo_by_account_creation_date);
+    sort_array(catalog_ride->rduinfo_female_array, compare_rduinfo_by_account_creation_date);
 }

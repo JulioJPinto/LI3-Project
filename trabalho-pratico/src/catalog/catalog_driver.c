@@ -62,7 +62,7 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
 }
 
 void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
-    g_ptr_array_sort(catalog_driver->drivers_array, glib_wrapper_compare_drivers_by_score);
+    sort_array(catalog_driver->drivers_array, compare_drivers_by_score);
 
     catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
 }

@@ -44,7 +44,7 @@ User *catalog_user_get_user(CatalogUser *catalog_user, char *username) {
 }
 
 void catalog_user_notify_stop_registering(CatalogUser *catalog_user) {
-    g_ptr_array_sort(catalog_user->users_array, glib_wrapper_compare_users_by_total_distance);
+    sort_array(catalog_user->users_array, compare_users_by_total_distance);
 }
 
 int catalog_user_get_top_n_users(CatalogUser *catalog_user, int n, GPtrArray *result) {
