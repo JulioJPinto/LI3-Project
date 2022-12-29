@@ -75,13 +75,23 @@ copy-build-release-to-main-folder: build-release
 
 leaks: build-debug
 ifeq ($(shell uname), Darwin)
-	leaks --quiet --atExit -- ./build/debug/li3-debug dataset input2.txt
+	leaks --quiet --atExit -- ./build/debug/li3-debug datasets/data-regular input2.txt
 else
-	valgrind --suppressions=/usr/share/glib-2.0/valgrind/glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug dataset input2.txt
+	valgrind --suppressions=/usr/share/glib-2.0/valgrind/glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug datasets/data-regular input2.txt
 endif
 
-test: build-test
+test: build-test build-release
 	./build/test/li3-test
+
+	rm -rf Resultados
+	./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
+	diff Resultados datasets/data-regular/expected-results-1
+
+	rm -rf Resultados
+	./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
+	diff Resultados datasets/data-regular/expected-results-2
+
+	rm -rf Resultados
 
 compile-latex:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../
