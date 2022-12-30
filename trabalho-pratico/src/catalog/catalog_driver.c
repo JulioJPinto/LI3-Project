@@ -1,11 +1,12 @@
 #include "catalog/catalog_driver.h"
 
+#include "catalog/lazy.h"
 #include "catalog/catalog_driver_city_info.h"
 #include "catalog_sort.h"
 #include "benchmark.h"
 
 struct CatalogDriver {
-    GPtrArray *drivers_array;
+    Lazy *drivers_lazy;
     GHashTable *driver_from_id_hashtable;
 
     CatalogDriverCityInfo *catalog_driver_city_info;
@@ -18,9 +19,15 @@ void glib_wrapper_free_driver(gpointer driver) {
     free_driver(driver);
 }
 
+void sort_array_by_driver_score(void* driver_array) {
+    GPtrArray *drivers_ptr_array = *(GPtrArray **) driver_array;
+    sort_array(drivers_ptr_array, compare_drivers_by_score);
+
+}
+
 CatalogDriver *create_catalog_driver(void) {
     CatalogDriver *catalog_driver = malloc(sizeof(CatalogDriver));
-    catalog_driver->drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
+    catalog_driver->drivers_lazy = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_driver), sort_array_by_driver_score);
     catalog_driver->driver_from_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     catalog_driver->catalog_driver_city_info = create_catalog_driver_city_info();
@@ -28,14 +35,14 @@ CatalogDriver *create_catalog_driver(void) {
 }
 
 void free_catalog_driver(CatalogDriver *catalog_driver) {
-    g_ptr_array_free(catalog_driver->drivers_array, TRUE);
     g_hash_table_destroy(catalog_driver->driver_from_id_hashtable);
     free_catalog_driver_city_info(catalog_driver->catalog_driver_city_info);
     free(catalog_driver);
 }
 
 void catalog_driver_register_driver(CatalogDriver *catalog_driver, Driver *driver) {
-    g_ptr_array_add(catalog_driver->drivers_array, driver);
+    GPtrArray *drivers_array = *(GPtrArray **) get_value(catalog_driver->drivers_lazy);
+    g_ptr_array_add(drivers_array, driver);
 
     g_hash_table_insert(catalog_driver->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
 }
@@ -49,10 +56,11 @@ Driver *catalog_driver_get_driver(CatalogDriver *catalog_driver, int driver_id) 
 }
 
 int catalog_driver_get_top_n_drivers_with_best_score(CatalogDriver *catalog_driver, int n, GPtrArray *result) {
-    int length = MIN(n, (int) catalog_driver->drivers_array->len);
+    GPtrArray *drivers_array = *(GPtrArray **) get_value(catalog_driver->drivers_lazy);
+    int length = MIN(n, (int) drivers_array->len);
 
     for (int i = 0; i < length; i++) {
-        g_ptr_array_add(result, g_ptr_array_index(catalog_driver->drivers_array, i));
+        g_ptr_array_add(result, g_ptr_array_index(drivers_array, i));
     }
 
     return length;
@@ -63,9 +71,7 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
 }
 
 void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
-    BENCHMARK_START(sort_drivers_array);
     sort_array(catalog_driver->drivers_array, compare_drivers_by_score);
-    BENCHMARK_END(sort_drivers_array, "     sort_drivers_array: %lf seconds\n");
 
     catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
 }
