@@ -77,7 +77,7 @@ leaks: build-debug
 ifeq ($(shell uname), Darwin)
 	leaks --quiet --atExit -- ./build/debug/li3-debug datasets/data-regular input2.txt
 else
-	valgrind --suppressions=/usr/share/glib-2.0/valgrind/glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug datasets/data-regular input2.txt
+	valgrind --gen-suppressions=all --suppressions=./valgrind-glib.supp --leak-check=full --show-leak-kinds=all ./build/debug/li3-debug datasets/data-regular input2.txt
 endif
 
 test: build-test build-release
