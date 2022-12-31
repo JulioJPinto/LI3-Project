@@ -12,10 +12,10 @@ struct RideDriverAndUserInfo {
 };
 
 RideDriverAndUserInfo *create_rduinfo(int ride_id,
-                                                        int driver_id,
-                                                        char *user_username,
-                                                        Date user_account_creation_date,
-                                                        Date driver_account_creation_date) {
+                                      int driver_id,
+                                      char *user_username,
+                                      Date user_account_creation_date,
+                                      Date driver_account_creation_date) {
     RideDriverAndUserInfo *ride_driver_and_user_info = malloc(sizeof(RideDriverAndUserInfo));
     ride_driver_and_user_info->ride_id = ride_id;
     ride_driver_and_user_info->driver_id = driver_id;

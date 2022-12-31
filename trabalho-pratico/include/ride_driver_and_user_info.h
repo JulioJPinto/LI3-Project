@@ -10,10 +10,10 @@
 typedef struct RideDriverAndUserInfo RideDriverAndUserInfo;
 
 RideDriverAndUserInfo *create_rduinfo(int ride_id,
-                                                        int driver_id,
-                                                        char *user_username,
-                                                        Date user_account_creation_date,
-                                                        Date driver_account_creation_date);
+                                      int driver_id,
+                                      char *user_username,
+                                      Date user_account_creation_date,
+                                      Date driver_account_creation_date);
 
 int rduinfo_get_ride_id(RideDriverAndUserInfo *ride_driver_and_user_info);
 

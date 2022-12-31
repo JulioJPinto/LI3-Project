@@ -98,7 +98,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
         Gender user_gender = user_get_gender(user);
         Gender driver_gender = driver_get_gender(driver);
-        if (user_gender != driver_gender) return;
+        if (user_gender != driver_gender) goto cleanup;
 
         int ride_id = ride_get_id(ride);
 
@@ -115,6 +115,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
         catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
     }
 
+cleanup:
     free(user_username);
 }
 
