@@ -1,0 +1,18 @@
+name: Prepare dataset
+
+on: workflow_call
+
+jobs:
+  prepare-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache dataset
+        id: cache-dataset
+        uses: actions/cache@v3
+        with:
+          path: datasets.zip
+          key: dataset-zip
+      - name: Download dataset
+        if: steps.cache-dataset.outputs.cache-hit != 'true'
+        run: |
+          wget -O datasets.zip "https://drive.google.com/uc?export=download&id=1iqyj-YSEs3kpmiPhLBF7y6PTvcuyAIc-&confirm=t&uuid=271b37f4-8002-4735-9a90-642080a1896f"
