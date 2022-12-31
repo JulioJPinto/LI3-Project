@@ -1,0 +1,67 @@
+name: LI3 Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  prepare-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache dataset
+        id: cache-dataset
+        uses: actions/cache@v3
+        with:
+          path: datasets.zip
+          key: dataset-zip
+      - name: Download dataset
+        if: steps.cache-dataset.outputs.cache-hit != 'true'
+        run: |
+          wget -O datasets.zip "https://drive.google.com/uc?export=download&id=1iqyj-YSEs3kpmiPhLBF7y6PTvcuyAIc-&confirm=t&uuid=271b37f4-8002-4735-9a90-642080a1896f"
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Compile
+        run: cd trabalho-pratico && make
+
+  run-leaks:
+    runs-on: ubuntu-latest
+    needs: prepare-dataset
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download dataset
+        uses: actions/cache@v3
+        with:
+          path: datasets.zip
+          key: dataset-zip
+      - name: Unzip dataset
+        run: unzip ./datasets.zip -d ${GITHUB_WORKSPACE}/trabalho-pratico/datasets
+      - name: Install valgrind
+        run: sudo apt-get install valgrind
+      - name: Run leaks
+        run: cd trabalho-pratico && make leaks
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: prepare-dataset
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download dataset
+        uses: actions/cache@v3
+        with:
+          path: datasets.zip
+          key: dataset-zip
+      - name: Unzip dataset
+        run: unzip ./datasets.zip -d ${GITHUB_WORKSPACE}/trabalho-pratico/datasets
+      - name: Run tests
+        run: cd trabalho-pratico && make test
