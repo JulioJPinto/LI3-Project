@@ -1,0 +1,4 @@
+--suppressions=valgrind-glib.supp
+--leak-check=full
+--show-leak-kinds=definite,indirect,possible,reachable
+--error-exitcode=1

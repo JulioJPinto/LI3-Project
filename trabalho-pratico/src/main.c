@@ -37,6 +37,8 @@ int main(int argc, char **argv) {
     FILE *drivers_file = open_file_folder(dataset_folder_path, "drivers.csv");
     FILE *rides_file = open_file_folder(dataset_folder_path, "rides.csv");
 
+    FILE *queries_file = open_file(queries_file_path);
+
     Catalog *catalog = create_catalog();
 
     char *line_buffer = malloc(1024 * sizeof(char));
@@ -60,8 +62,6 @@ int main(int argc, char **argv) {
     g_timer_stop(loading_timer);
 
     BENCHMARK_START(total_query_time_timer);
-
-    FILE *queries_file = open_file(queries_file_path);
 
     int query_count = 0;
 
