@@ -1,5 +1,5 @@
---suppressions=valgrind-glib.supp
---gen-suppressions=all
+--suppressions=./valgrind-suppressions/aarch64-valgrind-glib.supp
+--suppressions=./valgrind-suppressions/github-valgrind-glib.supp
 --leak-check=full
 --show-leak-kinds=definite,indirect,possible,reachable
 --error-exitcode=1

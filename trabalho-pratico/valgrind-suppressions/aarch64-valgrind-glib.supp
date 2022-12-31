@@ -4,13 +4,13 @@
    match-leak-kinds: reachable
    fun:malloc
    fun:g_realloc
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -20,11 +20,11 @@
    fun:g_malloc
    fun:g_slice_alloc
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -32,14 +32,14 @@
    match-leak-kinds: reachable
    fun:calloc
    fun:g_malloc0
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -47,29 +47,29 @@
    match-leak-kinds: reachable
    fun:calloc
    fun:g_malloc0
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
    match-leak-kinds: reachable
    fun:malloc
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:g_private_get
    fun:g_slice_alloc
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -79,12 +79,12 @@
    fun:g_malloc
    fun:g_slice_alloc
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -92,14 +92,14 @@
    match-leak-kinds: reachable
    fun:malloc
    fun:g_realloc
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -107,12 +107,12 @@
    match-leak-kinds: reachable
    fun:malloc
    fun:g_malloc
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
 {
    <insert_a_suppression_name_here>
@@ -122,10 +122,10 @@
    fun:g_malloc0
    fun:g_slice_alloc
    fun:g_hash_table_new_full
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
-   obj:/usr/lib/*/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
+   obj:/usr/lib/aarch64-linux-gnu/libglib-2.0.so.0.7200.4
    fun:call_init
    fun:call_init
    fun:_dl_init
-   obj:/usr/lib/*/ld-linux-aarch64.so.1
+   obj:/usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
 }
