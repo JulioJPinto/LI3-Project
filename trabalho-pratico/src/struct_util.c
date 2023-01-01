@@ -10,16 +10,23 @@ static const int reference_date_month = 10;
 static const int reference_date_year = 2022;
 
 int parse_int_safe(char *string, int *error) {
-    char *end;
-    int result = (int) strtol(string, &end, 10);
-    if (*end != '\0') {
-        *error = 1;
+    int val = 0;
+    while (*string) {
+        if (!isdigit(*string)) {
+            *error = 1;
+            return 0;
+        }
+        val = val * 10 + (*string++ - '0');
     }
-    return result;
+    return val;
 }
 
 inline int parse_int_unsafe(char *string) {
-    return (int) strtol(string, NULL, 10);
+    int val = 0;
+    while (*string) {
+        val = val * 10 + (*string++ - '0');
+    }
+    return val;
 }
 
 double parse_double_safe(char *string, int *error) {

@@ -14,7 +14,7 @@ ifeq ($(BUILD_TYPE), debug)
     SRC_FOLDER := src
     CFLAGS += -Iinclude/
 else ifeq ($(BUILD_TYPE), release)
-    CFLAGS += -O3 -flto -funroll-loops
+    CFLAGS += -g -O3 -flto -funroll-loops
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := build/release
     SRC_FOLDER := src
