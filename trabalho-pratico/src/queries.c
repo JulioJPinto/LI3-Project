@@ -261,11 +261,15 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
     for (size_t i = 0; i < result->len; i++) {
         RideDriverAndUserInfo *rduinfo = g_ptr_array_index(result, i);
 
-        int driver_id = rduinfo_get_driver_id(rduinfo);
+        int ride_id = rduinfo_get_ride_id(rduinfo);
+
+        Ride *ride = catalog_get_ride(catalog, ride_id);
+
+        int driver_id = ride_get_driver_id(ride);
         Driver *driver = catalog_get_driver(catalog, driver_id);
         char *driver_name = driver_get_name(driver);
 
-        char *user_username = rduinfo_get_user_username(rduinfo);
+        char *user_username = ride_get_user_username(ride);
         User *user = catalog_get_user(catalog, user_username);
         char *user_name = user_get_name(user);
 

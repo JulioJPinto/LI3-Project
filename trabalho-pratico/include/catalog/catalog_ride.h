@@ -17,6 +17,8 @@ void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride);
 
 void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride, Gender gender, RideDriverAndUserInfo *rduinfo);
 
+Ride *catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id);
+
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city);
 
 double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, char *city);

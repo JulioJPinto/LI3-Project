@@ -98,24 +98,20 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
         Gender user_gender = user_get_gender(user);
         Gender driver_gender = driver_get_gender(driver);
-        if (user_gender != driver_gender) goto cleanup;
+        if (user_gender == driver_gender) {
+            int ride_id = ride_get_id(ride);
 
-        int ride_id = ride_get_id(ride);
+            Date user_account_creation_date = user_get_account_creation_date(user);
+            Date driver_account_creation_date = driver_get_account_creation_date(driver);
 
-        Date user_account_creation_date = user_get_account_creation_date(user);
-        Date driver_account_creation_date = driver_get_account_creation_date(driver);
+            RideDriverAndUserInfo *ride_driver_and_user_info = create_rduinfo(ride_id,
+                                                                              user_account_creation_date,
+                                                                              driver_account_creation_date);
 
-        RideDriverAndUserInfo *ride_driver_and_user_info =
-                create_rduinfo(ride_id,
-                               driver_id,
-                               user_username,
-                               user_account_creation_date,
-                               driver_account_creation_date);
-
-        catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
+            catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
+        }
     }
 
-cleanup:
     free(user_username);
 }
 
@@ -129,6 +125,10 @@ User *catalog_get_user(Catalog *catalog, char *username) {
 
 Driver *catalog_get_driver(Catalog *catalog, int id) {
     return catalog_driver_get_driver(catalog->catalog_driver, id);
+}
+
+Ride *catalog_get_ride(Catalog *catalog, int id) {
+    return catalog_ride_get_ride(catalog->catalog_ride, id);
 }
 
 gboolean catalog_city_exists(Catalog *catalog, char *city) {

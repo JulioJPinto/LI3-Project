@@ -73,6 +73,10 @@ void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride,
                     rduinfo);
 }
 
+Ride* catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id) {
+    return g_ptr_array_index(catalog_ride->rides_array, ride_id);
+}
+
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
     return g_hash_table_contains(catalog_ride->rides_in_city_hashtable, city);
 }
