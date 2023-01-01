@@ -6,6 +6,7 @@
 struct CatalogRide {
     GPtrArray *rides_array;
     GHashTable *rides_in_city_hashtable;
+    GHashTable *rides_by_id_hashtable;
 
     GPtrArray *rduinfo_male_array;
     GPtrArray *rduinfo_female_array;
@@ -28,6 +29,7 @@ void glib_wrapper_ptr_array_free(gpointer array) {
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
     catalog_ride->rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
+    catalog_ride->rides_by_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free);
 
     catalog_ride->rduinfo_male_array = g_ptr_array_new_with_free_func(free_rduinfo);
@@ -38,6 +40,7 @@ CatalogRide *create_catalog_ride(void) {
 
 void free_catalog_ride(CatalogRide *catalog_ride) {
     g_ptr_array_free(catalog_ride->rides_array, TRUE);
+    g_hash_table_destroy(catalog_ride->rides_by_id_hashtable);
     g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
 
     g_ptr_array_free(catalog_ride->rduinfo_male_array, TRUE);
@@ -63,6 +66,7 @@ static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride
 void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
     g_ptr_array_add(catalog_ride->rides_array, ride);
 
+    g_hash_table_insert(catalog_ride->rides_by_id_hashtable, GINT_TO_POINTER(ride_get_id(ride)), ride);
     catalog_ride_index_city(catalog_ride, ride);
 }
 
@@ -73,8 +77,8 @@ void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride,
                     rduinfo);
 }
 
-Ride* catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id) {
-    return g_ptr_array_index(catalog_ride->rides_array, ride_id);
+Ride *catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id) {
+    return g_hash_table_lookup(catalog_ride->rides_by_id_hashtable, GINT_TO_POINTER(ride_id));
 }
 
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
