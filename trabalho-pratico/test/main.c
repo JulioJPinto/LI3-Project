@@ -121,11 +121,37 @@ void assert_valid_csv_loads_everything_regular(void) {
     }
 }
 
+void test_date(char *date, int expected_day, int expected_month, int expected_year) {
+    char *date_copy = g_strdup(date);
+    Date parsed_date = parse_date(date_copy);
+    if (date_get_day(parsed_date) != expected_day) {
+        g_test_fail_printf("Day should've been %d for date '%s' but is %d\n", expected_day, date, date_get_day(parsed_date));
+    }
+    if (date_get_month(parsed_date) != expected_month) {
+        g_test_fail_printf("Month should've been %d for date '%s' but is %d\n", expected_month, date, date_get_month(parsed_date));
+    }
+    if (date_get_year(parsed_date) != expected_year) {
+        g_test_fail_printf("Year should've been %d for date '%s' but is %d\n", expected_year, date, date_get_year(parsed_date));
+    }
+    free(date_copy);
+}
+
+void test_date_parse_and_encoding(void) {
+    test_date("01/01/2022", 1, 1, 2022);
+    test_date("31/12/2000", 31, 12, 2000);
+
+    char date3[] = "38/01/2001";
+    if (is_date_valid(parse_date(date3))) {
+        g_test_fail_printf("Date should've been invalid for date '%s'\n", date3);
+    }
+}
+
 int main(int argc, char *argv[]) {
     g_test_init(&argc, &argv, NULL);
 
     g_test_set_nonfatal_assertions();
 
+    g_test_add_func("/assert_date_correct_parse_and_encoding", test_date_parse_and_encoding);
     g_test_add_func("/assert_invalid_csv_loads_nothing_large", assert_invalid_csv_loads_nothing_large);
     g_test_add_func("/assert_invalid_csv_loads_nothing_regular", assert_invalid_csv_loads_nothing_regular);
     g_test_add_func("/assert_valid_csv_loads_everything", assert_valid_csv_loads_everything_regular);

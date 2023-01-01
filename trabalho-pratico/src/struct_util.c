@@ -4,8 +4,10 @@
 #include <string.h>
 #include <ctype.h>
 
-const Date invalid_date = {.day = -1};
-static const Date reference_date = {9, 10, 2022};
+const Date invalid_date = {.encoded_date = 0};
+static const int reference_date_day = 9;
+static const int reference_date_month = 10;
+static const int reference_date_year = 2022;
 
 int parse_int_safe(char *string, int *error) {
     char *end;
@@ -29,8 +31,12 @@ double parse_double_safe(char *string, int *error) {
     return result;
 }
 
-inline int is_date_valid(Date date) {
-    return date.day >= 1 && date.day <= 31 && date.month >= 1 && date.month <= 12;
+int is_date_valid(Date date) {
+    return date.encoded_date != 0;
+}
+
+int is_date(int day, int month, int year) {
+    return day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 0;
 }
 
 inline Date parse_date(char *string) {
@@ -53,7 +59,31 @@ inline Date parse_date(char *string) {
         return invalid_date;
     }
 
-    return (Date){day, month, year};
+    if (!is_date(day, month, year)) {
+        return invalid_date;
+    }
+
+    return create_date(day, month, year);
+}
+
+inline Date create_date(int day, int month, int year) {
+    uint32_t encoded = 0;
+    encoded |= day;
+    encoded |= month << 5;
+    encoded |= year << 10;
+    return (Date){.encoded_date = encoded};
+}
+
+int date_get_day(Date date) {
+    return (int) date.encoded_date & 0x1F;
+}
+
+int date_get_month(Date date) {
+    return (int) (date.encoded_date >> 5) & 0xF;
+}
+
+int date_get_year(Date date) {
+    return (int) (date.encoded_date >> 10) & 0x7FFF;
 }
 
 inline Gender parse_gender(const char *string) {
@@ -95,20 +125,17 @@ inline PaymentMethod parse_pay_method(const char *string) {
 }
 
 int get_age(Date date_of_birth) {
-    if (reference_date.month > date_of_birth.month ||
-        (reference_date.month == date_of_birth.month && reference_date.day >= date_of_birth.day))
-        return reference_date.year - date_of_birth.year;
+    int day = date_get_day(date_of_birth);
+    int month = date_get_month(date_of_birth);
+    int year = date_get_year(date_of_birth);
+
+    if (reference_date_month > month ||
+        (reference_date_month == month && reference_date_day >= day))
+        return reference_date_year - year;
     else
-        return reference_date.year - date_of_birth.year - 1;
+        return reference_date_year - year - 1;
 }
 
 int date_compare(Date date_1, Date date_2) {
-    if (date_1.year != date_2.year)
-        return date_1.year - date_2.year;
-    else if (date_1.month != date_2.month)
-        return date_1.month - date_2.month;
-    else if (date_1.day != date_2.day)
-        return date_1.day - date_2.day;
-    else
-        return 0;
+    return (int) date_1.encoded_date - (int) date_2.encoded_date;
 }

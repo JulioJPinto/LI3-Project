@@ -300,7 +300,11 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char 
         char *city = ride_get_city(ride);
         double tip = ride_get_tip(ride);
 
-        fprintf(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, date.day, date.month, date.year, distance, city, tip);
+        int day = date_get_day(date);
+        int month = date_get_month(date);
+        int year = date_get_year(date);
+
+        fprintf(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
         free(city);
     }
 

@@ -2,6 +2,8 @@
 #ifndef LI3_STRUCT_UTIL_H
 #define LI3_STRUCT_UTIL_H
 
+#include <stdint.h>
+
 /**
  * Struct that represents a gender (Female and Male)
  */
@@ -14,7 +16,7 @@ typedef enum gender {
  * Struct that represents a date (day, month and year)
  */
 typedef struct date {
-    int day, month, year;
+    uint32_t encoded_date;
 } Date;
 
 /**
@@ -90,6 +92,17 @@ int is_date_valid(Date date);
  * The date is considered valid if it is in the format dd/mm/yyyy (1<=dd<=12 && 1<=mm<=31)
  */
 Date parse_date(char *string);
+
+/**
+ * Creates a date struct from the given day, month and year
+ */
+Date create_date(int day, int month, int year);
+
+int date_get_day(Date date);
+
+int date_get_month(Date date);
+
+int date_get_year(Date date);
 
 /**
  * Parses a string into a gender struct 

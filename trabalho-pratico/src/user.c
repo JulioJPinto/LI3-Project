@@ -38,7 +38,7 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     user->accumulated_score = 0;
     user->total_spent = 0;
     user->total_distance = 0;
-    user->most_recent_ride = (Date){.day = 0, .month = 0, .year = 0};
+    user->most_recent_ride = (Date){0};
 
     return user;
 }
