@@ -57,7 +57,10 @@ void parse_and_register_driver(void *catalog, char *line, char separator) {
 }
 
 static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
-    Ride *ride = parse_line_ride(line, separator);
+    char *city;
+    char *user_username;
+
+    Ride *ride = parse_line_ride_detailed(line, separator, &city, &user_username);
     if (ride == NULL) return;
 
     int driver_id = ride_get_driver_id(ride);
@@ -73,8 +76,6 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     driver_add_earned(driver, total_price);
     driver_register_ride_date(driver, ride_get_date(ride));
 
-    char *user_username = ride_get_user_username(ride);
-
     User *user = catalog_get_user(catalog, user_username);
     user_increment_number_of_rides(user);
     user_add_score(user, ride_get_score_user(ride));
@@ -88,11 +89,9 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     AccountStatus user_account_status = user_get_account_status(user);
 
     if (driver_account_status == ACTIVE) { // We only need to index for query 7 if the driver is active
-        char *city = ride_get_city(ride);
         char *driver_name = driver_get_name(driver);
         catalog_driver_register_driver_ride(catalog->catalog_driver, driver_id, driver_name, driver_score, city);
         free(driver_name);
-        free(city);
     }
 
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
@@ -111,8 +110,6 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
             catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
         }
     }
-
-    free(user_username);
 }
 
 void parse_and_register_ride(void *catalog, char *line, char separator) {

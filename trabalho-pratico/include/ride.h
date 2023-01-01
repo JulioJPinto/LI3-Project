@@ -20,6 +20,13 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 Ride *parse_line_ride(char *line, char delim);
 
 /**
+ * Parses a line of the CSV to a ride
+ * parsed_city and parsed_user_username are used to return the strings city and user_username of the ride
+ * to avoid having to strdup them again when registering the ride in the catalog
+ */
+Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char **parsed_user_username);
+
+/**
  * Returns the driver id of the ride
  */
 int ride_get_driver_id(Ride *ride);

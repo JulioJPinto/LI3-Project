@@ -40,6 +40,10 @@ Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, 
 }
 
 Ride *parse_line_ride(char *line, char delim) {
+    return parse_line_ride_detailed(line, delim, NULL, NULL);
+}
+
+Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char **parsed_user_username) {
     char *id_string = next_token(&line, delim);
     if (IS_EMPTY(id_string)) return NULL;
     int id = parse_int_unsafe(id_string);
@@ -77,6 +81,9 @@ Ride *parse_line_ride(char *line, char delim) {
     double tip = parse_double_safe(tip_string, &error);
 
     if (error || distance < 1 || user_score < 1 || driver_score < 1 || tip < 0 || tip != tip) return NULL;
+
+    if (parsed_city) *parsed_city = city;
+    if (parsed_user_username) *parsed_user_username = user;
 
     return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
 }
