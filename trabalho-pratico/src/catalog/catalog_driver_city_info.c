@@ -91,8 +91,7 @@ void catalog_driver_city_info_notify_stop_registering(CatalogDriverCityInfo *cat
         g_hash_table_destroy(collection->driver_city_info_hashtable);
 
         // Sort the array by average score
-        GPtrArray* driver_city_info_array = *(GPtrArray **) get_value(catalog->driver_city_info_lazy);
-        sort_array(driver_city_info_array, compare_driver_city_infos_by_average_score);
+        get_value_apply_func(collection->driver_city_info_lazy);
         collection->driver_city_info_hashtable = NULL;
         log_info("     driver_city_info_destroy_and_sort (%s): %lf seconds\n", key, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
     }

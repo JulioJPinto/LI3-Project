@@ -12,7 +12,7 @@ Lazy* lazy_of(void* voidp, FunctionToApply func);
 
 void* get_value(Lazy* lazy);
 
-void* get_value_apply_func(Lazy* lazy)
+void* get_value_apply_func(Lazy* lazy);
 
 void* free_lazy(Lazy* lazy);
 

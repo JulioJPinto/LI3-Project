@@ -56,7 +56,7 @@ Driver *catalog_driver_get_driver(CatalogDriver *catalog_driver, int driver_id) 
 }
 
 int catalog_driver_get_top_n_drivers_with_best_score(CatalogDriver *catalog_driver, int n, GPtrArray *result) {
-    GPtrArray *drivers_array = *(GPtrArray **) get_value(catalog_driver->drivers_lazy);
+    GPtrArray *drivers_array = *(GPtrArray **) get_value_apply_func(catalog_driver->drivers_lazy);
     int length = MIN(n, (int) drivers_array->len);
 
     for (int i = 0; i < length; i++) {
@@ -71,7 +71,7 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
 }
 
 void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
-    sort_array(catalog_driver->drivers_array, compare_drivers_by_score);
-
+    GPtrArray *drivers_array = *(GPtrArray **) get_value_apply_func(catalog_driver->drivers_lazy);
+    
     catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
 }
