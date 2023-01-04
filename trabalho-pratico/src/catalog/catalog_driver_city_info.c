@@ -47,7 +47,7 @@ void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_in
 }
 
 void sort_array_infos_by_average_score(void* drivers_city_infos_array) {
-    GPtrArray *drivers_city_infos_ptr_array = *(GPtrArray **) drivers_city_infos_array;
+    GPtrArray *drivers_city_infos_ptr_array = (GPtrArray *) drivers_city_infos_array;
     sort_array(drivers_city_infos_ptr_array, compare_driver_city_infos_by_average_score);
 }
 
@@ -57,7 +57,8 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
     DriverCityInfo *target;
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
         driver_city_collection = malloc(sizeof(DriverCityInfoCollection));
-        driver_city_collection->driver_city_info_lazy = lazy_of(g_ptr_array_new_with_free_func(free_driver_city_info_voidp), sort_array_infos_by_average_score);
+        GPtrArray *driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
+        driver_city_collection->driver_city_info_lazy = lazy_of(driver_city_info_array, sort_array_infos_by_average_score);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
         g_hash_table_insert(catalog->driver_city_info_collection_hashtable, g_strdup(ride_city), driver_city_collection);
@@ -70,7 +71,7 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
     register_driver_city_info:
         target = create_driver_city_info(driver_id, driver_name);
         
-        GPtrArray* driver_city_info_array = *(GPtrArray **) get_value(driver_city_collection->driver_city_info_lazy);
+        GPtrArray* driver_city_info_array = (GPtrArray *) get_value(driver_city_collection->driver_city_info_lazy);
         g_ptr_array_add(driver_city_info_array, target);
         g_hash_table_insert(driver_city_collection->driver_city_info_hashtable, GINT_TO_POINTER(driver_id), target);
     }
@@ -102,7 +103,7 @@ int catalog_driver_city_info_get_top_best_drivers_by_city(CatalogDriverCityInfo 
     if (driver_city_info_collection == NULL) return 0; // city doesn't exist
 
     Lazy *driver_city_info_lazy = driver_city_info_collection->driver_city_info_lazy;
-    GPtrArray *top_drivers_in_city = *(GPtrArray **) get_value_apply_func(driver_city_info_lazy);
+    GPtrArray *top_drivers_in_city = (GPtrArray *) get_value_apply_func(driver_city_info_lazy);
 
     int size = MIN(n, (int) top_drivers_in_city->len);
 
