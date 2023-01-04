@@ -8,7 +8,9 @@ typedef struct Lazy Lazy;
 
 typedef void (*FunctionToApply)(void *);
 
-Lazy* lazy_of(void* voidp, FunctionToApply func);
+typedef void (*FreeFunction)(void *);
+
+Lazy* lazy_of(void* voidp, FunctionToApply func, int index_func);
 
 void* get_value(Lazy* lazy);
 

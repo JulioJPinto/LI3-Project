@@ -58,7 +58,7 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
         driver_city_collection = malloc(sizeof(DriverCityInfoCollection));
         GPtrArray *driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
-        driver_city_collection->driver_city_info_lazy = lazy_of(driver_city_info_array, sort_array_infos_by_average_score);
+        driver_city_collection->driver_city_info_lazy = lazy_of(driver_city_info_array, sort_array_infos_by_average_score, 0);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
         g_hash_table_insert(catalog->driver_city_info_collection_hashtable, g_strdup(ride_city), driver_city_collection);

@@ -27,7 +27,8 @@ void sort_array_by_driver_score(void* driver_array) {
 
 CatalogDriver *create_catalog_driver(void) {
     CatalogDriver *catalog_driver = malloc(sizeof(CatalogDriver));
-    catalog_driver->drivers_lazy = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_driver), sort_array_by_driver_score);
+    GPtrArray *drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
+    catalog_driver->drivers_lazy = lazy_of(drivers_array, sort_array_by_driver_score, 0);
     catalog_driver->driver_from_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     catalog_driver->catalog_driver_city_info = create_catalog_driver_city_info();

@@ -24,7 +24,7 @@ void glib_wrapper_free_ride(gpointer ride) {
 /**
  * Function that wraps free array to be used in GLib g_hash_table free func.
  */
-void glib_wrapper_ptr_array_free(gpointer array) {
+void glib_wrapper_rides_city_array(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }
 
@@ -42,13 +42,13 @@ void sort_rduinfo_by_account_creation_date(void *rides_array) {
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
     GPtrArray* rides_array = g_ptr_array_new_with_free_func(free_rduinfo);
-    catalog_ride->rides_lazy = lazy_of(rides_array, sort_array_rides_by_date);
-    catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_ptr_array_free);
+    catalog_ride->rides_lazy = lazy_of(rides_array, sort_array_rides_by_date, 0);
+    catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_rides_city_array);
 
     GPtrArray* rduinfo_male_garray = g_ptr_array_new_with_free_func(free_rduinfo);
     GPtrArray* rduinfo_female_garray = g_ptr_array_new_with_free_func(free_rduinfo);
-    catalog_ride->rduinfo_male_lazy = lazy_of(rduinfo_male_garray, sort_rduinfo_by_account_creation_date);
-    catalog_ride->rduinfo_female_lazy = lazy_of(rduinfo_female_garray, sort_rduinfo_by_account_creation_date);
+    catalog_ride->rduinfo_male_lazy = lazy_of(rduinfo_male_garray, sort_rduinfo_by_account_creation_date, 0);
+    catalog_ride->rduinfo_female_lazy = lazy_of(rduinfo_female_garray, sort_rduinfo_by_account_creation_date, 0);
 
     return catalog_ride;
 }
@@ -69,7 +69,7 @@ static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride
     Lazy *rides_in_city = g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city);
     if (rides_in_city == NULL) {
         GPtrArray *rides_city_array = g_ptr_array_new();
-        rides_in_city = lazy_of(rides_city_array, sort_array_rides_by_date);
+        rides_in_city = lazy_of(rides_city_array, sort_array_rides_by_date, 0);
         g_hash_table_insert(catalog_ride->rides_in_city_hashtable, city, rides_in_city);
     } else {
         free(city);

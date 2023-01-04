@@ -25,7 +25,7 @@ CatalogUser *create_catalog_user(void) {
     CatalogUser *catalog_user = malloc(sizeof(CatalogUser));
 
     GPtrArray *users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
-    catalog_user->users_lazy = lazy_of(users_array,sort_array_by_total_distance);
+    catalog_user->users_lazy = lazy_of(users_array,sort_array_by_total_distance, 0);
     catalog_user->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 
     return catalog_user;
