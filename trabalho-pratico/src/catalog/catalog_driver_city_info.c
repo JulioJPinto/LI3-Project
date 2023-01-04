@@ -1,6 +1,7 @@
 #include "catalog/catalog_driver_city_info.h"
 
 #include "catalog_sort.h"
+#include "benchmark.h"
 
 struct CatalogDriverCityInfo {
     GHashTable *driver_city_info_collection_hashtable;
@@ -74,10 +75,12 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
 
 void catalog_driver_city_info_notify_stop_registering(CatalogDriverCityInfo *catalog) {
     GHashTableIter iter;
-    gpointer value;
+    gpointer key, value;
 
     g_hash_table_iter_init(&iter, catalog->driver_city_info_collection_hashtable);
-    while (g_hash_table_iter_next(&iter, NULL, &value)) {
+    BENCHMARK_START(driver_city_info_destroy_and_sort);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        g_timer_start(driver_city_info_destroy_and_sort);
         DriverCityInfoCollection *collection = value;
         // We don't need the hashtable anymore, so we can free it
         g_hash_table_destroy(collection->driver_city_info_hashtable);
@@ -85,6 +88,7 @@ void catalog_driver_city_info_notify_stop_registering(CatalogDriverCityInfo *cat
         // Sort the array by average score
         sort_array(collection->driver_city_info_array, compare_driver_city_infos_by_average_score);
         collection->driver_city_info_hashtable = NULL;
+        log_info("     driver_city_info_destroy_and_sort (%s): %lf seconds\n", key, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
     }
 }
 

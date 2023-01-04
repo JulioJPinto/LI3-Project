@@ -23,7 +23,7 @@ FILE *open_file_folder(const char *const folder_path, const char *const file_nam
 FILE *open_file(const char *const file_name) {
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        log_panic("Could not open file %s\n", file_name);
+        log_warning("Could not open file %s\n", file_name);
     }
 
     return file;

@@ -2,6 +2,7 @@
 
 #include "catalog/catalog_driver_city_info.h"
 #include "catalog_sort.h"
+#include "benchmark.h"
 
 struct CatalogDriver {
     GPtrArray *drivers_array;
@@ -62,7 +63,9 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
 }
 
 void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
+    BENCHMARK_START(sort_drivers_array);
     sort_array(catalog_driver->drivers_array, compare_drivers_by_score);
+    BENCHMARK_END(sort_drivers_array, "     sort_drivers_array: %lf seconds\n");
 
     catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
 }

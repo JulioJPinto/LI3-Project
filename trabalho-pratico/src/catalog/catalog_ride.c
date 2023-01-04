@@ -1,5 +1,6 @@
 #include "catalog/catalog_ride.h"
 
+#include "benchmark.h"
 #include "catalog_sort.h"
 #include "ride_driver_and_user_info.h"
 
@@ -232,18 +233,28 @@ int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(Cata
 }
 
 void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride) {
+    BENCHMARK_START(sort_rides_array_timer);
     // Sort rides by date for queries that requires lookup in a date range
     sort_array(catalog_ride->rides_array, compare_rides_by_date);
+    BENCHMARK_END(sort_rides_array_timer, "     sort_rides_array_by_date: %lf seconds\n");
 
     // Sort each rides array in the rides_in_city_hashtable by date for queries that requires date range in a city
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
+
+    BENCHMARK_START(sort_rides_in_city_array_timer);
     GHashTableIter iter;
-    gpointer value;
+    gpointer key, value;
     g_hash_table_iter_init(&iter, catalog_ride->rides_in_city_hashtable);
-    while (g_hash_table_iter_next(&iter, NULL, &value)) {
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        g_timer_start(sort_rides_in_city_array_timer);
         sort_array(value, compare_rides_by_date);
+        log_info("     sort_rides_in_city_array (%s): %lf seconds\n", key, g_timer_elapsed(sort_rides_in_city_array_timer, NULL));
     }
 
+    BENCHMARK_START(sort_rduinfo_male_array_timer);
     sort_array(catalog_ride->rduinfo_male_array, compare_rduinfo_by_account_creation_date);
+    BENCHMARK_END(sort_rduinfo_male_array_timer, "     sort_rduinfo_male_array_timer: %lf seconds\n");
+    BENCHMARK_START(sort_rduinfo_female_array_timer);
     sort_array(catalog_ride->rduinfo_female_array, compare_rduinfo_by_account_creation_date);
+    BENCHMARK_END(sort_rduinfo_female_array_timer, "     sort_rduinfo_female_array_timer: %lf seconds\n");
 }

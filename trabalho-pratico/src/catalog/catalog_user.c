@@ -1,6 +1,7 @@
 #include "catalog/catalog_user.h"
 
 #include "catalog_sort.h"
+#include "benchmark.h"
 
 struct CatalogUser {
     GPtrArray *users_array;
@@ -44,7 +45,9 @@ User *catalog_user_get_user(CatalogUser *catalog_user, char *username) {
 }
 
 void catalog_user_notify_stop_registering(CatalogUser *catalog_user) {
+    BENCHMARK_START(sort_users_array);
     sort_array(catalog_user->users_array, compare_users_by_total_distance);
+    BENCHMARK_END(sort_users_array, "     sort_users_array: %lf seconds\n");
 }
 
 int catalog_user_get_top_n_users(CatalogUser *catalog_user, int n, GPtrArray *result) {
