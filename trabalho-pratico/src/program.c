@@ -97,9 +97,11 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
         format_fgets_input_line(line_buffer);
         program_run_query(program, line_buffer);
     }
-
+    
     g_timer_stop(input_file_execution_timer);
     log_info("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
 
+    fclose(input_file);
+    
     return TRUE;
 }
