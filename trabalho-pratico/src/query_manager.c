@@ -21,10 +21,10 @@ static const size_t query_functions_size = sizeof(query_functions) / sizeof(Quer
 void parse_and_run_query(Catalog *catalog, FILE *output, char *query) {
     char **args = g_strsplit(query, " ", 0);
 
-    char *query_id_str_left;
-    int query_id = (int) strtol(args[0], &query_id_str_left, 10);
+    int error = 0;
+    int query_id = parse_int_safe(args[0], &error);
 
-    if (*query_id_str_left != '\0') {
+    if (error) {
         fprintf(output, "Invalid query id: %s\n", args[0]);
     } else {
         run_query(catalog, output, query_id, args + 1);

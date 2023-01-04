@@ -9,7 +9,7 @@ void fprintf_debug(FILE *stream, const char *format, ...) {
 #ifdef DEBUG
     va_list args;
     va_start(args, format);
-    fprintf(stream, "(empty) ");
+    fprintf(stream, "(debug) ");
     vfprintf(stream, format, args);
     va_end(args);
 #else
@@ -80,9 +80,9 @@ void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
 void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *output, char **args) {
     char *id_or_username = args[0];
 
-    char *rest;
-    int id = (int) strtol(id_or_username, &rest, 10);
-    if (*rest != '\0') {
+    int error = 0;
+    int id = parse_int_safe(id_or_username, &error);
+    if (error) {
         execute_query_find_user_by_name(catalog, output, id_or_username);
     } else {
         execute_query_find_driver_by_id(catalog, output, id);
@@ -93,10 +93,10 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
  * Query 2
  */
 void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
-    char *end_ptr;
-    int n = (int) strtol(args[0], &end_ptr, 10);
-    if (*end_ptr != '\0') {
-        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+    int error = 0;
+    int n = parse_int_safe(args[0], &error);
+    if (error) {
+        fprintf_debug(output, "Couldn't parse number of size of top drivers '%s'\n", args[0]);
         return;
     }
 
@@ -123,10 +123,11 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
  * Query 3
  */
 void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args) {
-    char *end_ptr;
-    int n = (int) strtol(args[0], &end_ptr, 10);
-    if (*end_ptr != '\0') {
-        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+    int error = 0;
+    int n = parse_int_safe(args[0], &error);
+
+    if (error) {
+        fprintf_debug(output, "Couldn't parse number of size of top users '%s'\n", args[0]);
         return;
     }
 
@@ -217,10 +218,10 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
   * Query 7
   */
 void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *output, char **args) {
-    char *end_ptr;
-    int n = (int) strtol(args[0], &end_ptr, 10);
-    if (*end_ptr != '\0') {
-        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+    int error = 0;
+    int n = parse_int_safe(args[0], &error);
+    if (error) {
+        fprintf_debug(output, "Couldn't parse number of drivers in city '%s'\n", args[0]);
         return;
     }
 
@@ -248,10 +249,10 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
     char *gender_string = args[0];
     Gender gender = parse_gender(gender_string);
 
-    char *end_ptr;
-    int min_account_age = (int) strtol(args[1], &end_ptr, 10);
-    if (*end_ptr != '\0') {
-        fprintf_debug(output, "Couldn't parse number of drivers '%s'\n", args[0]);
+    int error = 0;
+    int min_account_age = parse_int_safe(args[1], &error);
+    if (error) {
+        fprintf_debug(output, "Couldn't parse number of minimum age '%s'\n", args[1]);
         return;
     }
 
