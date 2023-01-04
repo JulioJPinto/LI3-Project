@@ -20,7 +20,6 @@ RideDriverAndUserInfo *create_rduinfo(int ride_id,
 }
 
 void free_rduinfo_internal(RideDriverAndUserInfo *ride_driver_and_user_info) {
-    free(ride_driver_and_user_info->user_username);
     free(ride_driver_and_user_info);
 }
 
