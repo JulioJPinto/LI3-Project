@@ -11,4 +11,9 @@
  */
 char *next_token(char **line, char delim);
 
+/**
+ * Makes a string uppercase.
+ */
+void str_to_upper(char *string);
+
 #endif //LI3_STRING_UTIL_H

@@ -10,6 +10,8 @@ Program *create_program(void);
 
 void free_program(Program *program);
 
+void run_program(Program *program, char **args, int arg_size);
+
 gboolean program_load_dataset(Program *program, char *dataset_folder_path);
 
 void program_run_query(Program *program, char *query);

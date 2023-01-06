@@ -1,8 +1,13 @@
 #include "program.h"
 
+#include <ctype.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 #include "benchmark.h"
 #include "catalog.h"
 #include "file_util.h"
+#include "string_util.h"
 #include "logger.h"
 #include "query_manager.h"
 #include "parser.h"
@@ -10,8 +15,9 @@
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
     PROGRAM_STATE_WAITING_FOR_DATASET_INPUT,
-    PROGRAM_STATE_WAITING_FOR_QUERY_INPUT,
+    PROGRAM_STATE_WAITING_FOR_COMMANDS,
     PROGRAM_STATE_VIEWING_QUERY_RESULT,
+    PROGRAM_STATE_EXITING,
 } ProgramState;
 
 struct Program {
@@ -19,6 +25,55 @@ struct Program {
     ProgramState state;
     int current_query_id;
 };
+
+typedef struct ProgramCommand {
+    char *name;
+    char *description;
+    void (*function)(Program *program, char **args, int arg_size);
+} ProgramCommand;
+
+void program_run_queries_from_file_command(Program *program, char **args, int arg_size) {
+    if (arg_size < 2) {
+        log_warning("Use 'file <file_path>'\n");
+        return;
+    }
+
+    char *input_file_path = args[1];
+
+    if (!program_run_queries_from_file(program, input_file_path)) {
+        log_warning("Failed to run queries from file '%s'\n", input_file_path);
+    }
+}
+
+void program_run_help_command(Program *program, char **args, int arg_size);
+
+void program_exit_command(Program *program, char **args, int arg_size) {
+    (void) args;
+    (void) arg_size;
+
+    program->state = PROGRAM_STATE_EXITING;
+}
+
+const ProgramCommand program_commands[] = {
+        {"file", "Runs all the queries from a file", program_run_queries_from_file_command},
+        {"help", "Shows this help message", program_run_help_command},
+        {"exit", "Exits the program", program_exit_command},
+};
+
+const int program_commands_size = sizeof(program_commands) / sizeof(ProgramCommand);
+
+void program_run_help_command(Program *program, char **args, int arg_size) {
+    (void) program;
+    (void) args;
+    (void) arg_size;
+
+    log_info("Available commands:\n");
+    log_info("  <query_id> <query> - Runs a query\n");
+
+    for (int i = 0; i < program_commands_size; i++) {
+        log_info("  %s - %s\n", program_commands[i].name, program_commands[i].description);
+    }
+}
 
 Program *create_program(void) {
     Program *program = malloc(sizeof(Program));
@@ -31,6 +86,68 @@ Program *create_program(void) {
 void free_program(Program *program) {
     free_catalog(program->catalog);
     free(program);
+}
+
+void program_ask_for_dataset_path(Program *program) {
+    program->state = PROGRAM_STATE_WAITING_FOR_DATASET_INPUT;
+
+    gboolean loaded = FALSE;
+
+    while (!loaded) {
+        char *input = readline("Please enter the path to the dataset folder (default: datasets/data-regular): ");
+
+        if (IS_EMPTY(input)) {
+            strcpy(input, "datasets/data-regular");
+        }
+
+        loaded = program_load_dataset(program, input);
+        free(input);
+    }
+}
+
+void program_ask_for_commands(Program *program) {
+    program->state = PROGRAM_STATE_WAITING_FOR_COMMANDS;
+    char *input = readline("> ");
+
+    char **args = g_strsplit(input, " ", 0);
+    int arg_size = (int) g_strv_length(args);
+
+    if (arg_size == 0) return;
+
+    for (int i = 0; i < program_commands_size; i++) {
+        if (strcmp(program_commands[i].name, args[0]) == 0) {
+            program_commands[i].function(program, args, arg_size);
+            return;
+        }
+    }
+
+    if (isdigit(args[0][0])) {
+        program_run_query(program, input);
+    } else {
+        log_warning("Invalid command '%s'\n", args[0]);
+    }
+
+    add_history(input);
+
+    free(input);
+}
+
+void run_program(Program *program, char **args, int arg_size) {
+    if (arg_size >= 2) {
+        char *dataset_folder_path = args[1];
+        char *queries_file_path = args[2];
+
+        program_load_dataset(program, dataset_folder_path);
+        program_run_queries_from_file(program, queries_file_path);
+    } else {
+        rl_bind_key('\t', rl_complete);
+        using_history();
+
+        program_ask_for_dataset_path(program);
+        while (program->state != PROGRAM_STATE_EXITING) {
+            program_ask_for_commands(program);
+        }
+    }
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
@@ -68,6 +185,7 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 }
 
 void program_run_query(Program *program, char *query) {
+    // TODO: Make output to console or file
     Catalog *catalog = program->catalog;
     int query_number = ++program->current_query_id;
 

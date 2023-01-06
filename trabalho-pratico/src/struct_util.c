@@ -4,6 +4,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "string_util.h"
+
 const Date invalid_date = {.encoded_date = 0};
 static const int reference_date_day = 9;
 static const int reference_date_month = 10;
@@ -97,14 +99,8 @@ inline Gender parse_gender(const char *string) {
     return (string[0] == 'F' ? F : M);
 }
 
-void to_upper(char *string) {
-    for (int i = 0; string[i] != '\0'; i++) {
-        string[i] = (char) toupper(string[i]);
-    }
-}
-
 inline CarClass parse_car_class(char *string) {
-    to_upper(string);
+    str_to_upper(string);
     if (strcmp(string, "BASIC") == 0) {
         return BASIC;
     } else if (strcmp(string, "GREEN") == 0) {
@@ -117,7 +113,7 @@ inline CarClass parse_car_class(char *string) {
 }
 
 inline AccountStatus parse_acc_status(char *string) {
-    to_upper(string);
+    str_to_upper(string);
     if (strcmp(string, "ACTIVE") == 0) {
         return ACTIVE;
     } else if (strcmp(string, "INACTIVE") == 0) {

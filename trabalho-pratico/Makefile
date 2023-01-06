@@ -4,7 +4,7 @@ EXEC := li3
 CFLAGS := -std=c11 -Wall -Wextra -Wdouble-promotion -Werror=pedantic -Werror=vla -pedantic-errors -Wfatal-errors
 
 CFLAGS += $(shell pkg-config --cflags glib-2.0)
-LIBS := $(shell pkg-config --libs glib-2.0)
+LIBS := $(shell pkg-config --libs glib-2.0) -lreadline
 
 BUILD_TYPE ?= release
 ifeq ($(BUILD_TYPE), debug)

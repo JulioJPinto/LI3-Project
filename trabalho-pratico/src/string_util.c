@@ -1,5 +1,7 @@
 #include "string_util.h"
 
+#include <ctype.h>
+
 inline char *next_token(char **line, char delim) {
     char *start = *line;
 
@@ -13,4 +15,10 @@ inline char *next_token(char **line, char delim) {
     }
 
     return start;
+}
+
+void str_to_upper(char *string) {
+    for (int i = 0; string[i] != '\0'; i++) {
+        string[i] = (char) toupper(string[i]);
+    }
 }
