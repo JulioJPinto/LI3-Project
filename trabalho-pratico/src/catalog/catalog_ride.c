@@ -1,17 +1,17 @@
 #include "catalog/catalog_ride.h"
 
 #include "benchmark.h"
-#include "catalog/lazy.h"
+#include "lazy.h"
 #include "catalog_sort.h"
 #include "ride_driver_and_user_info.h"
 
 struct CatalogRide {
-    Lazy *rides_lazy;
+    Lazy *rides_array_lazy;
     GHashTable *rides_in_city_hashtable;
     GHashTable *rides_by_id_hashtable;
 
-    Lazy *rduinfo_male_lazy;
-    Lazy *rduinfo_female_lazy;
+    Lazy *rduinfo_male_array_lazy;
+    Lazy *rduinfo_female_array_lazy;
 };
 
 /**
@@ -21,11 +21,15 @@ void glib_wrapper_free_ride(gpointer ride) {
     free_ride(ride);
 }
 
+void wrapper_free_rides_array_lazys(gpointer array) {
+    g_ptr_array_free((GPtrArray *) array, TRUE);
+}
+
 /**
  * Function that wraps free array to be used in GLib g_hash_table free func.
  */
 void glib_wrapper_free_rides_city_lazy(gpointer lazy) {
-    free_lazy(lazy);
+    free_lazy(lazy, wrapper_free_rides_array_lazys);
 }
 
 void sort_array_rides_by_date(void *rides_array) {
@@ -42,23 +46,23 @@ void sort_rduinfo_by_account_creation_date(void *rides_array) {
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
     GPtrArray* rides_array = g_ptr_array_new_with_free_func(free_rduinfo);
-    catalog_ride->rides_lazy = lazy_of(rides_array, sort_array_rides_by_date, 0);
+    catalog_ride->rides_array_lazy = lazy_of(rides_array, sort_array_rides_by_date);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_rides_city_lazy);
 
     GPtrArray* rduinfo_male_array = g_ptr_array_new_with_free_func(free_rduinfo);
     GPtrArray* rduinfo_female_array = g_ptr_array_new_with_free_func(free_rduinfo);
-    catalog_ride->rduinfo_male_lazy = lazy_of(rduinfo_male_array, sort_rduinfo_by_account_creation_date, 0);
-    catalog_ride->rduinfo_female_lazy = lazy_of(rduinfo_female_array, sort_rduinfo_by_account_creation_date, 0);
+    catalog_ride->rduinfo_male_array_lazy = lazy_of(rduinfo_male_array, sort_rduinfo_by_account_creation_date);
+    catalog_ride->rduinfo_female_array_lazy = lazy_of(rduinfo_female_array, sort_rduinfo_by_account_creation_date);
 
     return catalog_ride;
 }
 
 void free_catalog_ride(CatalogRide *catalog_ride) {
-    free_lazy(catalog_ride->rides_lazy);
+    free_lazy(catalog_ride->rides_array_lazy,wrapper_free_rides_array_lazys);
     g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
 
-    free_lazy(catalog_ride->rduinfo_male_lazy);
-    free_lazy(catalog_ride->rduinfo_female_lazy);
+    free_lazy(catalog_ride->rduinfo_male_array_lazy,wrapper_free_rides_array_lazys);
+    free_lazy(catalog_ride->rduinfo_female_array_lazy,wrapper_free_rides_array_lazys);
 
     free(catalog_ride);
 }
@@ -69,18 +73,18 @@ static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride
     Lazy *rides_in_city = g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city);
     if (rides_in_city == NULL) {
         GPtrArray *rides_city_array = g_ptr_array_new();
-        rides_in_city = lazy_of(rides_city_array, sort_array_rides_by_date, 0);
+        rides_in_city = lazy_of(rides_city_array, sort_array_rides_by_date);
         g_hash_table_insert(catalog_ride->rides_in_city_hashtable, city, rides_in_city);
     } else {
         free(city);
     }
-    GPtrArray* rides_in_city_array = (GPtrArray *) get_value(rides_in_city);
+    GPtrArray* rides_in_city_array = (GPtrArray *) lazy_get_raw_value(rides_in_city);
 
     g_ptr_array_add(rides_in_city_array, ride);
 }
 
 void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
-    GPtrArray* rides_in_city_array = (GPtrArray *) get_value(catalog_ride->rides_lazy);
+    GPtrArray* rides_in_city_array = (GPtrArray *) lazy_get_raw_value(catalog_ride->rides_array_lazy);
     g_ptr_array_add(rides_in_city_array, ride);
 
     g_hash_table_insert(catalog_ride->rides_by_id_hashtable, GINT_TO_POINTER(ride_get_id(ride)), ride);
@@ -90,7 +94,7 @@ void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
 void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride,
                                                Gender gender,
                                                RideDriverAndUserInfo *rduinfo) {
-    g_ptr_array_add(gender == M ? (GPtrArray *) get_value(catalog_ride->rduinfo_male_lazy) : (GPtrArray *) get_value(catalog_ride->rduinfo_female_lazy),
+    g_ptr_array_add(gender == M ? (GPtrArray *) lazy_get_raw_value(catalog_ride->rduinfo_male_array_lazy) : (GPtrArray *) lazy_get_raw_value(catalog_ride->rduinfo_female_array_lazy),
                     rduinfo);
 }
 
@@ -103,7 +107,7 @@ gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
 }
 
 double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, char *city) {
-    GPtrArray *rides_in_city = (GPtrArray *) get_value_apply_func(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
+    GPtrArray *rides_in_city = (GPtrArray *) lazy_get_value(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
     if (rides_in_city == NULL) return 0;
 
     double price_sum = 0;
@@ -145,7 +149,7 @@ static guint ride_array_find_date_lower_bound(GPtrArray *array, Date date) {
 }
 
 double catalog_ride_get_average_distance_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date) {
-    GPtrArray *rides = (GPtrArray *) get_value_apply_func(catalog_ride->rides_lazy);
+    GPtrArray *rides = (GPtrArray *) lazy_get_value(catalog_ride->rides_array_lazy);
 
     long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
 
@@ -170,7 +174,7 @@ double catalog_ride_get_average_distance_in_date_range(CatalogRide *catalog_ride
 }
 
 double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, char *city) {
-    GPtrArray *rides_in_city = (GPtrArray *) get_value_apply_func(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
+    GPtrArray *rides_in_city = (GPtrArray *) lazy_get_value(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
     if (rides_in_city == NULL) return 0;
 
     long current_value_index = ride_array_find_date_lower_bound(rides_in_city, start_date);
@@ -197,7 +201,7 @@ double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *cat
 }
 
 void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, GPtrArray *result) {
-    GPtrArray *rides = (GPtrArray *) get_value_apply_func(catalog_ride->rides_lazy);
+    GPtrArray *rides = (GPtrArray *) lazy_get_value(catalog_ride->rides_array_lazy);
 
     long current_value_index = ride_array_find_date_lower_bound(rides, start_date);
 
@@ -222,7 +226,7 @@ void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalo
 }
 
 int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age) {
-    GPtrArray *rduinfo_array = (GPtrArray *) get_value_apply_func(gender == M ? catalog_ride->rduinfo_male_lazy : catalog_ride->rduinfo_female_lazy);
+    GPtrArray *rduinfo_array = (GPtrArray *) lazy_get_value(gender == M ? catalog_ride->rduinfo_male_array_lazy : catalog_ride->rduinfo_female_array_lazy);
 
     int i = 0;
     while (i < (int) rduinfo_array->len) {
@@ -251,7 +255,7 @@ int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(Cata
 void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride) {
     BENCHMARK_START(sort_rides_array_timer);
     // Sort rides by date for queries that requires lookup in a date range
-    get_value_apply_func(catalog_ride->rides_lazy);
+    lazy_get_value(catalog_ride->rides_array_lazy);
 
     // Sort each rides array in the rides_in_city_hashtable by date for queries that requires date range in a city
     // TODO: Maybe make so the sort for each city is only done when a query for that city is called
@@ -274,9 +278,9 @@ void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride) {
     BENCHMARK_END(sort_rduinfo_female_array_timer, "     sort_rduinfo_female_array_timer: %lf seconds\n");
     
     while (g_hash_table_iter_next(&iter, NULL, &value)) {
-        get_value_apply_func(value);
+        lazy_get_value(value);
     }
 
-    get_value_apply_func(catalog_ride->rduinfo_male_lazy);
-    get_value_apply_func(catalog_ride->rduinfo_female_lazy);
+    lazy_get_value(catalog_ride->rduinfo_male_array_lazy);
+    lazy_get_value(catalog_ride->rduinfo_female_array_lazy);
 }
