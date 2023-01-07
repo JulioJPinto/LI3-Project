@@ -10,11 +10,11 @@ int main(int argc, char **argv) {
     BENCHMARK_START(global_timer);
     Program *program = create_program();
 
-    run_program(program, argv, argc);
+    int result = run_program(program, argv, argc);
 
     free_program(program);
 
     log_info("Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
 
-    return 0;
+    return result;
 }

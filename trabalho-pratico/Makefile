@@ -13,24 +13,24 @@ ifeq ($(BUILD_TYPE), debug)
     BUILD_DIR_PATH := build/debug
     SRC_FOLDER := src
     CFLAGS += -Iinclude/
+    SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), release)
     CFLAGS += -g -O3 -flto -funroll-loops
     EXEC := $(EXEC)-release
     BUILD_DIR_PATH := build/release
     SRC_FOLDER := src
     CFLAGS += -Iinclude/
+    SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), test)
 	CFLAGS += -O0 -g -DDEBUG=1
 	EXEC := $(EXEC)-test
 	BUILD_DIR_PATH := build/test
-	SRC_FOLDER := test
-	SRC += $(filter-out src/main.c,$(wildcard src/*.c src/*/*.c))
+	SRC += test/main.c $(filter-out src/main.c,$(wildcard src/*.c src/*/*.c))
 	CFLAGS += -Iinclude/
 else
 	$(error Invalid build type: $(BUILD_TYPE))
 endif
 
-SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 OBJ := $(addprefix $(BUILD_DIR_PATH)/, $(SRC:.c=.o))
 
 WHITE := \033[0m
@@ -82,17 +82,18 @@ else
 endif
 
 test: build-test build-release
-	./build/test/li3-test
+	@./build/test/li3-test
 
-	rm -rf Resultados
-	./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
-	diff Resultados datasets/data-regular/expected-results-1
+	@rm -rf Resultados
+	@output=`./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt` || (echo $$output && false)
+	@diff Resultados datasets/data-regular/expected-results-1
 
-	rm -rf Resultados
-	./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
-	diff Resultados datasets/data-regular/expected-results-2
+	@rm -rf Resultados
+	@output=`./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt` || (echo $$output && false)
+	@diff Resultados datasets/data-regular/expected-results-2
 
-	rm -rf Resultados
+	@rm -rf Resultados
+	@echo ok End-to-end test
 
 compile-latex:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../

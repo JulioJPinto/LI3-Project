@@ -132,13 +132,16 @@ void program_ask_for_commands(Program *program) {
     free(input);
 }
 
-void run_program(Program *program, char **args, int arg_size) {
+int run_program(Program *program, char **args, int arg_size) {
     if (arg_size >= 2) {
         char *dataset_folder_path = args[1];
         char *queries_file_path = args[2];
 
-        program_load_dataset(program, dataset_folder_path);
-        program_run_queries_from_file(program, queries_file_path);
+        if (!program_load_dataset(program, dataset_folder_path))
+            return EXIT_FAILURE;
+        if (!program_run_queries_from_file(program, queries_file_path))
+            return EXIT_FAILURE;
+
     } else {
         rl_bind_key('\t', rl_complete);
         using_history();
@@ -148,6 +151,8 @@ void run_program(Program *program, char **args, int arg_size) {
             program_ask_for_commands(program);
         }
     }
+
+    return EXIT_SUCCESS;
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
@@ -215,11 +220,11 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
         format_fgets_input_line(line_buffer);
         program_run_query(program, line_buffer);
     }
-    
+
     g_timer_stop(input_file_execution_timer);
     log_info("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
 
     fclose(input_file);
-    
+
     return TRUE;
 }
