@@ -77,7 +77,7 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
 }
 
 void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
-    GPtrArray *drivers_array = (GPtrArray *) lazy_get_value(catalog_driver->drivers_array_lazy);
+    lazy_get_value(catalog_driver->drivers_array_lazy);
     
     catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
 }

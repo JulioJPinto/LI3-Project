@@ -1,4 +1,5 @@
 #include "program.h"
+#include <stdio.h>
 
 #include <ctype.h>
 #include <readline/readline.h>
@@ -164,6 +165,8 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
         return FALSE;
     }
 
+    gboolean lazy_loading = FALSE;
+
     Catalog *catalog = program->catalog;
 
     BENCHMARK_START(load_timer);
@@ -179,7 +182,7 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     BENCHMARK_END(load_timer, "Load rides time:        %f seconds\n");
 
     g_timer_start(load_timer);
-    notify_stop_registering(catalog);
+    if(!lazy_loading) notify_stop_registering(catalog);
     BENCHMARK_END(load_timer, "Final indexing time:    %f seconds\n");
 
     fclose(users_file);

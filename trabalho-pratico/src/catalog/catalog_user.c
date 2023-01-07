@@ -52,13 +52,13 @@ User *catalog_user_get_user(CatalogUser *catalog_user, char *username) {
 }
 
 void catalog_user_notify_stop_registering(CatalogUser *catalog_user) {
-    GPtrArray *users_array = (GPtrArray *) lazy_get_raw_value(catalog_user->users_array_lazy);
-    sort_array(users_array, compare_users_by_total_distance);
+    BENCHMARK_START(sort_users_array);
+    lazy_get_value(catalog_user->users_array_lazy);
     BENCHMARK_END(sort_users_array, "     sort_users_array: %lf seconds\n");    
 }
 
 int catalog_user_get_top_n_users(CatalogUser *catalog_user, int n, GPtrArray *result) {
-    GPtrArray *users_array = (GPtrArray *) lazy_get_raw_value(catalog_user->users_array_lazy);
+    GPtrArray *users_array = (GPtrArray *) lazy_get_value(catalog_user->users_array_lazy);
     int length = MIN(n, (int) users_array->len);
 
     for (int i = 0; i < length; i++) {

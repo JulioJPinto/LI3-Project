@@ -103,7 +103,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
             Date user_account_creation_date = user_get_account_creation_date(user);
             Date driver_account_creation_date = driver_get_account_creation_date(driver);
 
-            RideDriverAndUserInfo *ride_driver_and_user_info = create_rduinfo(ride_id,
+            RideDriverAndUserInfo *ride_driver_and_user_info = create_rduinfo(ride_id, driver_id, user_username,
                                                                               user_account_creation_date,
                                                                               driver_account_creation_date);
 

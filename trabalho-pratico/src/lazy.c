@@ -7,13 +7,11 @@ typedef struct Lazy {
     gboolean initialized;
 };
 
-static const gboolean lazy_loading = FALSE;
-
 Lazy *lazy_of(void *voidp, FunctionToApply func) {
     Lazy *lazy = malloc(sizeof(struct Lazy));
     lazy->value = voidp;
     lazy->func = func;
-    lazy->initialized = lazy_loading;
+    lazy->initialized = FALSE;
     return lazy;
 }
 
