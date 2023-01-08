@@ -165,7 +165,7 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
         return FALSE;
     }
 
-    gboolean lazy_loading = FALSE;
+    gboolean lazy_loading = TRUE; //Boolean that determines if lazy loading is on or off
 
     Catalog *catalog = program->catalog;
 
