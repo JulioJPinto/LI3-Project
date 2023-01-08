@@ -20,9 +20,9 @@ void *lazy_get_raw_value(Lazy *lazy) {
 }
 
 void *lazy_get_value(Lazy *lazy) {
-    if (lazy->initialized) {
+    if (!lazy->initialized) {
         lazy->func(lazy->value);
-        lazy->initialized = FALSE;
+        lazy->initialized = TRUE;
     }
     return lazy->value;
 }
