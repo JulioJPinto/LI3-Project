@@ -61,6 +61,7 @@ CatalogRide *create_catalog_ride(void) {
 void free_catalog_ride(CatalogRide *catalog_ride) {
     free_lazy(catalog_ride->rides_array_lazy,wrapper_free_rides_array_lazys);
     g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
+    g_hash_table_destroy(catalog_ride->rides_by_id_hashtable);
 
     free_lazy(catalog_ride->rduinfo_male_array_lazy,wrapper_free_rides_array_lazys);
     free_lazy(catalog_ride->rduinfo_female_array_lazy,wrapper_free_rides_array_lazys);

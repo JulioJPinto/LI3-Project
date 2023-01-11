@@ -31,8 +31,13 @@ CatalogUser *create_catalog_user(void) {
     return catalog_user;
 }
 
+void wrapper_free_users_array_lazys(gpointer array) {
+    g_ptr_array_free((GPtrArray *) array, TRUE);
+}
+
 void free_catalog_user(CatalogUser *catalog_user) {
     g_hash_table_destroy(catalog_user->user_from_username_hashtable);
+    free_lazy(catalog_user->users_array_lazy, wrapper_free_users_array_lazys);
 
     free(catalog_user);
 }
