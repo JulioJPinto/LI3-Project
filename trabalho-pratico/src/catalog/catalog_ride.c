@@ -45,7 +45,7 @@ void sort_rduinfo_by_account_creation_date(void *rides_array) {
 
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
-    GPtrArray* rides_array = g_ptr_array_new_with_free_func(free_rduinfo);
+    GPtrArray* rides_array = g_ptr_array_new_with_free_func(glib_wrapper_free_ride);
     catalog_ride->rides_array_lazy = lazy_of(rides_array, sort_array_rides_by_date);
     catalog_ride->rides_by_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, glib_wrapper_free_rides_city_lazy);

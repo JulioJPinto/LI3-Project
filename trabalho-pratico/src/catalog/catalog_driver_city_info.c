@@ -26,8 +26,14 @@ typedef struct {
     GHashTable *driver_city_info_hashtable;
 } DriverCityInfoCollection;
 
+void glib_wrapper_free_driver_city_info_lazy(gpointer array) {
+    g_ptr_array_free((GPtrArray *) array, TRUE);
+}
+
 void free_driver_city_info_collection(DriverCityInfoCollection *collection) {
     // We don't need to free the hashtable because it is already freed in `notify_stop_registering` (in the end of the rides insertions).
+    g_hash_table_destroy(collection->driver_city_info_hashtable);
+    lazy_of(collection->driver_city_info_lazy, glib_wrapper_free_driver_city_info_lazy);
     free(collection);
 }
 
