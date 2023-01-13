@@ -3,6 +3,7 @@
 #define LI3_PROGRAM_H
 
 #include "catalog.h"
+#include <stdio.h>
 
 typedef struct Program Program;
 

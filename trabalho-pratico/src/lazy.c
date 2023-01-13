@@ -1,5 +1,5 @@
 #include "lazy.h"
-
+#include "benchmark.h"
 
 typedef struct Lazy {
     void *value;
@@ -20,10 +20,13 @@ void *lazy_get_raw_value(Lazy *lazy) {
 }
 
 void *lazy_get_value(Lazy *lazy) {
+    BENCHMARK_START(lazy_timer);
     if (!lazy->initialized) {
+
         lazy->func(lazy->value);
         lazy->initialized = TRUE;
     }
+    BENCHMARK_END(lazy_timer, "     lazy_get_value: %lf\n");
     return lazy->value;
 }
 

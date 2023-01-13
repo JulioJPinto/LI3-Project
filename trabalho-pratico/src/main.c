@@ -15,9 +15,6 @@ int main(int argc, char **argv) {
     free_program(program);
 
     log_info("Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
-    
+
     return result;
-
-
-    return 0;
 }

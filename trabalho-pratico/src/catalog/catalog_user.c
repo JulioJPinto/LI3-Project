@@ -5,7 +5,7 @@
 #include "benchmark.h"
 
 struct CatalogUser {
-    Lazy *users_array_lazy;
+    Lazy *lazy_users_array;
     GHashTable *user_from_username_hashtable;
 };
 
@@ -17,34 +17,31 @@ void glib_wrapper_free_user(gpointer user) {
 }
 
 void sort_array_by_total_distance(void* users_array) {
-    GPtrArray *users_ptr_array = (GPtrArray *) users_array;
-    sort_array(users_ptr_array, compare_users_by_total_distance);
+    sort_array(users_array, compare_users_by_total_distance);
 }
 
 CatalogUser *create_catalog_user(void) {
     CatalogUser *catalog_user = malloc(sizeof(CatalogUser));
 
-    GPtrArray *users_array = g_ptr_array_new_with_free_func(glib_wrapper_free_user);
-    catalog_user->users_array_lazy = lazy_of(users_array, sort_array_by_total_distance);
+    catalog_user->lazy_users_array = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_user), sort_array_by_total_distance);
     catalog_user->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 
     return catalog_user;
 }
 
-void wrapper_free_users_array_lazys(gpointer array) {
-    g_ptr_array_free((GPtrArray *) array, TRUE);
+void lazy_wrapper_free_users_array(gpointer array) {
+    g_ptr_array_free(array, TRUE);
 }
 
 void free_catalog_user(CatalogUser *catalog_user) {
     g_hash_table_destroy(catalog_user->user_from_username_hashtable);
-    free_lazy(catalog_user->users_array_lazy, wrapper_free_users_array_lazys);
+    free_lazy(catalog_user->lazy_users_array, lazy_wrapper_free_users_array);
 
     free(catalog_user);
 }
 
 void catalog_user_register_user(CatalogUser *catalog_user, User *user) {
-    GPtrArray* users_array = (GPtrArray *) lazy_get_raw_value(catalog_user->users_array_lazy);
-    g_ptr_array_add(users_array, user);
+    g_ptr_array_add(lazy_get_raw_value(catalog_user->lazy_users_array), user);
 
     char *key = user_get_username(user);
     // No need to free the key, it's freed by the hashtable when the user is removed
@@ -58,12 +55,12 @@ User *catalog_user_get_user(CatalogUser *catalog_user, char *username) {
 
 void catalog_user_notify_stop_registering(CatalogUser *catalog_user) {
     BENCHMARK_START(sort_users_array);
-    lazy_get_value(catalog_user->users_array_lazy);
+    lazy_get_value(catalog_user->lazy_users_array); 
     BENCHMARK_END(sort_users_array, "     sort_users_array: %lf seconds\n");    
 }
 
 int catalog_user_get_top_n_users(CatalogUser *catalog_user, int n, GPtrArray *result) {
-    GPtrArray *users_array = (GPtrArray *) lazy_get_value(catalog_user->users_array_lazy);
+    GPtrArray *users_array = (GPtrArray *) lazy_get_value(catalog_user->lazy_users_array);
     int length = MIN(n, (int) users_array->len);
 
     for (int i = 0; i < length; i++) {

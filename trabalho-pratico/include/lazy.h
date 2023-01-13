@@ -3,6 +3,12 @@
 #define LI3_LAZY_H
 
 #include <glib.h>
+/**
+ * In this file we defined everything needed for a Lazy to work properly.
+ * Starting with the lazy itself, the typedef for the functions applied to the lazy,
+ * the functions to get the value of the lazy, the raw value or the value after applying
+ * the function, the function that creates a lazy and the function that frees it.
+ */
 
 /**
  * Struct that represents a lazy.
@@ -15,20 +21,19 @@ typedef struct Lazy Lazy;
 typedef void (*FunctionToApply)(void *);
 
 /**
- * Typedef that represents the function that will be applied to free lazy.
+ * Typedef that represents the function that frees the lazy.
  */
-typedef void (*FreeFunction)(void *);
+typedef FunctionToApply FreeFunction;
 
 /**
- * Struct that creates a lazy.
- * void *voidp: gptrarray
- * FunctionToApply func: array sort function
+ * Function that creates a lazy.
+ * void *voidp : value
+ * FunctionToApply func: function to apply in value
  */
 Lazy *lazy_of(void *voidp, FunctionToApply func);
 
 /**
- * Returns the raw value of the lazy.
- * The raw value is simply the value of the lazy without applying the sort function.
+ * Returns the lazy's value without applying any function
  */
 void *lazy_get_raw_value(Lazy *lazy);
 
