@@ -2,6 +2,7 @@
 #include "../include/file_util.h"
 
 #include "struct_util_test.c"
+#include "lazy_test.c"
 
 #include <glib.h>
 #include <stdio.h>
@@ -133,6 +134,8 @@ int main(int argc, char *argv[]) {
     g_test_add_func("/parse_functions/assert_invalid_csv_loads_nothing_large", assert_invalid_csv_loads_nothing_large);
     g_test_add_func("/parse_functions/assert_invalid_csv_loads_nothing_regular", assert_invalid_csv_loads_nothing_regular);
     g_test_add_func("/parse_functions/assert_valid_csv_loads_everything", assert_valid_csv_loads_everything_regular);
+    g_test_add_func("/lazy/test_lazy_behavior_int_apply_function", test_lazy_behavior_int_apply_function);
+    g_test_add_func("/lazy/test_lazy_behavior_null_apply_function", test_lazy_behavior_null_apply_function);
 
     return g_test_run();
 }
