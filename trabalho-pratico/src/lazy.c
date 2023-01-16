@@ -20,9 +20,7 @@ void *lazy_get_raw_value(Lazy *lazy) {
 }
 
 void *lazy_get_value(Lazy *lazy) {
-    BENCHMARK_START(lazy_timer);
     lazy_apply_function(lazy);
-    BENCHMARK_END(lazy_timer, "     lazy_get_value: %lf\n");
     return lazy->value;
 }
 

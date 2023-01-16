@@ -6,6 +6,7 @@
 
 #include "price_util.h"
 #include "catalog_sort.h"
+#include "benchmark.h"
 
 /**
  * Struct that represents a catalog.
@@ -164,8 +165,12 @@ void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog
     catalog_ride_get_passengers_that_gave_tip_in_date_range(catalog->catalog_ride, start_date, end_date, result);
 }
 
-void notify_stop_registering(Catalog *catalog) {
-    catalog_driver_notify_stop_registering(catalog->catalog_driver);
-    catalog_user_notify_stop_registering(catalog->catalog_user);
-    catalog_ride_notify_stop_registering(catalog->catalog_ride);
+void catalog_force_eager_indexing(Catalog *catalog) {
+    BENCHMARK_START(load_timer);
+
+    catalog_driver_force_eager_indexing(catalog->catalog_driver);
+    catalog_user_force_eager_indexing(catalog->catalog_user);
+    catalog_ride_force_eager_indexing(catalog->catalog_ride);
+
+    BENCHMARK_END(load_timer, "Final indexing time:    %f seconds\n");
 }

@@ -21,6 +21,6 @@ int catalog_driver_get_top_n_drivers_with_best_score(CatalogDriver *catalog_driv
 
 int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *catalog_driver, char *city, int n, GPtrArray *result);
 
-void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver);
+void catalog_driver_force_eager_indexing(CatalogDriver *catalog_driver);
 
 #endif //LI3_CATALOG_DRIVER_H

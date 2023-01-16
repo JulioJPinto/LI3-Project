@@ -2,16 +2,18 @@
 #ifndef LI3_PROGRAM_H
 #define LI3_PROGRAM_H
 
-#include "catalog.h"
+#include <glib.h>
 #include <stdio.h>
+
+#include "program_flags.h"
 
 typedef struct Program Program;
 
-Program *create_program(void);
+Program *create_program(ProgramFlags *flags);
 
 void free_program(Program *program);
 
-int run_program(Program *program, char **args, int arg_size);
+int start_program(Program *program, GPtrArray *program_args);
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path);
 

@@ -19,9 +19,10 @@ void glib_wrapper_free_driver(gpointer driver) {
     free_driver(driver);
 }
 
-void sort_array_by_driver_score(void* driver_array) {
-    sort_array(driver_array, compare_drivers_by_score);
-
+void sort_array_by_driver_score(void *drivers_array) {
+    BENCHMARK_START(sort_drivers_array);
+    sort_array(drivers_array, compare_drivers_by_score);
+    BENCHMARK_END(sort_drivers_array, " - sort_drivers_array: %lf seconds\n");
 }
 
 CatalogDriver *create_catalog_driver(void) {
@@ -34,12 +35,12 @@ CatalogDriver *create_catalog_driver(void) {
     return catalog_driver;
 }
 
-void lazy_wrapper_free_driver_array(gpointer lazy) {
-    g_ptr_array_free(lazy, TRUE);
+void free_g_ptr_array(gpointer array) {
+    g_ptr_array_free(array, TRUE);
 }
 
 void free_catalog_driver(CatalogDriver *catalog_driver) {
-    free_lazy(catalog_driver->lazy_drivers_array, lazy_wrapper_free_driver_array);
+    free_lazy(catalog_driver->lazy_drivers_array, free_g_ptr_array);
     g_hash_table_destroy(catalog_driver->driver_from_id_hashtable);
     free_catalog_driver_city_info(catalog_driver->catalog_driver_city_info);
     free(catalog_driver);
@@ -75,10 +76,7 @@ int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *cata
     return catalog_driver_city_info_get_top_best_drivers_by_city(catalog_driver->catalog_driver_city_info, city, n, result);
 }
 
-void catalog_driver_notify_stop_registering(CatalogDriver *catalog_driver) {
-    BENCHMARK_START(sort_drivers_array);
-    lazy_get_value(catalog_driver->lazy_drivers_array);
-    BENCHMARK_END(sort_drivers_array, "     sort drivers arrasy: %lf seconds\n");
-    
-    catalog_driver_city_info_notify_stop_registering(catalog_driver->catalog_driver_city_info);
+void catalog_driver_force_eager_indexing(CatalogDriver *catalog_driver) {
+    lazy_apply_function(catalog_driver->lazy_drivers_array);
+    catalog_driver_city_info_force_eager_indexing(catalog_driver->catalog_driver_city_info);
 }

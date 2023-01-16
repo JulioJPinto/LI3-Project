@@ -50,7 +50,7 @@ void parse_and_register_ride(void *catalog, char *line, char separator);
  * This will allow the catalog to optimize its internal data structures.
  * This function must be called before any query.
  */
-void notify_stop_registering(Catalog *catalog);
+void catalog_force_eager_indexing(Catalog *catalog);
 
 /**
  * Returns a pointer to the Ride with the given id.
@@ -79,7 +79,7 @@ Driver *catalog_get_driver(Catalog *catalog, int id);
  * The drivers are not copied, their pointers are inserted.
  * The GPtrArray should be empty and pre-allocated with N elements.
  * Returns the number of drivers inserted. This number can be less than N if there are less than N drivers.
- * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
 int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result);
 
@@ -89,7 +89,7 @@ int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPt
  * The users are not copied, their pointers are inserted.
  * The GPtrArray should be empty and pre-allocated with N elements.
  * Returns the number of users inserted. This number can be less than N if there are less than N users.
- * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
 int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
 
@@ -107,14 +107,14 @@ double query_4_catalog_get_average_price_in_city(Catalog *catalog, char *city);
 /**
  * Returns the average price of rides between the given dates.
  * If there are no rides between the given dates, returns -1.
- * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
 double query_5_catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date);
 
 /**
  * Returns the average distance of rides in the given city between the given dates.
  * If there are no rides in the city between the given dates, returns -1.
- * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
 double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
 
@@ -127,7 +127,7 @@ int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_ag
  * The rides are not copied, their pointers are inserted.
  * The GPtrArray result should be empty.
  * The array is sorted by ride's distance, date and then id.
- * `notify_stop_registering(Catalog*)` should be called before calling this function.
+ * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
 void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date);
 

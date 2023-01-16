@@ -16,7 +16,7 @@ void catalog_user_register_user(CatalogUser *catalog_user, User *user);
 
 User *catalog_user_get_user(CatalogUser *catalog_user, char *username);
 
-void catalog_user_notify_stop_registering(CatalogUser *catalog_user);
+void catalog_user_force_eager_indexing(CatalogUser *catalog_user);
 
 int catalog_user_get_top_n_users(CatalogUser *catalog_user, int n, GPtrArray *result);
 

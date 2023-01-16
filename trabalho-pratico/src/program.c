@@ -21,6 +21,7 @@ typedef enum ProgramState {
 } ProgramState;
 
 struct Program {
+    ProgramFlags *flags;
     Catalog *catalog;
     ProgramState state;
     int current_query_id;
@@ -75,11 +76,12 @@ void program_run_help_command(Program *program, char **args, int arg_size) {
     }
 }
 
-Program *create_program(void) {
+Program *create_program(ProgramFlags *flags) {
     Program *program = malloc(sizeof(Program));
     program->catalog = create_catalog();
     program->state = PROGRAM_STATE_RUNNING;
     program->current_query_id = 0;
+    program->flags = flags;
     return program;
 }
 
@@ -92,7 +94,6 @@ void program_ask_for_dataset_path(Program *program) {
     program->state = PROGRAM_STATE_WAITING_FOR_DATASET_INPUT;
 
     gboolean loaded = FALSE;
-
     while (!loaded) {
         char *input = readline("Please enter the path to the dataset folder (default: datasets/data-regular): ");
 
@@ -105,10 +106,7 @@ void program_ask_for_dataset_path(Program *program) {
     }
 }
 
-void program_ask_for_commands(Program *program) {
-    program->state = PROGRAM_STATE_WAITING_FOR_COMMANDS;
-    char *input = readline("> ");
-
+void execute_command(Program *program, char *input) {
     char **args = g_strsplit(input, " ", 0);
     int arg_size = (int) g_strv_length(args);
 
@@ -126,16 +124,22 @@ void program_ask_for_commands(Program *program) {
     } else {
         log_warning("Invalid command '%s'\n", args[0]);
     }
+}
+
+void program_ask_for_commands(Program *program) {
+    program->state = PROGRAM_STATE_WAITING_FOR_COMMANDS;
+    char *input = readline("> ");
+
+    execute_command(program, input);
 
     add_history(input);
-
     free(input);
 }
 
-int run_program(Program *program, char **args, int arg_size) {
-    if (arg_size >= 2) {
-        char *dataset_folder_path = args[1];
-        char *queries_file_path = args[2];
+int start_program(Program *program, GPtrArray *program_args) {
+    if (program_args->len >= 2) {
+        char *dataset_folder_path = g_ptr_array_index(program_args, 0);
+        char *queries_file_path = g_ptr_array_index(program_args, 1);
 
         if (!program_load_dataset(program, dataset_folder_path))
             return EXIT_FAILURE;
@@ -164,8 +168,6 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
         return FALSE;
     }
 
-    gboolean lazy_loading = TRUE; //Boolean that determines if lazy loading is on or off
-
     Catalog *catalog = program->catalog;
 
     BENCHMARK_START(load_timer);
@@ -180,9 +182,9 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     read_file(rides_file, parse_and_register_ride, catalog);
     BENCHMARK_END(load_timer, "Load rides time:        %f seconds\n");
 
-    g_timer_start(load_timer);
-    if (!lazy_loading) notify_stop_registering(catalog);
-    BENCHMARK_END(load_timer, "Final indexing time:    %f seconds\n");
+    char *lazy_loading_value_string = get_program_flag_value(program->flags, "lazy-loading", "true");
+    if (strcmp(lazy_loading_value_string, "true") != 0)
+        catalog_force_eager_indexing(catalog);
 
     fclose(users_file);
     fclose(drivers_file);

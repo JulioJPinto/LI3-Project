@@ -22,3 +22,9 @@ void str_to_upper(char *string) {
         string[i] = (char) toupper(string[i]);
     }
 }
+
+void str_to_lower(char *string) {
+    for (int i = 0; string[i] != '\0'; i++) {
+        string[i] = (char) tolower(string[i]);
+    }
+}

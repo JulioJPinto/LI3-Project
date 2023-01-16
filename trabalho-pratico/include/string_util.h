@@ -16,4 +16,9 @@ char *next_token(char **line, char delim);
  */
 void str_to_upper(char *string);
 
+/**
+ * Makes a string lowercase.
+ */
+void str_to_lower(char *string);
+
 #endif //LI3_STRING_UTIL_H

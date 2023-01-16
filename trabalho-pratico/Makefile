@@ -75,7 +75,7 @@ copy-build-release-to-main-folder: build-release
 
 leaks: build-debug
 ifeq ($(shell uname), Darwin)
-	leaks --quiet --atExit -- ./build/debug/li3-debug datasets/data-regular input2.txt
+	leaks --quiet --atExit -- ./build/debug/li3-debug datasets/data-regular datasets/data-regular/input2.txt
 else
 	valgrind \
 	./build/debug/li3-debug datasets/data-regular datasets/data-regular/input1.txt

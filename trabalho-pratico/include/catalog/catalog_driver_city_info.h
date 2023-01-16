@@ -14,7 +14,7 @@ void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_in
 
 void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city);
 
-void catalog_driver_city_info_notify_stop_registering(CatalogDriverCityInfo *catalog);
+void catalog_driver_city_info_force_eager_indexing(CatalogDriverCityInfo *catalog);
 
 int catalog_driver_city_info_get_top_best_drivers_by_city(CatalogDriverCityInfo *catalog, char *city, int n, GPtrArray *result);
 

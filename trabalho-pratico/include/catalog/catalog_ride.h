@@ -31,6 +31,6 @@ void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalo
 
 int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age);
 
-void catalog_ride_notify_stop_registering(CatalogRide *catalog_ride);
+void catalog_ride_force_eager_indexing(CatalogRide *catalog_ride);
 
 #endif //LI3_CATALOG_RIDE_H
