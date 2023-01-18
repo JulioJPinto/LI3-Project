@@ -20,10 +20,18 @@ typedef enum ProgramState {
     PROGRAM_STATE_EXITING,
 } ProgramState;
 
+typedef enum ProgramMode {
+    WAITING_FOR_MODE,
+    RUNNING_IN_BATCH_MODE,
+    RUNNING_IN_ITERATIVE_MODE_TO_FILE,
+    RUNNING_IN_ITERATIVE_MODE,
+} ProgramMode;
+
 struct Program {
     ProgramFlags *flags;
     Catalog *catalog;
     ProgramState state;
+    ProgramMode mode;
     int current_query_id;
 };
 
@@ -80,6 +88,7 @@ Program *create_program(ProgramFlags *flags) {
     Program *program = malloc(sizeof(Program));
     program->catalog = create_catalog();
     program->state = PROGRAM_STATE_RUNNING;
+    program->mode = WAITING_FOR_MODE;
     program->current_query_id = 0;
     program->flags = flags;
     return program;
@@ -138,6 +147,7 @@ void program_ask_for_commands(Program *program) {
 
 int start_program(Program *program, GPtrArray *program_args) {
     if (program_args->len >= 2) {
+        program->mode = RUNNING_IN_BATCH_MODE;
         char *dataset_folder_path = g_ptr_array_index(program_args, 0);
         char *queries_file_path = g_ptr_array_index(program_args, 1);
 
@@ -147,6 +157,7 @@ int start_program(Program *program, GPtrArray *program_args) {
             return EXIT_FAILURE;
 
     } else {
+        program->mode = RUNNING_IN_ITERATIVE_MODE;
         rl_bind_key('\t', rl_complete);
         using_history();
 
@@ -193,8 +204,20 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     return TRUE;
 }
 
+void run_query_for_terminal(Catalog *catalog, char* query, int query_number) {
+    fprintf(stdout, "=== Query number: #%d =====================\n", query_number);
+    parse_and_run_query(catalog, stdout, query);
+    fprintf(stdout, "===========================================\n");
+}
+
+void run_query_for_output_folder(Catalog *catalog, char* query, int query_number) {
+    create_output_folder_if_not_exists();
+    FILE *output_file = create_command_output_file(query_number);
+    parse_and_run_query(catalog, output_file, query);
+    fclose(output_file);
+}
+
 void program_run_query(Program *program, char *query) {
-    // TODO: Make output to console or file
     Catalog *catalog = program->catalog;
     int query_number = ++program->current_query_id;
 
@@ -202,12 +225,11 @@ void program_run_query(Program *program, char *query) {
         return;
     }
 
-    create_output_folder_if_not_exists();
-    FILE *output_file = create_command_output_file(query_number);
-
-    parse_and_run_query(catalog, output_file, query);
-
-    fclose(output_file);
+    if (program->mode == RUNNING_IN_ITERATIVE_MODE) {
+        run_query_for_terminal(catalog, query, query_number);
+    } else {
+        run_query_for_output_folder(catalog, query, query_number);        
+    }
 }
 
 gboolean program_run_queries_from_file(Program *program, char *input_file_path) {
@@ -220,13 +242,21 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
 
     char line_buffer[65536];
 
+    program->mode = RUNNING_IN_ITERATIVE_MODE_TO_FILE;
+
+    int aux_id = program->current_query_id;
+    program->current_query_id = 0;
+
     while (fgets(line_buffer, 65536, input_file)) {
         format_fgets_input_line(line_buffer);
         program_run_query(program, line_buffer);
     }
 
+    program->mode = RUNNING_IN_ITERATIVE_MODE;
+
     g_timer_stop(input_file_execution_timer);
     log_info("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
+    program->current_query_id = aux_id;
 
     fclose(input_file);
 
