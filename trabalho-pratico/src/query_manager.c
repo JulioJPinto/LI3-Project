@@ -18,14 +18,14 @@ static const QueryFunction query_functions[] = {
 
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunction);
 
-void parse_and_run_query(Catalog *catalog, FILE *output, char *query) {
+void parse_and_run_query(Catalog *catalog, OutputWriter *output, char *query) {
     char **args = g_strsplit(query, " ", 0);
 
     int error = 0;
     int query_id = parse_int_safe(args[0], &error);
 
     if (error) {
-        fprintf(output, "Invalid query id: %s\n", args[0]);
+        write_output_line(output, "Invalid query id: %s\n", args[0]);
     } else {
         run_query(catalog, output, query_id, args + 1);
     }
@@ -33,9 +33,9 @@ void parse_and_run_query(Catalog *catalog, FILE *output, char *query) {
     g_strfreev(args);
 }
 
-void run_query(Catalog *catalog, FILE *output, int query_id, char **args) {
+void run_query(Catalog *catalog, OutputWriter *output, int query_id, char **args) {
     if (query_id <= 0 || query_id > (int) query_functions_size || query_functions[query_id - 1] == NULL) {
-        fprintf(output, "Query %d not implemented\n", query_id);
+        write_output_line(output, "Query %d not implemented\n", query_id);
         return;
     }
 
