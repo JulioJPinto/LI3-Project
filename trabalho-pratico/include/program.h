@@ -9,6 +9,8 @@
 
 typedef struct Program Program;
 
+gboolean program_should_exit(Program *program);
+
 Program *create_program(ProgramFlags *flags);
 
 void free_program(Program *program);

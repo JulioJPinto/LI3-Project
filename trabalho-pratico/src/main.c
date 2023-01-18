@@ -19,7 +19,11 @@ int main(int argc, char **argv) {
 
     Program *program = create_program(program_flags);
 
-    int result = start_program(program, program_args);
+    int result = 0;
+
+    while (!program_should_exit(program) && result != 1) {
+        result = start_program(program, program_args);
+    }
 
     g_ptr_array_free(program_args, TRUE);
     free_program_flags(program_flags);

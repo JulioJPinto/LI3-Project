@@ -18,6 +18,7 @@ typedef enum ProgramState {
     PROGRAM_STATE_WAITING_FOR_COMMANDS,
     PROGRAM_STATE_VIEWING_QUERY_RESULT,
     PROGRAM_STATE_EXITING,
+    PROGRAM_STATE_RELOADING,
 } ProgramState;
 
 typedef enum ProgramMode {
@@ -41,6 +42,11 @@ typedef struct ProgramCommand {
     void (*function)(Program *program, char **args, int arg_size);
 } ProgramCommand;
 
+gboolean program_should_exit(Program *program) {
+    if (program->state == PROGRAM_STATE_EXITING) return TRUE;
+    return FALSE;
+}
+
 void program_run_queries_from_file_command(Program *program, char **args, int arg_size) {
     if (arg_size < 2) {
         log_warning("Use 'file <file_path>'\n");
@@ -63,8 +69,16 @@ void program_exit_command(Program *program, char **args, int arg_size) {
     program->state = PROGRAM_STATE_EXITING;
 }
 
+void program_reload_command(Program *program, char **args, int arg_size) {
+    (void) args;
+    (void) arg_size;
+
+    program->state = PROGRAM_STATE_RELOADING;
+}
+
 const ProgramCommand program_commands[] = {
         {"file", "Runs all the queries from a file", program_run_queries_from_file_command},
+        {"reload", "Reloads the program", program_reload_command},
         {"help", "Shows this help message", program_run_help_command},
         {"exit", "Exits the program", program_exit_command},
 };
@@ -162,7 +176,7 @@ int start_program(Program *program, GPtrArray *program_args) {
         using_history();
 
         program_ask_for_dataset_path(program);
-        while (program->state != PROGRAM_STATE_EXITING) {
+        while (program->state != PROGRAM_STATE_EXITING && program->state != PROGRAM_STATE_RELOADING) {
             program_ask_for_commands(program);
         }
     }
@@ -204,13 +218,13 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     return TRUE;
 }
 
-void run_query_for_terminal(Catalog *catalog, char* query, int query_number) {
+void run_query_for_terminal(Catalog *catalog, char *query, int query_number) {
     fprintf(stdout, "=== Query number: #%d =====================\n", query_number);
     parse_and_run_query(catalog, stdout, query);
     fprintf(stdout, "===========================================\n");
 }
 
-void run_query_for_output_folder(Catalog *catalog, char* query, int query_number) {
+void run_query_for_output_folder(Catalog *catalog, char *query, int query_number) {
     create_output_folder_if_not_exists();
     FILE *output_file = create_command_output_file(query_number);
     parse_and_run_query(catalog, output_file, query);
@@ -228,7 +242,7 @@ void program_run_query(Program *program, char *query) {
     if (program->mode == RUNNING_IN_ITERATIVE_MODE) {
         run_query_for_terminal(catalog, query, query_number);
     } else {
-        run_query_for_output_folder(catalog, query, query_number);        
+        run_query_for_output_folder(catalog, query, query_number);
     }
 }
 
