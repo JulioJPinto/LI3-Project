@@ -17,13 +17,20 @@ int main(int argc, char **argv) {
 
     ProgramFlags *program_flags = retrieve_program_flags(program_args);
 
-    Program *program = create_program(program_flags);
+    int result;
 
-    int result = start_program(program, program_args);
+    while (1) {
+        Program *program = create_program(program_flags);
+        result = start_program(program, program_args);
+
+        gboolean should_exit = program_should_exit(program);
+        free_program(program);
+
+        if (should_exit) break;
+    }
 
     g_ptr_array_free(program_args, TRUE);
     free_program_flags(program_flags);
-    free_program(program);
 
     log_info("Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
 

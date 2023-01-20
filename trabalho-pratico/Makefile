@@ -85,11 +85,11 @@ test: build-test build-release
 	@./build/test/li3-test
 
 	@rm -rf Resultados
-	@output=`./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt` || (echo $$output && false)
+	./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
 	@diff Resultados datasets/data-regular/expected-results-1
 
 	@rm -rf Resultados
-	@output=`./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt` || (echo $$output && false)
+	./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
 	@diff Resultados datasets/data-regular/expected-results-2
 
 	@rm -rf Resultados

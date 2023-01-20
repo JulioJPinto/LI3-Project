@@ -5,12 +5,11 @@
 /**
  * Same as fprintf but only print to stream if DEBUG macro is defined.
  */
-void fprintf_debug(FILE *stream, const char *format, ...) {
+void write_output_debug(OutputWriter *stream, const char *format, ...) {
 #ifdef DEBUG
     va_list args;
     va_start(args, format);
-    fprintf(stream, "(debug) ");
-    vfprintf(stream, format, args);
+    write_output_line(stream, format, args);
     va_end(args);
 #else
     UNUSED(stream);
@@ -21,16 +20,16 @@ void fprintf_debug(FILE *stream, const char *format, ...) {
 /**
  * Query 1 for users
  */
-void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *username) {
+void execute_query_find_user_by_name(Catalog *catalog, OutputWriter *output, char *username) {
     User *user = catalog_get_user(catalog, username);
 
     if (user == NULL) {
-        fprintf_debug(output, "User %s not found\n", username);
+        write_output_debug(output, "User %s not found\n", username);
         return;
     }
 
     if (user_get_account_status(user) == INACTIVE) {
-        fprintf_debug(output, "User %s is inactive\n", username);
+        write_output_debug(output, "User %s is inactive\n", username);
         return;
     }
 
@@ -41,7 +40,7 @@ void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *usern
     int number_of_rides = user_get_number_of_rides(user);
     double total_spent = user_get_total_spent(user);
 
-    fprintf(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+    write_output_line(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
 
     free(name);
 }
@@ -49,16 +48,16 @@ void execute_query_find_user_by_name(Catalog *catalog, FILE *output, char *usern
 /**
  * Query 1 for driver
  */
-void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
+void execute_query_find_driver_by_id(Catalog *catalog, OutputWriter *output, int id) {
     Driver *driver = catalog_get_driver(catalog, id);
 
     if (driver == NULL) {
-        fprintf_debug(output, "Driver %d not found\n", id);
+        write_output_debug(output, "Driver %d not found\n", id);
         return;
     }
 
     if (driver_get_account_status(driver) == INACTIVE) {
-        fprintf_debug(output, "Driver %d is inactive\n", id);
+        write_output_debug(output, "Driver %d is inactive\n", id);
         return;
     }
 
@@ -69,7 +68,7 @@ void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
     int number_of_rides = driver_get_number_of_rides(driver);
     double total_spent = driver_get_total_earned(driver);
 
-    fprintf(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+    write_output_line(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
 
     free(name);
 }
@@ -77,7 +76,7 @@ void execute_query_find_driver_by_id(Catalog *catalog, FILE *output, int id) {
 /**
  * Query 1
  */
-void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *output, char **args) {
+void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, OutputWriter *output, char **args) {
     char *id_or_username = args[0];
 
     int error = 0;
@@ -92,11 +91,11 @@ void execute_query_find_user_or_driver_by_name_or_id(Catalog *catalog, FILE *out
 /**
  * Query 2
  */
-void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
+void execute_query_top_n_drivers(Catalog *catalog, OutputWriter *output, char **args) {
     int error = 0;
     int n = parse_int_safe(args[0], &error);
     if (error) {
-        fprintf_debug(output, "Couldn't parse number of size of top drivers '%s'\n", args[0]);
+        write_output_debug(output, "Couldn't parse number of size of top drivers '%s'\n", args[0]);
         return;
     }
 
@@ -111,7 +110,7 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
         char *name = driver_get_name(driver);
         double average_score = driver_get_average_score(driver);
 
-        fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
+        write_output_line(output, "%012d;%s;%.3f\n", id, name, average_score);
 
         free(name);
     }
@@ -122,12 +121,12 @@ void execute_query_top_n_drivers(Catalog *catalog, FILE *output, char **args) {
 /**
  * Query 3
  */
-void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char **args) {
+void execute_query_longest_n_total_distance(Catalog *catalog, OutputWriter *output, char **args) {
     int error = 0;
     int n = parse_int_safe(args[0], &error);
 
     if (error) {
-        fprintf_debug(output, "Couldn't parse number of size of top users '%s'\n", args[0]);
+        write_output_debug(output, "Couldn't parse number of size of top users '%s'\n", args[0]);
         return;
     }
 
@@ -142,7 +141,7 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
         char *name = user_get_name(user);
         int total_distance = user_get_total_distance(user);
 
-        fprintf(output, "%s;%s;%d\n", username, name, total_distance);
+        write_output_line(output, "%s;%s;%d\n", username, name, total_distance);
 
         free(username);
         free(name);
@@ -154,23 +153,23 @@ void execute_query_longest_n_total_distance(Catalog *catalog, FILE *output, char
 /**
  * Query 4
  */
-void execute_query_average_price_in_city(Catalog *catalog, FILE *output, char **args) {
+void execute_query_average_price_in_city(Catalog *catalog, OutputWriter *output, char **args) {
     char *city = args[0];
 
     if (!catalog_city_exists(catalog, city)) {
-        fprintf_debug(output, "City %s not found\n", city);
+        write_output_debug(output, "City %s not found\n", city);
         return;
     }
 
     double average_price = query_4_catalog_get_average_price_in_city(catalog, city);
 
-    fprintf(output, "%.3f\n", average_price);
+    write_output_line(output, "%.3f\n", average_price);
 }
 
 /**
  * Query 5
  */
-void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, char **args) {
+void execute_query_average_price_in_date_range(Catalog *catalog, OutputWriter *output, char **args) {
     char *start_date_string = args[0];
     char *end_date_string = args[1];
 
@@ -180,21 +179,21 @@ void execute_query_average_price_in_date_range(Catalog *catalog, FILE *output, c
     double average_price = query_5_catalog_get_average_price_in_date_range(catalog, start_date, end_date);
 
     if (average_price == -1) {
-        fprintf_debug(output, "No rides in date range\n");
+        write_output_debug(output, "No rides in date range\n");
         return;
     }
 
-    fprintf(output, "%.3f\n", average_price);
+    write_output_line(output, "%.3f\n", average_price);
 }
 
 /**
  * Query 6
  */
-void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE *output, char **args) {
+void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, OutputWriter *output, char **args) {
     char *city = args[0];
 
     if (!catalog_city_exists(catalog, city)) {
-        fprintf_debug(output, "City %s not found\n", city);
+        write_output_debug(output, "City %s not found\n", city);
         return;
     }
 
@@ -207,21 +206,21 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, FILE
     double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
 
     if (average_distance == -1) {
-        fprintf_debug(output, "No rides in date range\n");
+        write_output_debug(output, "No rides in date range\n");
         return;
     }
 
-    fprintf(output, "%.3f\n", average_distance);
+    write_output_line(output, "%.3f\n", average_distance);
 }
 
 /**
   * Query 7
   */
-void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *output, char **args) {
+void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, OutputWriter *output, char **args) {
     int error = 0;
     int n = parse_int_safe(args[0], &error);
     if (error) {
-        fprintf_debug(output, "Couldn't parse number of drivers in city '%s'\n", args[0]);
+        write_output_debug(output, "Couldn't parse number of drivers in city '%s'\n", args[0]);
         return;
     }
 
@@ -236,7 +235,7 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
         char *name = driver_city_info_get_name(driver);
         double average_score = driver_city_info_get_average_score(driver);
 
-        fprintf(output, "%012d;%s;%.3f\n", id, name, average_score);
+        write_output_line(output, "%012d;%s;%.3f\n", id, name, average_score);
     }
 
     g_ptr_array_free(result, TRUE);
@@ -245,14 +244,14 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, FILE *
 /**
   * Query 8 
   */
-void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_age(Catalog *catalog, FILE *output, char **args) {
+void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_age(Catalog *catalog, OutputWriter *output, char **args) {
     char *gender_string = args[0];
     Gender gender = parse_gender(gender_string);
 
     int error = 0;
     int min_account_age = parse_int_safe(args[1], &error);
     if (error) {
-        fprintf_debug(output, "Couldn't parse number of minimum age '%s'\n", args[1]);
+        write_output_debug(output, "Couldn't parse number of minimum age '%s'\n", args[1]);
         return;
     }
 
@@ -274,7 +273,7 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
         User *user = catalog_get_user(catalog, user_username);
         char *user_name = user_get_name(user);
 
-        fprintf(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);
+        write_output_line(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);
 
         free(driver_name);
         free(user_username);
@@ -287,7 +286,7 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
 /**
  * Query 9
  */
-void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char **args) {
+void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *output, char **args) {
     char *start_date_string = args[0];
     char *end_date_string = args[1];
 
@@ -309,7 +308,7 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, FILE *output, char 
         int month = date_get_month(date);
         int year = date_get_year(date);
 
-        fprintf(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
+        write_output_line(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
         free(city);
     }
 
