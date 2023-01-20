@@ -271,7 +271,7 @@ void catalog_ride_force_eager_indexing(CatalogRide *catalog_ride) {
     g_hash_table_iter_init(&iter, catalog_ride->rides_in_city_hashtable);
 
     while (g_hash_table_iter_next(&iter, &key, &value)) {
-        log_info("   (%s)", key);
+        BENCHMARK_LOG("   (%s)", key);
         lazy_apply_function(value);
     }
 

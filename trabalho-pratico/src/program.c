@@ -255,7 +255,7 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
     program->mode = INTERACTIVE_MODE;
 
     g_timer_stop(input_file_execution_timer);
-    log_info("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
+    BENCHMARK_LOG("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
     program->current_query_id = aux_id;
 
     fclose(input_file);

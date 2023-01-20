@@ -32,6 +32,6 @@ void load_catalog_execute_queries_and_benchmark(char *dataset_folder_path, char 
     free_catalog(catalog);
 }
 
-void load_catalog_execute_queries_and_benchmar_regular_2(void) {
+void load_catalog_execute_queries_and_benchmark_regular_2(void) {
     load_catalog_execute_queries_and_benchmark("datasets/data-regular", "datasets/data-regular/input2.txt");
 }

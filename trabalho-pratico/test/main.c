@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
     ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_2);
     ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_1_lazy);
     ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_2_lazy);
-    ADD_TEST("/performance/", load_catalog_execute_queries_and_benchmar_regular_2);
+    ADD_TEST("/performance/", load_catalog_execute_queries_and_benchmark_regular_2);
 
     return g_test_run();
 }

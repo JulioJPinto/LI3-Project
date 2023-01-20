@@ -22,7 +22,7 @@ else ifeq ($(BUILD_TYPE), release)
     CFLAGS += -Iinclude/
     SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), test)
-	CFLAGS += -O0 -g
+	CFLAGS += -O0 -g -DOMIT_BENCHMARK_LOGGING
 	EXEC := $(EXEC)-test
 	BUILD_DIR_PATH := build/test
 	SRC += test/main.c $(filter-out src/main.c,$(wildcard src/*.c src/*/*.c))
@@ -84,16 +84,20 @@ endif
 test: build-test build-release
 	@./build/test/li3-test
 
+	@echo "# Start of end-to-end tests"
 	@rm -rf Resultados
-	@./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
+	@./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt > /dev/null
 	@diff Resultados datasets/data-regular/expected-results-1
+	@echo "ok /end-to-end/regular_1"
 
 	@rm -rf Resultados
-	@./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
+	@./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt > /dev/null
 	@diff Resultados datasets/data-regular/expected-results-2
+	@echo "ok /end-to-end/regular_2"
 
 	@rm -rf Resultados
-	@echo ok End-to-end test
+	@echo "# End of end-to-end tests"
+	@echo "\nTests passed!"
 
 compile-latex:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../
