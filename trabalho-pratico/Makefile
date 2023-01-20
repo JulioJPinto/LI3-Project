@@ -22,7 +22,7 @@ else ifeq ($(BUILD_TYPE), release)
     CFLAGS += -Iinclude/
     SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), test)
-	CFLAGS += -O0 -g -DDEBUG=1
+	CFLAGS += -O0 -g
 	EXEC := $(EXEC)-test
 	BUILD_DIR_PATH := build/test
 	SRC += test/main.c $(filter-out src/main.c,$(wildcard src/*.c src/*/*.c))
@@ -85,11 +85,11 @@ test: build-test build-release
 	@./build/test/li3-test
 
 	@rm -rf Resultados
-	./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
+	@./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
 	@diff Resultados datasets/data-regular/expected-results-1
 
 	@rm -rf Resultados
-	./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
+	@./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
 	@diff Resultados datasets/data-regular/expected-results-2
 
 	@rm -rf Resultados

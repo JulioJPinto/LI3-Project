@@ -42,18 +42,30 @@ OutputWriter *create_array_of_strings_output_writer(void) {
     return buffer;
 }
 
-void write_output_line(OutputWriter *buffer, const char *format, ...) {
-    if (buffer->write != NULL) {
+OutputWriter *create_null_output_writer(void) {
+    OutputWriter *buffer = malloc(sizeof(OutputWriter));
+    buffer->buffer = NULL;
+    buffer->write = NULL;
+    buffer->close = NULL;
+    return buffer;
+}
+
+void write_output_line(OutputWriter *output_writer, const char *format, ...) {
+    if (output_writer->write != NULL) {
         va_list args;
         va_start(args, format);
-        buffer->write(buffer->buffer, format, args);
+        output_writer->write(output_writer->buffer, format, args);
         va_end(args);
     }
 }
 
-void close_output_writer(OutputWriter *buffer) {
-    if (buffer->close != NULL) {
-        buffer->close(buffer->buffer);
+void *get_buffer(OutputWriter *output_writer) {
+    return output_writer->buffer;
+}
+
+void close_output_writer(OutputWriter *output_writer) {
+    if (output_writer->close != NULL) {
+        output_writer->close(output_writer->buffer);
     }
-    free(buffer);
+    free(output_writer);
 }

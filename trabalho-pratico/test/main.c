@@ -3,6 +3,8 @@
 
 #include "struct_util_test.c"
 #include "lazy_test.c"
+#include "correctness_query_test.c"
+#include "performance_query_test.c"
 
 #include <glib.h>
 #include <stdio.h>
@@ -128,14 +130,21 @@ int main(int argc, char *argv[]) {
 
     g_test_set_nonfatal_assertions();
 
-    g_test_add_func("/struct_utils/assert_date_correct_parse_and_encoding", test_date_parse_and_encoding);
-    g_test_add_func("/struct_utils/assert_date_correct_compare", test_date_compare);
-    g_test_add_func("/struct_utils/assert_date_correct_age", test_date_age);
-    g_test_add_func("/parse_functions/assert_invalid_csv_loads_nothing_large", assert_invalid_csv_loads_nothing_large);
-    g_test_add_func("/parse_functions/assert_invalid_csv_loads_nothing_regular", assert_invalid_csv_loads_nothing_regular);
-    g_test_add_func("/parse_functions/assert_valid_csv_loads_everything", assert_valid_csv_loads_everything_regular);
-    g_test_add_func("/lazy/test_lazy_behavior_int_apply_function", test_lazy_behavior_int_apply_function);
-    g_test_add_func("/lazy/test_lazy_behavior_null_apply_function", test_lazy_behavior_null_apply_function);
+#define ADD_TEST(testpath, function) g_test_add_func(testpath #function, function)
+
+    ADD_TEST("/struct_utils/", assert_test_date_parse_and_encoding);
+    ADD_TEST("/struct_utils/", assert_test_date_compare);
+    ADD_TEST("/struct_utils/", assert_test_date_age);
+    ADD_TEST("/parse_functions/", assert_invalid_csv_loads_nothing_large);
+    ADD_TEST("/parse_functions/", assert_invalid_csv_loads_nothing_regular);
+    ADD_TEST("/parse_functions/", assert_valid_csv_loads_everything_regular);
+    ADD_TEST("/lazy/", test_lazy_behavior_int_apply_function);
+    ADD_TEST("/lazy/", test_lazy_behavior_null_apply_function);
+    ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_1);
+    ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_2);
+    ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_1_lazy);
+    ADD_TEST("/correctness/", load_catalog_execute_queries_and_check_expected_outputs_regular_2_lazy);
+    ADD_TEST("/performance/", load_catalog_execute_queries_and_benchmar_regular_2);
 
     return g_test_run();
 }

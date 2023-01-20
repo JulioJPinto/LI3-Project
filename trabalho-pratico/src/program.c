@@ -6,11 +6,11 @@
 
 #include "benchmark.h"
 #include "catalog.h"
+#include "catalog_loader.h"
 #include "file_util.h"
-#include "string_util.h"
 #include "logger.h"
 #include "query_manager.h"
-#include "parser.h"
+#include "string_util.h"
 
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
@@ -187,35 +187,11 @@ int start_program(Program *program, GPtrArray *program_args) {
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
-    FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
-    FILE *drivers_file = open_file_folder(dataset_folder_path, "drivers.csv");
-    FILE *rides_file = open_file_folder(dataset_folder_path, "rides.csv");
-
-    if (users_file == NULL || drivers_file == NULL || rides_file == NULL) {
-        return FALSE;
-    }
-
-    Catalog *catalog = program->catalog;
-
-    BENCHMARK_START(load_timer);
-    read_file(users_file, parse_and_register_user, catalog);
-    BENCHMARK_END(load_timer, "Load users time:        %f seconds\n");
-
-    g_timer_start(load_timer);
-    read_file(drivers_file, parse_and_register_driver, catalog);
-    BENCHMARK_END(load_timer, "Load drivers time:      %f seconds\n");
-
-    g_timer_start(load_timer);
-    read_file(rides_file, parse_and_register_ride, catalog);
-    BENCHMARK_END(load_timer, "Load rides time:        %f seconds\n");
+    catalog_load_dataset(program->catalog, dataset_folder_path);
 
     char *lazy_loading_value_string = get_program_flag_value(program->flags, "lazy-loading", "true");
     if (strcmp(lazy_loading_value_string, "true") != 0)
-        catalog_force_eager_indexing(catalog);
-
-    fclose(users_file);
-    fclose(drivers_file);
-    fclose(rides_file);
+        catalog_force_eager_indexing(program->catalog);
 
     return TRUE;
 }

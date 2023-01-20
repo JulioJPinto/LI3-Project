@@ -17,7 +17,7 @@ void test_date(char *date, int expected_day, int expected_month, int expected_ye
     free(date_copy);
 }
 
-void test_date_parse_and_encoding(void) {
+void assert_test_date_parse_and_encoding(void) {
     test_date("01/01/2022", 1, 1, 2022);
     test_date("31/12/2000", 31, 12, 2000);
 
@@ -27,7 +27,7 @@ void test_date_parse_and_encoding(void) {
     }
 }
 
-void test_date_compare(void) {
+void assert_test_date_compare(void) {
     Date date1 = create_date(1, 1, 2000);
     Date date3 = create_date(1, 1, 2001);
     Date date4 = create_date(1, 2, 2000);
@@ -53,7 +53,7 @@ void test_date_compare(void) {
 
 
 // 9/10/2022
-void test_date_age(void) {
+void assert_test_date_age(void) {
     Date date1 = create_date(1, 1, 2000);
     Date date2 = create_date(7, 2, 2005);
     Date date3 = create_date(9, 10, 2022);
