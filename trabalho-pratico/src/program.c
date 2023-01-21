@@ -196,11 +196,29 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     return TRUE;
 }
 
+#define page_size 10
+
+void run_paging_output(OutputWriter *writer) {
+    GPtrArray *output_array = get_buffer(writer);
+    int number_of_lines = output_array->len;
+    int number_of_pages = number_of_lines / page_size + (number_of_lines % page_size && number_of_lines > page_size ? 1 : 0);
+    if(number_of_pages != 0) fprintf(stdout, "Page 0 to %d available - Type Exit to leave\n", number_of_pages);
+    while(1) {
+        char *input = readline("    > ");
+        if(strcmp(input, "exit") || strcmp(input, "Exit")) break;
+        int page_number = atoi(input); 
+        for(int i = 0; i < page_size && i + page_number*page_size < number_of_lines; i++) {
+            fprintf(stdout, "%s", g_ptr_array_index(output_array, i + page_number*page_size));
+        }
+    }
+}
+
 void run_query_for_terminal(Catalog *catalog, char *query, int query_number) {
     fprintf(stdout, "=== Query number: #%d =====================\n", query_number);
 
-    OutputWriter *writer = create_file_output_writer(stdout);
+    OutputWriter *writer = create_array_of_strings_output_writer();
     parse_and_run_query(catalog, writer, query);
+    run_paging_output(writer);
     close_output_writer(writer);
 
     fprintf(stdout, "===========================================\n");
