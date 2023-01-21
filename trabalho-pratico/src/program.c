@@ -198,19 +198,26 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 
 #define page_size 10
 
-void run_paging_output(OutputWriter *writer) {
-    GPtrArray *output_array = get_buffer(writer);
-    int number_of_lines = output_array->len;
-    int number_of_pages = number_of_lines / page_size + (number_of_lines % page_size && number_of_lines > page_size ? 1 : 0);
-    if(number_of_pages != 0) fprintf(stdout, "Page 0 to %d available - Type Exit to leave\n", number_of_pages);
-    while(1) {
-        char *input = readline("    > ");
-        if(strcmp(input, "exit") || strcmp(input, "Exit")) break;
-        int page_number = atoi(input); 
-        for(int i = 0; i < page_size && i + page_number*page_size < number_of_lines; i++) {
-            fprintf(stdout, "%s", g_ptr_array_index(output_array, i + page_number*page_size));
-        }
+void print_page_number(GPtrArray *array, int page_number, int number_of_pages) {
+    if(page_number <= 0 || page_number > number_of_pages) return;
+    for(int i = 0; i + page_size*(page_number - 1) <= page_size*page_number; i++) {
+        fprintf(stdout, "%p\n", g_ptr_array_index(array, i));
     }
+}
+
+void run_paging_output(OutputWriter *writer) {
+    GPtrArray *array = get_buffer(writer);
+    int number_of_lines = array->len;
+    int number_of_pages = number_of_lines / page_size + (number_of_lines % page_size ? 2 : 1);
+    fprintf(stdout, "=== Number of pages %d =====================\n", number_of_pages);
+    while(1) {
+        char* page_number = readline("=== Type the page you want or press any key to leave:  " );
+        int page = atoi(page_number);
+        if(!page) return;
+        print_page_number(array, page, number_of_pages);
+        free(page_number);
+    }
+    
 }
 
 void run_query_for_terminal(Catalog *catalog, char *query, int query_number) {
