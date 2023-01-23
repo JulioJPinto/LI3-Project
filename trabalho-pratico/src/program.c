@@ -209,9 +209,9 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 #define number_of_prints_per_page_changed 14
 
 void print_page_number(GPtrArray *array, int page_number, int number_of_pages) {
-    if(page_number <= 0 || page_number > number_of_pages) return;
-    int fst_element = page_size*(page_number - 1);
-    for(int i = fst_element; i < array->len && i < page_size*page_number ; i++) {
+    if (page_number <= 0 || page_number > number_of_pages) return;
+    int fst_element = page_size * (page_number - 1);
+    for (int i = fst_element; i < array->len && i < page_size * page_number; i++) {
         fprintf(stdout, "%s", (char *) g_ptr_array_index(array, i));
     }
 }
@@ -229,7 +229,7 @@ int decrement_page(int page, int number_of_pages) {
 void run_paging_output(OutputWriter *writer) {
     GPtrArray *array = get_buffer(writer);
     int number_of_lines = array->len;
-    if(number_of_lines == 1) {
+    if (number_of_lines == 1) {
         fprintf(stdout, "%s", (char *) g_ptr_array_index(array, 0));
         return;
     }
@@ -238,33 +238,28 @@ void run_paging_output(OutputWriter *writer) {
     int number_of_pages = (int) ceil(total_pages);
     fprintf(stdout, "=== Number of pages %d\n\n", number_of_pages);
     int page = 1;
-    while(!(!page || page > number_of_pages)) {
+    while (!(!page || page > number_of_pages)) {
         print_page_number(array, page, number_of_pages);
-        if(page <= number_of_pages && number_of_pages != 1) fprintf(stdout, "\n=== Page %d of %d pages \n", page, number_of_pages);
+        if (page <= number_of_pages && number_of_pages != 1) fprintf(stdout, "\n=== Page %d of %d pages \n", page, number_of_pages);
         char *after = readline("Type Next or Previous to move to the next or previous page\nIf you want a specific page you can also type it\nTo exit or clear just type it out: ");
         fprintf(stdout, "\n\n");
         int page_value = atoi(after);
-        if(page_value) {
-            page_value > 0 && page_value <= number_of_pages ? page = page_value : fprintf(stdout, "Invalid page number\n"); 
-        }
-        else if(after[0] == 'n' || after[0] == 'N') {
+        if (page_value) {
+            page_value > 0 &&page_value <= number_of_pages ? page = page_value : fprintf(stdout, "Invalid page number\n");
+        } else if (after[0] == 'n' || after[0] == 'N') {
             page >= number_of_pages ? page = 1 : page++;
-        }
-        else if(after[0] == 'p' || after[0] == 'P') {
+        } else if (after[0] == 'p' || after[0] == 'P') {
             page <= 1 ? page = number_of_pages : page--;
-        }
-        else if(after[0] == 'c') {
+        } else if (after[0] == 'c') {
             system("clear");
-            fprintf(stdout,"===========\n\n");
-        }
-        else if(after[0] == 'e') return;
+            fprintf(stdout, "===========\n\n");
+        } else if (after[0] == 'e')
+            return;
         else {
             fprintf(stdout, "Invalid Command\n");
             return;
         }
     }
-    
-    
 }
 
 void run_query_for_terminal(Catalog *catalog, char *query, int query_number) {
