@@ -77,8 +77,17 @@ void program_reload_command(Program *program, char **args, int arg_size) {
     program->should_exit = FALSE;
 }
 
+void program_clear_command(Program *program, char **args, int arg_size) {
+    (void) args;
+    (void) arg_size;
+    (void) program;
+
+    system("clear");
+}
+
 const ProgramCommand program_commands[] = {
         {"file", "Runs all the queries from a file", program_run_queries_from_file_command},
+        {"clear", "Cleans everything in the terminal", program_clear_command},
         {"reload", "Reloads the program", program_reload_command},
         {"help", "Shows this help message", program_run_help_command},
         {"exit", "Exits the program", program_exit_command},
@@ -197,26 +206,39 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 }
 
 #define page_size 10
+#define number_of_prints_per_page_changed 14
 
 void print_page_number(GPtrArray *array, int page_number, int number_of_pages) {
     if(page_number <= 0 || page_number > number_of_pages) return;
-    for(int i = 0; i + page_size*(page_number - 1) <= page_size*page_number; i++) {
-        fprintf(stdout, "%p\n", g_ptr_array_index(array, i));
+    int fst_element = page_size*(page_number - 1);
+    for(int i = fst_element; i < array->len && i < page_size*page_number ; i++) {
+        fprintf(stdout, "%s", (char *) g_ptr_array_index(array, i));
     }
+    readline("=== Press Enter to continue =====================");
 }
 
 void run_paging_output(OutputWriter *writer) {
     GPtrArray *array = get_buffer(writer);
     int number_of_lines = array->len;
-    int number_of_pages = number_of_lines / page_size + (number_of_lines % page_size ? 2 : 1);
-    fprintf(stdout, "=== Number of pages %d =====================\n", number_of_pages);
-    while(1) {
-        char* page_number = readline("=== Type the page you want or press any key to leave:  " );
-        int page = atoi(page_number);
-        if(!page) return;
-        print_page_number(array, page, number_of_pages);
-        free(page_number);
+    if(number_of_lines == 1) {
+        fprintf(stdout, "%s", (char *) g_ptr_array_index(array, 0));
+        return;
     }
+
+    double number_of_pages = (double) number_of_lines / (double) page_size;
+    number_of_pages = ceil(number_of_pages);
+    while(1) {
+        fprintf(stdout, "=== Number of pages %d =====================\n", (int) number_of_pages);
+        char* line = readline("=== Type the page you want or press enter to leave:  " );
+        int line_value = strcmp(line, "clear"); 
+        int page = atoi(line);
+        if((!page || page > number_of_pages) && line_value) return;
+        print_page_number(array, page,(int) number_of_pages);
+        if(page <= number_of_pages && number_of_pages != 1) fprintf(stdout, "=== Page %d of %d pages ============\n", page, (int) number_of_pages);
+        if (!line_value) system("clear");
+        free(line);
+    }
+    
     
 }
 

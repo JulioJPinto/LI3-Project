@@ -4,6 +4,7 @@
 
 #include <glib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "program_flags.h"
 

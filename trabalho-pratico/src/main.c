@@ -8,6 +8,8 @@
 int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
 
+    system("clear");
+
     BENCHMARK_START(global_timer);
 
     GPtrArray *program_args = g_ptr_array_new();
