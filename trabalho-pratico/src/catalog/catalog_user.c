@@ -3,14 +3,12 @@
 #include "lazy.h"
 #include "catalog_sort.h"
 #include "benchmark.h"
+#include "terminal_colors.h"
 
 struct CatalogUser {
     Lazy *lazy_users_array;
     GHashTable *user_from_username_hashtable;
 };
-
-#define BLUE "\033[0;34m"
-#define STANDARD "\033[0;37m"
 
 /**
  * Function that wraps free user to be used in GLib g_ptr_array free func.
@@ -22,7 +20,7 @@ void glib_wrapper_free_user(gpointer user) {
 void sort_array_by_total_distance(void *users_array) {
     BENCHMARK_START(sort_users_array);
     sort_array(users_array, compare_users_by_total_distance);
-    BENCHMARK_END(sort_users_array, " - sort_users_array: " BLUE "%lf seconds\n" STANDARD);
+    BENCHMARK_END(sort_users_array, TERMINAL_DARK_GRAY "sort_users_array: %lf seconds\n" TERMINAL_RESET);
 }
 
 CatalogUser *create_catalog_user(void) {

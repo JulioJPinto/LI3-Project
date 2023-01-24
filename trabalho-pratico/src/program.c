@@ -13,18 +13,6 @@
 #include "string_util.h"
 #include "terminal_pager.h"
 
-#define RED_BOLD "\033[1;31m"
-#define RED "\033[0;31m"
-#define YELLOW_BOLD "\033[1;33m"
-#define YELLOW "\033[0;33m"
-#define GREEN_BOLD "\033[1;32m"
-#define GREEN "\033[0;32m"
-#define BLUE "\033[0;34m"
-#define BLUE_BOLD "\033[1;34m"
-#define STANDARD "\033[0;37m"
-#define TERMINAL_GRAY "\x1b[38;5;8m"
-#define TERMINAL_RESET "\x1b[0m"
-
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
     PROGRAM_STATE_EXITING,
@@ -58,14 +46,14 @@ gboolean program_should_exit(Program *program) {
 
 void program_run_queries_from_file_command(Program *program, char **args, int arg_size) {
     if (arg_size < 2) {
-        log_warning(RED_BOLD "Use 'file <file_path>'\n");
+        LOG_WARNING("Use 'file <file_path>'");
         return;
     }
 
     char *input_file_path = args[1];
 
     if (!program_run_queries_from_file(program, input_file_path)) {
-        log_warning(RED_BOLD "Failed to run queries from file '%s'\n", input_file_path);
+        LOG_WARNING_VA("Failed to run queries from file '%s'", input_file_path);
     }
 }
 
@@ -109,11 +97,11 @@ void program_run_help_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
 
-    log_info(YELLOW_BOLD "Available commands:\n");
-    log_info(YELLOW_BOLD "  <query_id> <query>" STANDARD " - Runs a query\n");
+    log_info(TERMINAL_YELLOW_BOLD "Available commands:\n");
+    log_info(TERMINAL_YELLOW "  <query_id> <query>" TERMINAL_RESET " - Runs a query\n");
 
     for (int i = 0; i < program_commands_size; i++) {
-        log_info(YELLOW_BOLD "  %s" STANDARD " - %s\n", program_commands[i].name, program_commands[i].description);
+        log_info(TERMINAL_YELLOW "  %s" TERMINAL_RESET " - %s\n", program_commands[i].name, program_commands[i].description);
     }
 }
 
@@ -139,7 +127,8 @@ void program_ask_for_dataset_path(Program *program) {
         char *input = readline("Please enter the path to the dataset folder (default: datasets/data-regular): ");
 
         if (IS_EMPTY(input)) {
-            strcpy(input, "datasets/data-regular");
+            free(input);
+            input = strdup("datasets/data-regular");
         }
 
         loaded = program_load_dataset(program, input);
@@ -163,12 +152,12 @@ void execute_command(Program *program, char *input) {
     if (isdigit(args[0][0])) {
         program_run_query(program, input);
     } else {
-        log_warning(RED_BOLD "Invalid command '%s'\n" STANDARD, args[0]);
+        LOG_WARNING_VA("Invalid command '%s'", args[0]);
     }
 }
 
 void program_ask_for_commands(Program *program) {
-    char *input = readline(GREEN_BOLD "GRUPO-3 # " STANDARD);
+    char *input = readline(TERMINAL_GREEN "> " TERMINAL_RESET);
 
     execute_command(program, input);
 
@@ -192,7 +181,7 @@ int start_program(Program *program, GPtrArray *program_args) {
         using_history();
 
         program_ask_for_dataset_path(program);
-        fprintf(stdout, STANDARD "\nType " YELLOW_BOLD "help " STANDARD "to list all commands\n\n");
+        fprintf(stdout, "\nType " TERMINAL_YELLOW_BOLD "help " TERMINAL_RESET "to list all commands\n\n");
         while (program->state != PROGRAM_STATE_EXITING) {
             program_ask_for_commands(program);
         }
@@ -215,7 +204,7 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 void print_output(GPtrArray *output_lines) {
     if (output_lines->len <= PAGER_LINES) {
         for (int i = 0; i < (int) output_lines->len; i++) {
-            fprintf(stdout, TERMINAL_GRAY "%d", i + 1);
+            fprintf(stdout, TERMINAL_DARK_GRAY "%d", i + 1);
             fprintf(stdout, TERMINAL_RESET " %s", (char *) g_ptr_array_index(output_lines, i));
         }
     } else {
@@ -265,7 +254,7 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
 
     program->mode = BATCH_MODE;
 
-    int aux_id = program->current_query_id;
+    int old_id = program->current_query_id;
     program->current_query_id = 0;
 
     while (fgets(line_buffer, 65536, input_file)) {
@@ -276,8 +265,8 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
     program->mode = INTERACTIVE_MODE;
 
     g_timer_stop(input_file_execution_timer);
-    BENCHMARK_LOG( "%d queries from %s:" BLUE_BOLD " Executed in %f seconds\n" STANDARD, program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
-    program->current_query_id = aux_id;
+    BENCHMARK_LOG("%d queries from %s: Executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
+    program->current_query_id = old_id;
 
     fclose(input_file);
 

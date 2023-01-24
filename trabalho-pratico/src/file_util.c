@@ -1,7 +1,8 @@
 #include "file_util.h"
 
-#include <glib.h>
 #include "logger.h"
+#include "terminal_colors.h"
+#include <glib.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define PATH_SEPARATOR "\\"
@@ -10,10 +11,6 @@
 #endif
 
 #define OUTPUT_FOLDER "Resultados"
-
-#define RED_BOLD "\033[1;31m"
-#define RED "\033[0;31m"
-#define STANDARD "\033[0;37m"
 
 FILE *open_file_folder(const char *const folder_path, const char *const file_name) {
     gchar *string = g_build_path(PATH_SEPARATOR, folder_path, file_name, NULL);
@@ -27,7 +24,7 @@ FILE *open_file_folder(const char *const folder_path, const char *const file_nam
 FILE *open_file(const char *const file_name) {
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        log_warning( RED_BOLD "Could not open file %s\n" STANDARD, file_name);
+        LOG_WARNING_VA("Could not open file %s", file_name);
     }
 
     return file;

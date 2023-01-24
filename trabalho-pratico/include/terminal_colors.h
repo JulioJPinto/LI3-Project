@@ -1,0 +1,17 @@
+#pragma once
+#ifndef LI3_TERMINAL_COLORS_H
+#define LI3_TERMINAL_COLORS_H
+
+#define TERMINAL_BLUE "\033[0;34m"
+#define TERMINAL_BLUE_BOLD "\033[1;34m"
+#define TERMINAL_DARK_GRAY "\x1b[38;5;8m"
+#define TERMINAL_GREEN "\033[0;32m"
+#define TERMINAL_GREEN_BOLD "\033[1;32m"
+#define TERMINAL_RED "\033[0;31m"
+#define TERMINAL_RED_BOLD "\033[1;31m"
+#define TERMINAL_RESET "\x1b[0m"
+#define TERMINAL_WHITE "\x1b[38;5;231m"
+#define TERMINAL_YELLOW "\033[0;33m"
+#define TERMINAL_YELLOW_BOLD "\033[1;33m"
+
+#endif //LI3_TERMINAL_COLORS_H

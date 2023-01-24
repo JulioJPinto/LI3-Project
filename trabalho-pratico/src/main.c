@@ -1,16 +1,13 @@
 #include "benchmark.h"
 #include "program.h"
 #include "program_flags.h"
-
-#define YELLOW_BOLD "\033[1;33m"
+#include "terminal_colors.h"
 
 /**
  * Main entry point
  */
 int main(int argc, char **argv) {
     log_debug("Running on debug mode\n");
-
-    system("clear");
 
     BENCHMARK_START(global_timer);
 
@@ -36,7 +33,7 @@ int main(int argc, char **argv) {
     g_ptr_array_free(program_args, TRUE);
     free_program_flags(program_flags);
 
-    log_info( YELLOW_BOLD "Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
+    log_info(TERMINAL_YELLOW_BOLD "Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
 
     return result;
 }

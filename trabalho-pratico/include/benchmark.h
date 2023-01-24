@@ -3,10 +3,11 @@
 #define LI3_BENCHMARK_H
 
 #include "logger.h"
+#include "terminal_colors.h"
 
 #ifndef OMIT_BENCHMARK_LOGGING
-#define BENCHMARK_LOG(...) \
-    log_info(__VA_ARGS__)
+#define BENCHMARK_LOG(string, ...) \
+    log_info(TERMINAL_DARK_GRAY string TERMINAL_RESET, __VA_ARGS__)
 #else
 #define BENCHMARK_LOG(...)
 #endif

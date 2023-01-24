@@ -1,12 +1,11 @@
 #include "catalog/catalog_ride.h"
 
+#include "terminal_colors.h"
+
 #include "benchmark.h"
 #include "lazy.h"
 #include "catalog_sort.h"
 #include "ride_driver_and_user_info.h"
-
-#define BLUE "\033[0;34m"
-#define STANDARD "\033[0;37m"
 
 struct CatalogRide {
     Lazy *lazy_rides_array;
@@ -27,19 +26,19 @@ void glib_wrapper_free_ride(gpointer ride) {
 void sort_rides_array(gpointer rides_array) {
     BENCHMARK_START(sort_rides_array_timer);
     sort_array(rides_array, compare_rides_by_date);
-    BENCHMARK_END(sort_rides_array_timer, " - sort_rides_array: " BLUE "%lf seconds\n" STANDARD);
+    BENCHMARK_END(sort_rides_array_timer, "sort_rides_array: %lf seconds\n");
 }
 
 void sort_male_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
     sort_array(rduinfo_array, compare_rduinfo_by_account_creation_date);
-    BENCHMARK_END(sort_rduinfo_male_array_timer, " - sort_rduinfo_male_array: " BLUE "%lf seconds\n" STANDARD);
+    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_rduinfo_male_array: %lf seconds\n");
 }
 
 void sort_female_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
     sort_array(rduinfo_array, compare_rduinfo_by_account_creation_date);
-    BENCHMARK_END(sort_rduinfo_male_array_timer, " - sort_rduinfo_female_array: " BLUE "%lf seconds\n" STANDARD);
+    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_rduinfo_female_array: %lf seconds\n");
 }
 
 void free_rides_array(gpointer array) {
@@ -79,7 +78,7 @@ void free_catalog_ride(CatalogRide *catalog_ride) {
 void sort_array_rides_in_city_array(gpointer rides_array) {
     BENCHMARK_START(sort_rides_array_timer);
     sort_array(rides_array, compare_rides_by_date);
-    BENCHMARK_END(sort_rides_array_timer, " - sort_rides_in_city_array: " BLUE "%lf seconds\n" STANDARD);
+    BENCHMARK_END(sort_rides_array_timer, "sort_rides_in_city_array: %lf seconds\n");
 }
 
 static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride) {
@@ -274,7 +273,7 @@ void catalog_ride_force_eager_indexing(CatalogRide *catalog_ride) {
     g_hash_table_iter_init(&iter, catalog_ride->rides_in_city_hashtable);
 
     while (g_hash_table_iter_next(&iter, &key, &value)) {
-        BENCHMARK_LOG("   (%s)", key);
+        BENCHMARK_LOG("(%s) ", key);
         lazy_apply_function(value);
     }
 

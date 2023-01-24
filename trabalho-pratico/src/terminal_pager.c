@@ -2,13 +2,9 @@
 #include <stdio.h>
 #include <readline/readline.h>
 #include "terminal_pager.h"
-#include "struct_util.h"
+#include "terminal_colors.h"
 
-#define YELLOW_BOLD "\033[1;33m"
-#define YELLOW "\033[0;33m"
-#define STANDARD "\033[0;37m"
-#define TERMINAL_GRAY "\x1b[38;5;8m"
-#define TERMINAL_RESET "\x1b[0m"
+#include "struct_util.h"
 
 void clear_terminal_lines(int number_of_lines) {
     for (int i = 0; i < number_of_lines; i++) {
@@ -34,7 +30,7 @@ int print_page_content(GPtrArray *lines, int page) {
     int max_number_length = string_length_of_number(end);
 
     for (int i = start; i < end; i++) {
-        printf(TERMINAL_GRAY "%-*d", max_number_length + 1, i + 1);
+        printf(TERMINAL_DARK_GRAY "%-*d", max_number_length + 1, i + 1);
         printf(TERMINAL_RESET "%s", (char *) g_ptr_array_index(lines, i));
     }
 
@@ -50,8 +46,8 @@ void paginate(GPtrArray *lines) {
     int continue_paging = TRUE;
     while (continue_paging) {
         int number_of_lines_printed = print_page_content(lines, currentPage);
-        printf(YELLOW_BOLD "\nPage %d of %d\n" STANDARD, currentPage, totalPages);
-        char *input = readline("Go to page ('n', 'p', 'q', 'number'): ");
+        printf("\nPage " TERMINAL_WHITE "%d" TERMINAL_RESET " of " TERMINAL_WHITE "%d" TERMINAL_RESET "\n", currentPage, totalPages);
+        char *input = readline("Go to page " TERMINAL_DARK_GRAY "('n', 'p', 'q', 'number')" TERMINAL_RESET ": ");
 
         int parse_error = 0;
         int new_page = parse_int_safe(input, &parse_error);
