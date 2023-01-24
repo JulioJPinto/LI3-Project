@@ -12,12 +12,27 @@ void clear_terminal_lines(int number_of_lines) {
     }
 }
 
+#define TERMINAL_GRAY "\x1b[38;5;8m"
+#define TERMINAL_RESET "\x1b[0m"
+
+int string_length_of_number(int number) {
+    int length = 0;
+    while (number > 0) {
+        number /= 10;
+        length++;
+    }
+    return length;
+}
+
 int print_page_content(GPtrArray *lines, int page) {
     int start = (page - 1) * PAGER_LINES;
     int end = MIN(start + PAGER_LINES, (int) lines->len);
 
+    int max_number_length = string_length_of_number(end);
+
     for (int i = start; i < end; i++) {
-        printf("%s", (char *) g_ptr_array_index(lines, i));
+        printf(TERMINAL_GRAY "%-*d", max_number_length + 1, i + 1);
+        printf(TERMINAL_RESET "%s", (char *) g_ptr_array_index(lines, i));
     }
 
     return end - start;
