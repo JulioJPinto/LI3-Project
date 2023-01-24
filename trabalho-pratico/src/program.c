@@ -22,6 +22,8 @@
 #define BLUE "\033[0;34m"
 #define BLUE_BOLD "\033[1;34m"
 #define STANDARD "\033[0;37m"
+#define TERMINAL_GRAY "\x1b[38;5;8m"
+#define TERMINAL_RESET "\x1b[0m"
 
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
@@ -108,10 +110,10 @@ void program_run_help_command(Program *program, char **args, int arg_size) {
     (void) arg_size;
 
     log_info(YELLOW_BOLD "Available commands:\n");
-    log_info(YELLOW_BOLD "  <query_id> <query>" STANDARD "- Runs a query\n");
+    log_info(YELLOW_BOLD "  <query_id> <query>" STANDARD " - Runs a query\n");
 
     for (int i = 0; i < program_commands_size; i++) {
-        log_info(YELLOW_BOLD "  %s" STANDARD "- %s\n", program_commands[i].name, program_commands[i].description);
+        log_info(YELLOW_BOLD "  %s" STANDARD " - %s\n", program_commands[i].name, program_commands[i].description);
     }
 }
 
@@ -190,6 +192,7 @@ int start_program(Program *program, GPtrArray *program_args) {
         using_history();
 
         program_ask_for_dataset_path(program);
+        fprintf(stdout, STANDARD "\nType " YELLOW_BOLD "help " STANDARD "to list all commands\n\n");
         while (program->state != PROGRAM_STATE_EXITING) {
             program_ask_for_commands(program);
         }
@@ -212,7 +215,8 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 void print_output(GPtrArray *output_lines) {
     if (output_lines->len <= PAGER_LINES) {
         for (int i = 0; i < (int) output_lines->len; i++) {
-            fprintf(stdout, "%s", (char *) g_ptr_array_index(output_lines, i));
+            fprintf(stdout, TERMINAL_GRAY "%d", i + 1);
+            fprintf(stdout, TERMINAL_RESET " %s", (char *) g_ptr_array_index(output_lines, i));
         }
     } else {
         paginate(output_lines);
