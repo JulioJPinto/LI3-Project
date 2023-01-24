@@ -1,8 +1,56 @@
-Multihreading entre drivers e users não foi implementado porque loads de drivers e users são rápidos.
-O que impacta é o load de rides.
-Pode ser feito multithreading no loading de rides, mas não é prioridade.
+\documentclass{article}
 
-Lazy loading para implementar.
-Unit tests para implementar.
+\usepackage[portuguese]{babel}
 
-Csv generator mt fixe.
+\usepackage[a4paper]{geometry}
+\usepackage{pbox}
+\usepackage{caption, booktabs}
+\usepackage{makecell}
+\usepackage{cellspace}
+\usepackage{lipsum}  
+
+
+\title{Relatório da Fase 2 - Grupo 03}
+\author{Francisco Macedo Ferreira (A100660)\\Júlio José Medeiros Pereira Pinto (A100742)}
+
+\begin{document}  
+    \maketitle
+    Multihreading entre drivers e users não foi implementado porque loads de drivers e users são rápidos.
+    O que impacta é o load de rides.
+    Pode ser feito multithreading no loading de rides, mas não é prioridade.
+
+    Lazy loading para implementar.
+    Unit tests para implementar.
+
+    Csv generator mt fixe.
+
+    Data a usar 1 int com bitwise operations em vez de 3.
+
+    \section{Introdução}
+    \lipsum[1]
+    
+    \section{Desenvolvimento}
+    O projeto 
+    \subsection{Ajustes sobre a fase 1}
+        \subsubsection{Ajustes de críticas de docentes}
+            TODO: dizer que dividimos os catálogos em 3. e não me lembro mais
+
+        \subsubsection{Ajustes de fator escala (Dataset maior)}
+            Da forma como tínhamos o projeto implementado, quando 
+            usado o dataset maior, o programa mesmo assim continuava
+            a performar dentro dos limites de tempo com grandes 
+            margens. As estruturas de dados e estratégias para
+            a resolução de queries foram então adequadas, pelo que
+            não alteramos a implementação das queries já feitas
+            (1, 2, 3, 4 e 5). As previsões de possíveis alterações
+            mencionadas na fase 1 não foram necessárias de serem
+            implementadas, exceto o \emph{lazy loading} que foi
+            útil no modo interativo (será abordado mais abaixo).
+        
+    \subsection{Pipeline}
+        
+
+
+    
+
+\end{document}
