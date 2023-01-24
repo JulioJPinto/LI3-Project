@@ -11,19 +11,16 @@
 #include "logger.h"
 #include "query_manager.h"
 #include "string_util.h"
+#include "terminal_pager.h"
 
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
-    PROGRAM_STATE_WAITING_FOR_DATASET_INPUT,
-    PROGRAM_STATE_WAITING_FOR_COMMANDS,
-    PROGRAM_STATE_VIEWING_QUERY_RESULT,
     PROGRAM_STATE_EXITING,
 } ProgramState;
 
 typedef enum ProgramMode {
     WAITING_FOR_MODE,
     BATCH_MODE,
-    RUNNING_IN_ITERATIVE_MODE_TO_FILE,
     INTERACTIVE_MODE,
 } ProgramMode;
 
@@ -125,8 +122,6 @@ void free_program(Program *program) {
 }
 
 void program_ask_for_dataset_path(Program *program) {
-    program->state = PROGRAM_STATE_WAITING_FOR_DATASET_INPUT;
-
     gboolean loaded = FALSE;
     while (!loaded) {
         char *input = readline("Please enter the path to the dataset folder (default: datasets/data-regular): ");
@@ -161,7 +156,6 @@ void execute_command(Program *program, char *input) {
 }
 
 void program_ask_for_commands(Program *program) {
-    program->state = PROGRAM_STATE_WAITING_FOR_COMMANDS;
     char *input = readline("> ");
 
     execute_command(program, input);
@@ -180,7 +174,6 @@ int start_program(Program *program, GPtrArray *program_args) {
             return EXIT_FAILURE;
         if (!program_run_queries_from_file(program, queries_file_path))
             return EXIT_FAILURE;
-
     } else {
         program->mode = INTERACTIVE_MODE;
         rl_bind_key('\t', rl_complete);
@@ -196,7 +189,8 @@ int start_program(Program *program, GPtrArray *program_args) {
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
-    catalog_load_dataset(program->catalog, dataset_folder_path);
+    if (!catalog_load_dataset(program->catalog, dataset_folder_path))
+        return FALSE;
 
     char *lazy_loading_value_string = get_program_flag_value(program->flags, "lazy-loading", "true");
     if (strcmp(lazy_loading_value_string, "true") != 0)
@@ -205,149 +199,26 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     return TRUE;
 }
 
-#define page_size 10
-#define cleaner_string "===========\n\n"
-
-void clear_up_until(int number_of_lines) {
-    for(int i = 0; i < number_of_lines; i++) {
-        printf("\x1b[1F");
-        printf("\x1b[2K");
-        fflush(stdout);
-    }
-
-}
-
-void print_page_number(GPtrArray *array, int page_number) {
-    int fst_element = page_size * (page_number - 1);
-    for (int i = fst_element; i < array->len && i < page_size * page_number; i++) {
-        fprintf(stdout, "%s", (char *) g_ptr_array_index(array, i));
-    }
-}
-
-int help_page_command(int page, int number_of_pages, int number_of_lines);
-
-int increment_page_command(int page, int number_of_pages, int number_of_lines) {
-    int number_of_lines_per_page = number_of_lines - page * page_size;
-    if(number_of_lines_per_page > 10) number_of_lines = 10;
-    clear_up_until(7 + number_of_lines_per_page);
-    page++;
-    return page > number_of_pages ? 1 : page;
-}
-
-int decrement_page_command(int page, int number_of_pages, int number_of_lines) {
-    int number_of_lines_per_page = number_of_lines - page * page_size;
-    if(number_of_lines_per_page > 10) number_of_lines = 10;
-    clear_up_until(7 + number_of_lines_per_page);
-    page--;
-    return page < 1 ? number_of_pages : page;
-}
-
-int clear_page_command(int page, int number_of_pages, int number_of_lines) {
-    (void) page;
-    (void) number_of_pages;
-    (void) number_of_lines;
-
-    system("clear");
-    return 1;
-}
-
-int exit_page_command(int page, int number_of_pages, int number_of_lines) {
-    (void) page;
-    (void) number_of_pages;
-    (void) number_of_lines;
-
-    system("clear");
-    return -1;
-}
-
-typedef struct PageCommand {
-    char *name;
-    char *description;
-    int (*function)(int page, int number_of_pages, int number_of_lines);
-} PageCommand;
-
-
-const PageCommand page_commands[] = {
-    {"help", "Shows the command list for paging", help_page_command},
-    {"next", "Skips to the next page", increment_page_command},
-    {"previous", "Skips to the previous page", decrement_page_command},
-    {"clear", "Clears the page", clear_page_command},
-    {"exit", "Exits to the main menu", exit_page_command},
-};
-
-const int page_commands_size = sizeof(page_commands) / sizeof(PageCommand);
-
-int help_page_command(int page, int number_of_pages, int number_of_lines) {
-    (void) number_of_pages;
-    (void) number_of_lines;
-
-    system("clear");
-    for(int i = 0; i < page_commands_size; i++) {
-        fprintf(stdout, "%s - %s\n", page_commands[i].name, page_commands[i].description);
-    }
-    return page;
-}
-
-void run_paging_output(OutputWriter *writer) {
-    GPtrArray *array = get_buffer(writer);
-    int number_of_lines = array->len;
-    if (number_of_lines == 1) {
-        fprintf(stdout, "%s", (char *) g_ptr_array_index(array, 0));
-        return;
-    }
-
-    double total_pages = (double) number_of_lines / (double) page_size;
-    int number_of_pages = (int) ceil(total_pages);
-    fprintf(stdout, "=== Number of pages %d\n\n", number_of_pages);
-    int page = 1;
-    while (!(!page || page > number_of_pages)) {
-    while_start:
-        print_page_number(array, page);
-        if (page <= number_of_pages && number_of_pages != 1) fprintf(stdout, "\n=== Page %d of %d pages \n", page, number_of_pages);
-        char *arg = readline("Type Next or Previous to move to the next or previous page\nIf you want a specific page you can also type it\nTo exit or clear just type it out: \n\n");
-        int page_value = atoi(arg);
-        str_to_lower(arg);
-        if (page_value > 0 && page_value <= number_of_pages) {
-            page = page_value;
-            int number_of_lines_per_page = number_of_lines - page * page_size;
-            if(number_of_lines_per_page > 10) number_of_lines = 10;
-            clear_up_until(7 + number_of_lines_per_page);
-            goto while_start; //Since the input was a number we know that we can skip the for loop for the commands
-        } else if (page_value) {
-            fprintf(stdout, "Invalid page number\n");
-            return;
+void print_output(GPtrArray *output_lines) {
+    if (output_lines->len <= PAGER_LINES) {
+        for (int i = 0; i < (int) output_lines->len; i++) {
+            fprintf(stdout, "%s", (char *) g_ptr_array_index(output_lines, i));
         }
-
-        int invalid_command = 0;
-        for (int i = 0; i < page_commands_size; i++) {
-            if (strcmp(page_commands[i].name, arg) == 0) {
-                page = page_commands[i].function(page, number_of_pages, number_of_lines);
-                if(page == -1) return;
-                invalid_command = 1;
-                goto while_start;             
-            }
-        }
-
-        if(!invalid_command) {
-            fprintf(stdout, "Invalid command!\n");
-            return;
-        }
-        
+    } else {
+        paginate(output_lines);
     }
 }
 
-void run_query_for_terminal(Catalog *catalog, char *query, int query_number) {
-    fprintf(stdout, "=== Query number: #%d\n", query_number);
-
+void run_query_for_terminal(Catalog *catalog, char *query) {
     OutputWriter *writer = create_array_of_strings_output_writer();
     parse_and_run_query(catalog, writer, query);
-    run_paging_output(writer);
+    print_output(get_buffer(writer));
     close_output_writer(writer);
-
-    fprintf(stdout, "\n");
 }
 
 void run_query_for_output_folder(Catalog *catalog, char *query, int query_number) {
+    if (*query == '#') return; // Ignore query char
+
     create_output_folder_if_not_exists();
     FILE *output_file = create_command_output_file(query_number);
 
@@ -360,16 +231,11 @@ void run_query_for_output_folder(Catalog *catalog, char *query, int query_number
 
 void program_run_query(Program *program, char *query) {
     Catalog *catalog = program->catalog;
-    int query_number = ++program->current_query_id;
-
-    if (*query == '#') {
-        return;
-    }
 
     if (program->mode == INTERACTIVE_MODE) {
-        run_query_for_terminal(catalog, query, query_number);
+        run_query_for_terminal(catalog, query);
     } else {
-        run_query_for_output_folder(catalog, query, query_number);
+        run_query_for_output_folder(catalog, query, ++program->current_query_id);
     }
 }
 
@@ -383,7 +249,7 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
 
     char line_buffer[65536];
 
-    program->mode = RUNNING_IN_ITERATIVE_MODE_TO_FILE;
+    program->mode = BATCH_MODE;
 
     int aux_id = program->current_query_id;
     program->current_query_id = 0;
