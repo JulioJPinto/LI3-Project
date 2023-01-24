@@ -146,3 +146,31 @@ void user_register_ride_date(User *user, Date date) {
         user->most_recent_ride = date;
     }
 }
+
+int compare_users_by_total_distance(const void* a, const void* b) {
+    User *a_user = *((User **) a);
+    User *b_user = *((User **) b);
+
+    int by_activeness = (int) user_get_account_status(a_user) - (int) user_get_account_status(b_user);
+    if (by_activeness != 0) {
+        return by_activeness;
+    }
+
+    int total_distance_a = user_get_total_distance(a_user);
+    int total_distance_b = user_get_total_distance(b_user);
+
+    int by_total_distance = total_distance_b - total_distance_a;
+    if (by_total_distance != 0) {
+        return by_total_distance;
+    }
+
+    Date last_ride_date_a = user_get_most_recent_ride(a_user);
+    Date last_ride_date_b = user_get_most_recent_ride(b_user);
+
+    int by_last_ride = date_compare(last_ride_date_b, last_ride_date_a);
+    if (by_last_ride != 0) {
+        return by_last_ride;
+    }
+
+    return strcmp(a_user->username, b_user->username);
+}

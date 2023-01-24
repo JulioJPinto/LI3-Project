@@ -155,3 +155,49 @@ void ride_set_driver_account_creation_date(Ride *ride, Date date) {
 Date ride_get_driver_account_creation_date(Ride *ride) {
     return ride->driver_account_creation_date;
 }
+
+int compare_rides_by_date(const void *a, const void *b) {
+    Ride *a_ride = *(Ride **) a;
+    Ride *b_ride = *(Ride **) b;
+
+    return date_compare(ride_get_date(a_ride), ride_get_date(b_ride));
+}
+
+int compare_rides_by_distance(const void *a, const void *b) {
+    Ride *a_ride = *(Ride **) a;
+    Ride *b_ride = *(Ride **) b;
+
+    int by_distance = ride_get_distance(b_ride) - ride_get_distance(a_ride);
+    if (by_distance != 0) {
+        return by_distance;
+    }
+    int by_date = date_compare(ride_get_date(b_ride), ride_get_date(a_ride));
+    if (by_date != 0) {
+        return by_date;
+    }
+
+    return ride_get_id(b_ride) - ride_get_id(a_ride);
+}
+
+int compare_ride_by_driver_and_user_account_creation_date(const void *a, const void *b) {
+    Ride *ride_a = *(Ride **) a;
+    Ride *ride_b = *(Ride **) b;
+
+    Date driver_a_account_creation_date = ride_get_driver_account_creation_date(ride_a);
+    Date driver_b_account_creation_date = ride_get_driver_account_creation_date(ride_b);
+
+    int by_account_creation_driver = date_compare(driver_a_account_creation_date, driver_b_account_creation_date);
+    if (by_account_creation_driver != 0) {
+        return by_account_creation_driver;
+    }
+
+    Date user_a_account_creation_date = ride_get_user_account_creation_date(ride_a);
+    Date user_b_account_creation_date = ride_get_user_account_creation_date(ride_b);
+
+    int by_account_creation_user = date_compare(user_a_account_creation_date, user_b_account_creation_date);
+    if (by_account_creation_user != 0) {
+        return by_account_creation_user;
+    }
+
+    return ride_get_id(ride_a) - ride_get_id(ride_b);
+}

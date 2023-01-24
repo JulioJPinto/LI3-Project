@@ -152,3 +152,28 @@ void free_driver(Driver *driver) {
     free(driver->city);
     free(driver);
 }
+
+int compare_drivers_by_score(const void *a, const void *b) {
+    Driver *a_driver = *((Driver **) a);
+    Driver *b_driver = *((Driver **) b);
+
+    int by_activeness = (int) driver_get_account_status(a_driver) - (int) driver_get_account_status(b_driver);
+    if (by_activeness != 0) {
+        return by_activeness;
+    }
+
+    double average_score_a = driver_get_average_score(a_driver);
+    double average_score_b = driver_get_average_score(b_driver);
+
+    int by_score = (average_score_b > average_score_a) - (average_score_b < average_score_a);
+    if (by_score != 0) {
+        return by_score;
+    }
+
+    int by_last_ride = date_compare(driver_get_last_ride_date(b_driver), driver_get_last_ride_date(a_driver));
+    if (by_last_ride != 0) {
+        return by_last_ride;
+    }
+
+    return driver_get_id(a_driver) - driver_get_id(b_driver);
+}

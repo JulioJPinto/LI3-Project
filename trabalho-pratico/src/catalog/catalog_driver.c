@@ -1,10 +1,9 @@
 #include "catalog/catalog_driver.h"
 
-#include "lazy.h"
-#include "catalog/catalog_driver_city_info.h"
-#include "catalog_sort.h"
 #include "benchmark.h"
-#include "terminal_colors.h"
+#include "catalog/catalog_driver_city_info.h"
+#include "lazy.h"
+#include "sort_util.h"
 
 struct CatalogDriver {
     Lazy *lazy_drivers_array;

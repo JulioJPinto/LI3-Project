@@ -1,12 +1,12 @@
 #include "catalog.h"
 
-#include "catalog/catalog_user.h"
 #include "catalog/catalog_driver.h"
 #include "catalog/catalog_ride.h"
+#include "catalog/catalog_user.h"
 
-#include "price_util.h"
-#include "catalog_sort.h"
 #include "benchmark.h"
+#include "price_util.h"
+#include "sort_util.h"
 
 /**
  * Struct that represents a catalog.

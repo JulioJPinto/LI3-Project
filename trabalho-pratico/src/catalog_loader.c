@@ -4,8 +4,6 @@
 #include "parser.h"
 #include "benchmark.h"
 
-#include "terminal_colors.h"
-
 gboolean catalog_load_dataset(Catalog *catalog, const char *dataset_folder_path) {
     FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
     FILE *drivers_file = open_file_folder(dataset_folder_path, "drivers.csv");

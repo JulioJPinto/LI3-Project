@@ -21,8 +21,10 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
     while (fgets(buffer, 1000, queries_file) != NULL) {
         format_fgets_input_line(buffer);
 
+        char *query = g_strdup(buffer);
+
         OutputWriter *writer = create_array_of_strings_output_writer();
-        parse_and_run_query(catalog, writer, buffer);
+        parse_and_run_query(catalog, writer, query);
         GPtrArray *actualResult = get_buffer(writer);
 
         OutputWriter *expectedWriter = create_array_of_strings_output_writer();
@@ -42,7 +44,11 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
             char *actualLine = GET_INDEX_SAFE(actualResult, i, "");
             if (strcmp(expectedLine, actualLine) != 0) {
                 g_test_fail();
-                fprintf(stderr, "Query %d failed:\n", current_query_id);
+
+                format_fgets_input_line(expectedLine);
+                format_fgets_input_line(actualLine);
+
+                fprintf(stderr, "Query %d (%s) failed:\n", current_query_id, query);
                 fprintf(stderr, "Expected: '%s'\n", expectedLine);
                 fprintf(stderr, "Actual: '%s'\n", actualLine);
                 fprintf(stderr, "");
@@ -52,6 +58,7 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
         close_output_writer(writer);
         close_output_writer(expectedWriter);
+        free(query);
         free(expected_query_result_file_path);
         fclose(expected_query_result_file);
     }

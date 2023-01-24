@@ -44,3 +44,18 @@ void free_driver_city_info(DriverCityInfo *driver_city_info) {
 void free_driver_city_info_voidp(void *driver_city_info) {
     free_driver_city_info(driver_city_info);
 }
+
+int compare_driver_city_infos_by_average_score(const void *a_driver_city_info, const void *b_driver_city_info) {
+    DriverCityInfo *a_dci = *(DriverCityInfo **) a_driver_city_info;
+    DriverCityInfo *b_dci = *(DriverCityInfo **) b_driver_city_info;
+
+    double score_a = driver_city_info_get_average_score(a_dci);
+    double score_b = driver_city_info_get_average_score(b_dci);
+
+    int by_score = (score_b > score_a) - (score_b < score_a);
+    if (by_score != 0) {
+        return by_score;
+    }
+
+    return driver_city_info_get_id(b_dci) - driver_city_info_get_id(a_dci);
+}

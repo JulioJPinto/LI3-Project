@@ -1,10 +1,8 @@
 #include "catalog/catalog_driver_city_info.h"
 
-#include "terminal_colors.h"
-
-#include "lazy.h"
-#include "catalog_sort.h"
 #include "benchmark.h"
+#include "lazy.h"
+#include "sort_util.h"
 
 struct CatalogDriverCityInfo {
     Lazy *lazy_driver_city_info_collection_hashtable;

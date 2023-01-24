@@ -1,9 +1,8 @@
 #include "catalog/catalog_user.h"
 
-#include "lazy.h"
-#include "catalog_sort.h"
 #include "benchmark.h"
-#include "terminal_colors.h"
+#include "lazy.h"
+#include "sort_util.h"
 
 struct CatalogUser {
     Lazy *lazy_users_array;
@@ -20,7 +19,7 @@ void glib_wrapper_free_user(gpointer user) {
 void sort_array_by_total_distance(void *users_array) {
     BENCHMARK_START(sort_users_array);
     sort_array(users_array, compare_users_by_total_distance);
-    BENCHMARK_END(sort_users_array, TERMINAL_DARK_GRAY "sort_users_array: %lf seconds\n" TERMINAL_RESET);
+    BENCHMARK_END(sort_users_array, "sort_users_array: %lf seconds\n");
 }
 
 CatalogUser *create_catalog_user(void) {

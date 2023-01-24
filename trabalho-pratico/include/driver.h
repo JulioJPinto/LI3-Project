@@ -101,4 +101,11 @@ double driver_get_total_earned(Driver *driver);
  */
 void driver_register_ride_date(Driver *driver, Date date);
 
+/**
+ * Function that compares drivers by activeness, score, last ride and id.
+ * This function receives gconstpointers to be used as comparison functions.
+ * Used to sort the drivers array for fast resolution of the query 2.
+ */
+int compare_drivers_by_score(const void *a_driver, const void *b_driver);
+
 #endif //LI3_DRIVER_H

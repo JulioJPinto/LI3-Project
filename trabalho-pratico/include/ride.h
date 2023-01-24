@@ -97,4 +97,25 @@ void ride_set_driver_account_creation_date(Ride *ride, Date date);
 
 Date ride_get_driver_account_creation_date(Ride *ride);
 
+/**
+ * Function that compares rides by date.
+ * This function receives const pointers to be used as comparison functions.
+ * Used to sort the rides array for fast resolution of the query 5 and 6.
+ */
+int compare_rides_by_date(const void *a_ride, const void *b_ride);
+
+/**
+ * Function that compares RideDriverAndUserInfos by driver account creation date, user account creation date and then ride id.
+ * This function receives const pointers to be used as comparison functions.
+ * Used to sort the rides array for fast resolution of the query 8.
+ */
+int compare_ride_by_driver_and_user_account_creation_date(const void *a_ride, const void *b_ride);
+
+/**
+ * Function that compares rides by total distance, date, and then id.
+ * This function receives const pointers to be used as comparison functions.
+ * Used to sort the rides array for fast resolution of the query 9.
+ */
+int compare_rides_by_distance(const void *a_ride, const void *b_ride);
+
 #endif //LI3_RIDE_H

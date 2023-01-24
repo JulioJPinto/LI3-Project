@@ -1,10 +1,8 @@
 #include "catalog/catalog_ride.h"
 
-#include "terminal_colors.h"
-
 #include "benchmark.h"
 #include "lazy.h"
-#include "catalog_sort.h"
+#include "sort_util.h"
 
 struct CatalogRide {
     Lazy *lazy_rides_array;
@@ -27,15 +25,15 @@ void sort_rides_array(gpointer rides_array) {
     BENCHMARK_END(sort_rides_array_timer, "sort_rides_array: %lf seconds\n");
 }
 
-void sort_male_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
+void sort_male_rides_by_account_creation_date(gpointer male_rides_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
-    sort_array(rduinfo_array, compare_ride_by_driver_and_user_account_creation_date);
+    sort_array(male_rides_array, compare_ride_by_driver_and_user_account_creation_date);
     BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_male_array: %lf seconds\n");
 }
 
-void sort_female_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
+void sort_female_rides_by_account_creation_date(gpointer female_rides_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
-    sort_array(rduinfo_array, compare_ride_by_driver_and_user_account_creation_date);
+    sort_array(female_rides_array, compare_ride_by_driver_and_user_account_creation_date);
     BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_female_array: %lf seconds\n");
 }
 
@@ -55,8 +53,8 @@ CatalogRide *create_catalog_ride(void) {
     catalog_ride->lazy_rides_array = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_ride), sort_rides_array);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, free_lazy_with_rides_array);
 
-    catalog_ride->lazy_ride_male_array = lazy_of(g_ptr_array_new(), sort_male_rduinfo_by_account_creation_date);
-    catalog_ride->lazy_ride_female_array = lazy_of(g_ptr_array_new(), sort_female_rduinfo_by_account_creation_date);
+    catalog_ride->lazy_ride_male_array = lazy_of(g_ptr_array_new(), sort_male_rides_by_account_creation_date);
+    catalog_ride->lazy_ride_female_array = lazy_of(g_ptr_array_new(), sort_female_rides_by_account_creation_date);
 
     return catalog_ride;
 }

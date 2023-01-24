@@ -108,4 +108,11 @@ void user_register_ride_date(User *user, Date date);
  */
 User *parse_line_user(char *line, char delim);
 
+/**
+ * Function that compares users by activeness, total distance, last ride and username.
+ * This function receives gconstpointers to be used as comparison functions.
+ * Used to sort the users array for fast resolution of the query 3.
+ */
+int compare_users_by_total_distance(const void *a_user, const void *b_user);
+
 #endif //LI3_USER_H
