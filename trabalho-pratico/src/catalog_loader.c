@@ -10,6 +10,7 @@ gboolean catalog_load_dataset(Catalog *catalog, const char *dataset_folder_path)
     FILE *rides_file = open_file_folder(dataset_folder_path, "rides.csv");
 
     if (users_file == NULL || drivers_file == NULL || rides_file == NULL) {
+        fprintf(stdout, "\nTo load a new dataset type reload\n");
         return FALSE;
     }
 

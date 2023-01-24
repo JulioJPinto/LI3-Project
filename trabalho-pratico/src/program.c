@@ -208,39 +208,84 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
 #define page_size 10
 #define cleaner_string "===========\n\n"
 
-
-void delete_line(void) {
-    printf("\x1b[1F");
-    printf("\x1b[2K");
-    fflush(stdout);
-}
-
-void clear_up_until(void) {
-    char line[BUFSIZ];
-    while(fgets(line, BUFSIZ, stdin) != NULL){
-        if(strcmp(line, cleaner_string)) delete_line();
-        else break; 
+void clear_up_until(int number_of_lines) {
+    for(int i = 0; i < number_of_lines; i++) {
+        printf("\x1b[1F");
+        printf("\x1b[2K");
+        fflush(stdout);
     }
-    delete_line();
-    
+
 }
 
-void print_page_number(GPtrArray *array, int page_number, int number_of_pages) {
-    if (page_number <= 0 || page_number > number_of_pages) return;
+void print_page_number(GPtrArray *array, int page_number) {
     int fst_element = page_size * (page_number - 1);
     for (int i = fst_element; i < array->len && i < page_size * page_number; i++) {
         fprintf(stdout, "%s", (char *) g_ptr_array_index(array, i));
     }
 }
 
-int increment_page(int page, int number_of_pages) {
+int help_page_command(int page, int number_of_pages, int number_of_lines);
 
-    return (page < number_of_pages ? page++ : 1);
+int increment_page_command(int page, int number_of_pages, int number_of_lines) {
+    int number_of_lines_per_page = number_of_lines - page * page_size;
+    if(number_of_lines_per_page > 10) number_of_lines = 10;
+    clear_up_until(7 + number_of_lines_per_page);
+    page++;
+    return page > number_of_pages ? 1 : page;
 }
 
-int decrement_page(int page, int number_of_pages) {
+int decrement_page_command(int page, int number_of_pages, int number_of_lines) {
+    int number_of_lines_per_page = number_of_lines - page * page_size;
+    if(number_of_lines_per_page > 10) number_of_lines = 10;
+    clear_up_until(7 + number_of_lines_per_page);
+    page--;
+    return page < 1 ? number_of_pages : page;
+}
 
-    return (page > 0 ? page-- : number_of_pages);
+int clear_page_command(int page, int number_of_pages, int number_of_lines) {
+    (void) page;
+    (void) number_of_pages;
+    (void) number_of_lines;
+
+    system("clear");
+    return 1;
+}
+
+int exit_page_command(int page, int number_of_pages, int number_of_lines) {
+    (void) page;
+    (void) number_of_pages;
+    (void) number_of_lines;
+
+    system("clear");
+    return -1;
+}
+
+typedef struct PageCommand {
+    char *name;
+    char *description;
+    int (*function)(int page, int number_of_pages, int number_of_lines);
+} PageCommand;
+
+
+const PageCommand page_commands[] = {
+    {"help", "Shows the command list for paging", help_page_command},
+    {"next", "Skips to the next page", increment_page_command},
+    {"previous", "Skips to the previous page", decrement_page_command},
+    {"clear", "Clears the page", clear_page_command},
+    {"exit", "Exits to the main menu", exit_page_command},
+};
+
+const int page_commands_size = sizeof(page_commands) / sizeof(PageCommand);
+
+int help_page_command(int page, int number_of_pages, int number_of_lines) {
+    (void) number_of_pages;
+    (void) number_of_lines;
+
+    system("clear");
+    for(int i = 0; i < page_commands_size; i++) {
+        fprintf(stdout, "%s - %s\n", page_commands[i].name, page_commands[i].description);
+    }
+    return page;
 }
 
 void run_paging_output(OutputWriter *writer) {
@@ -256,39 +301,38 @@ void run_paging_output(OutputWriter *writer) {
     fprintf(stdout, "=== Number of pages %d\n\n", number_of_pages);
     int page = 1;
     while (!(!page || page > number_of_pages)) {
-    skip_commands_if:
-        clear_up_until();
-        fprintf(stdout, cleaner_string);
-        print_page_number(array, page, number_of_pages);
+    while_start:
+        print_page_number(array, page);
         if (page <= number_of_pages && number_of_pages != 1) fprintf(stdout, "\n=== Page %d of %d pages \n", page, number_of_pages);
-        char *after = readline("Type Next or Previous to move to the next or previous page\nIf you want a specific page you can also type it\nTo exit or clear just type it out: ");
-        fprintf(stdout, "\n\n");
-        int page_value = atoi(after);
+        char *arg = readline("Type Next or Previous to move to the next or previous page\nIf you want a specific page you can also type it\nTo exit or clear just type it out: \n\n");
+        int page_value = atoi(arg);
+        str_to_lower(arg);
         if (page_value > 0 && page_value <= number_of_pages) {
             page = page_value;
-            goto skip_commands_if; //Since the input was a number we know that we can skip the if for the commands
+            int number_of_lines_per_page = number_of_lines - page * page_size;
+            if(number_of_lines_per_page > 10) number_of_lines = 10;
+            clear_up_until(7 + number_of_lines_per_page);
+            goto while_start; //Since the input was a number we know that we can skip the for loop for the commands
         } else if (page_value) {
             fprintf(stdout, "Invalid page number\n");
             return;
         }
 
-        switch (after[0]) {
-            case 'n':
-                page >= number_of_pages ? page = 1 : page++;
-                break;
-            case 'p':
-                page <= 1 ? page = number_of_pages : page--;
-                break;
-            case 'c':
-                system("clear");
-                break;
-            case 'e':
-                system("clear");
-                return;
-            default:
-                fprintf(stdout, "Invalid Command\n");
-                return;
+        int invalid_command = 0;
+        for (int i = 0; i < page_commands_size; i++) {
+            if (strcmp(page_commands[i].name, arg) == 0) {
+                page = page_commands[i].function(page, number_of_pages, number_of_lines);
+                if(page == -1) return;
+                invalid_command = 1;
+                goto while_start;             
+            }
         }
+
+        if(!invalid_command) {
+            fprintf(stdout, "Invalid command!\n");
+            return;
+        }
+        
     }
 }
 
