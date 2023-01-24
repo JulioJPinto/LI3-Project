@@ -5,15 +5,13 @@
 #include "benchmark.h"
 #include "lazy.h"
 #include "catalog_sort.h"
-#include "ride_driver_and_user_info.h"
 
 struct CatalogRide {
     Lazy *lazy_rides_array;
     GHashTable *rides_in_city_hashtable;
-    GHashTable *rides_by_id_hashtable;
 
-    Lazy *lazy_rduinfo_male_array;
-    Lazy *lazy_rduinfo_female_array;
+    Lazy *lazy_ride_male_array;
+    Lazy *lazy_ride_female_array;
 };
 
 /**
@@ -31,14 +29,14 @@ void sort_rides_array(gpointer rides_array) {
 
 void sort_male_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
-    sort_array(rduinfo_array, compare_rduinfo_by_account_creation_date);
-    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_rduinfo_male_array: %lf seconds\n");
+    sort_array(rduinfo_array, compare_ride_by_driver_and_user_account_creation_date);
+    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_male_array: %lf seconds\n");
 }
 
 void sort_female_rduinfo_by_account_creation_date(gpointer rduinfo_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
-    sort_array(rduinfo_array, compare_rduinfo_by_account_creation_date);
-    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_rduinfo_female_array: %lf seconds\n");
+    sort_array(rduinfo_array, compare_ride_by_driver_and_user_account_creation_date);
+    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_female_array: %lf seconds\n");
 }
 
 void free_rides_array(gpointer array) {
@@ -55,11 +53,10 @@ void free_lazy_with_rides_array(gpointer lazy) {
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
     catalog_ride->lazy_rides_array = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_ride), sort_rides_array);
-    catalog_ride->rides_by_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
     catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, free_lazy_with_rides_array);
 
-    catalog_ride->lazy_rduinfo_male_array = lazy_of(g_ptr_array_new_with_free_func(free_rduinfo), sort_male_rduinfo_by_account_creation_date);
-    catalog_ride->lazy_rduinfo_female_array = lazy_of(g_ptr_array_new_with_free_func(free_rduinfo), sort_female_rduinfo_by_account_creation_date);
+    catalog_ride->lazy_ride_male_array = lazy_of(g_ptr_array_new(), sort_male_rduinfo_by_account_creation_date);
+    catalog_ride->lazy_ride_female_array = lazy_of(g_ptr_array_new(), sort_female_rduinfo_by_account_creation_date);
 
     return catalog_ride;
 }
@@ -67,10 +64,9 @@ CatalogRide *create_catalog_ride(void) {
 void free_catalog_ride(CatalogRide *catalog_ride) {
     free_lazy(catalog_ride->lazy_rides_array, free_rides_array);
     g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
-    g_hash_table_destroy(catalog_ride->rides_by_id_hashtable);
 
-    free_lazy(catalog_ride->lazy_rduinfo_male_array, free_rides_array);
-    free_lazy(catalog_ride->lazy_rduinfo_female_array, free_rides_array);
+    free_lazy(catalog_ride->lazy_ride_male_array, free_rides_array);
+    free_lazy(catalog_ride->lazy_ride_female_array, free_rides_array);
 
     free(catalog_ride);
 }
@@ -98,19 +94,14 @@ static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride
 void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
     g_ptr_array_add(lazy_get_raw_value(catalog_ride->lazy_rides_array), ride);
 
-    g_hash_table_insert(catalog_ride->rides_by_id_hashtable, GINT_TO_POINTER(ride_get_id(ride)), ride);
     catalog_ride_index_city(catalog_ride, ride);
 }
 
-void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride,
-                                               Gender gender,
-                                               RideDriverAndUserInfo *rduinfo) {
-    GPtrArray *rduinfo_array = lazy_get_raw_value(gender == M ? catalog_ride->lazy_rduinfo_male_array : catalog_ride->lazy_rduinfo_female_array);
-    g_ptr_array_add(rduinfo_array, rduinfo);
-}
-
-Ride *catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id) {
-    return g_hash_table_lookup(catalog_ride->rides_by_id_hashtable, GINT_TO_POINTER(ride_id));
+void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride,
+                                            Gender gender,
+                                            Ride *ride) {
+    GPtrArray *ride_same_gender_array = lazy_get_raw_value(gender == M ? catalog_ride->lazy_ride_male_array : catalog_ride->lazy_ride_female_array);
+    g_ptr_array_add(ride_same_gender_array, ride);
 }
 
 gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
@@ -237,20 +228,20 @@ void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalo
 }
 
 int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(CatalogRide *catalog_ride, GPtrArray *result, Gender gender, int min_account_age) {
-    GPtrArray *rduinfo_array = lazy_get_value(gender == M ? catalog_ride->lazy_rduinfo_male_array : catalog_ride->lazy_rduinfo_female_array);
+    GPtrArray *ride_same_gender_array = lazy_get_value(gender == M ? catalog_ride->lazy_ride_male_array : catalog_ride->lazy_ride_female_array);
 
     int i = 0;
-    while (i < (int) rduinfo_array->len) {
-        RideDriverAndUserInfo *rduinfo = g_ptr_array_index(rduinfo_array, i);
+    while (i < (int) ride_same_gender_array->len) {
+        Ride *ride = g_ptr_array_index(ride_same_gender_array, i);
 
-        Date user_account_creation_date = rduinfo_get_user_account_creation_date(rduinfo);
-        Date driver_account_creation_date = rduinfo_get_driver_account_creation_date(rduinfo);
+        Date user_account_creation_date = ride_get_user_account_creation_date(ride);
+        Date driver_account_creation_date = ride_get_driver_account_creation_date(ride);
 
         int user_age = get_age(user_account_creation_date);
         int driver_age = get_age(driver_account_creation_date);
 
         if (user_age >= min_account_age && driver_age >= min_account_age) {
-            g_ptr_array_add(result, rduinfo);
+            g_ptr_array_add(result, ride);
         }
 
         if (driver_age < min_account_age) {
@@ -277,6 +268,6 @@ void catalog_ride_force_eager_indexing(CatalogRide *catalog_ride) {
         lazy_apply_function(value);
     }
 
-    lazy_apply_function(catalog_ride->lazy_rduinfo_male_array);
-    lazy_apply_function(catalog_ride->lazy_rduinfo_female_array);
+    lazy_apply_function(catalog_ride->lazy_ride_male_array);
+    lazy_apply_function(catalog_ride->lazy_ride_female_array);
 }

@@ -89,4 +89,12 @@ void ride_set_price(Ride *ride, double price);
  */
 double ride_get_price(Ride *ride);
 
+void ride_set_user_account_creation_date(Ride *ride, Date date);
+
+Date ride_get_user_account_creation_date(Ride *ride);
+
+void ride_set_driver_account_creation_date(Ride *ride, Date date);
+
+Date ride_get_driver_account_creation_date(Ride *ride);
+
 #endif //LI3_RIDE_H

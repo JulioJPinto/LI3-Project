@@ -5,7 +5,6 @@
 #include <glib.h>
 
 #include "ride.h"
-#include "ride_driver_and_user_info.h"
 
 typedef struct CatalogRide CatalogRide;
 
@@ -15,7 +14,7 @@ void free_catalog_ride(CatalogRide *catalog_ride);
 
 void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride);
 
-void catalog_ride_register_rduinfo_same_gender(CatalogRide *catalog_ride, Gender gender, RideDriverAndUserInfo *rduinfo);
+void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride, Gender gender, Ride *ride);
 
 Ride *catalog_ride_get_ride(CatalogRide *catalog_ride, int ride_id);
 

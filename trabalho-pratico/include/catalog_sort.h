@@ -43,7 +43,7 @@ int compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b)
  * This function receives gconstpointers to be used as comparison functions.
  * Used to sort the rides array for fast resolution of the query 8.
  */
-int compare_rduinfo_by_account_creation_date(gconstpointer a, gconstpointer b);
+int compare_ride_by_driver_and_user_account_creation_date(gconstpointer a, gconstpointer b);
 
 /**
  * Function that compares rides by total distance, date, and then id.

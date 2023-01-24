@@ -104,11 +104,10 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
             Date user_account_creation_date = user_get_account_creation_date(user);
             Date driver_account_creation_date = driver_get_account_creation_date(driver);
 
-            RideDriverAndUserInfo *ride_driver_and_user_info = create_rduinfo(ride_id,
-                                                                              user_account_creation_date,
-                                                                              driver_account_creation_date);
+            ride_set_user_account_creation_date(ride, user_account_creation_date);
+            ride_set_driver_account_creation_date(ride, driver_account_creation_date);
 
-            catalog_ride_register_rduinfo_same_gender(catalog->catalog_ride, user_gender, ride_driver_and_user_info);
+            catalog_ride_register_ride_same_gender(catalog->catalog_ride, user_gender, ride);
         }
     }
 }
@@ -123,10 +122,6 @@ User *catalog_get_user(Catalog *catalog, char *username) {
 
 Driver *catalog_get_driver(Catalog *catalog, int id) {
     return catalog_driver_get_driver(catalog->catalog_driver, id);
-}
-
-Ride *catalog_get_ride(Catalog *catalog, int id) {
-    return catalog_ride_get_ride(catalog->catalog_ride, id);
 }
 
 gboolean catalog_city_exists(Catalog *catalog, char *city) {

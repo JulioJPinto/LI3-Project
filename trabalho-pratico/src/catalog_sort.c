@@ -1,6 +1,5 @@
 #include "catalog_sort.h"
 #include "catalog.h"
-#include "ride_driver_and_user_info.h"
 
 void sort_array(GPtrArray *array, GCompareFunc compare_func) {
     qsort(array->pdata, array->len, sizeof(gpointer), compare_func);
@@ -165,25 +164,25 @@ int compare_driver_city_infos_by_average_score(gconstpointer a, gconstpointer b)
     return driver_city_info_get_id(b_driver) - driver_city_info_get_id(a_driver);
 }
 
-int compare_rduinfo_by_account_creation_date(gconstpointer a, gconstpointer b) {
-    RideDriverAndUserInfo *rdui_a = *(RideDriverAndUserInfo **) a;
-    RideDriverAndUserInfo *rdui_b = *(RideDriverAndUserInfo **) b;
+int compare_ride_by_driver_and_user_account_creation_date(gconstpointer a, gconstpointer b) {
+    Ride *ride_a = *(Ride **) a;
+    Ride *ride_b = *(Ride **) b;
 
-    Date driver_a_account_creation_date = rduinfo_get_driver_account_creation_date(rdui_a);
-    Date driver_b_account_creation_date = rduinfo_get_driver_account_creation_date(rdui_b);
+    Date driver_a_account_creation_date = ride_get_driver_account_creation_date(ride_a);
+    Date driver_b_account_creation_date = ride_get_driver_account_creation_date(ride_b);
 
     int by_account_creation_driver = date_compare(driver_a_account_creation_date, driver_b_account_creation_date);
     if (by_account_creation_driver != 0) {
         return by_account_creation_driver;
     }
 
-    Date user_a_account_creation_date = rduinfo_get_user_account_creation_date(rdui_a);
-    Date user_b_account_creation_date = rduinfo_get_user_account_creation_date(rdui_b);
+    Date user_a_account_creation_date = ride_get_user_account_creation_date(ride_a);
+    Date user_b_account_creation_date = ride_get_user_account_creation_date(ride_b);
 
     int by_account_creation_user = date_compare(user_a_account_creation_date, user_b_account_creation_date);
     if (by_account_creation_user != 0) {
         return by_account_creation_user;
     }
 
-    return rduinfo_get_ride_id(rdui_a) - rduinfo_get_ride_id(rdui_b);
+    return ride_get_id(ride_a) - ride_get_id(ride_b);
 }

@@ -259,11 +259,7 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
     query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(catalog, result, gender, min_account_age);
 
     for (size_t i = 0; i < result->len; i++) {
-        RideDriverAndUserInfo *rduinfo = g_ptr_array_index(result, i);
-
-        int ride_id = rduinfo_get_ride_id(rduinfo);
-
-        Ride *ride = catalog_get_ride(catalog, ride_id);
+        Ride *ride = g_ptr_array_index(result, i);
 
         int driver_id = ride_get_driver_id(ride);
         Driver *driver = catalog_get_driver(catalog, driver_id);

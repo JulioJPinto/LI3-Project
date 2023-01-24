@@ -8,7 +8,6 @@
 #include "ride.h"
 #include "user.h"
 #include "driver_city_info.h"
-#include "ride_driver_and_user_info.h"
 
 /**
  * Struct that represents a catalog.
@@ -51,13 +50,6 @@ void parse_and_register_ride(void *catalog, char *line, char separator);
  * This function must be called before any query.
  */
 void catalog_force_eager_indexing(Catalog *catalog);
-
-/**
- * Returns a pointer to the Ride with the given id.
- * Returns NULL if the ride is not registered in the catalog.
- * The returned pointer is not a copy and must not be freed.
- */
-Ride *catalog_get_ride(Catalog *catalog, int id);
 
 /**
  * Returns a pointer to the user already registered with the given username.

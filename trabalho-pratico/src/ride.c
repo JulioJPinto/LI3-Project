@@ -21,6 +21,8 @@ struct Ride {
 
     // Query specific
     double price;
+    Date user_account_creation_date;
+    Date driver_account_creation_date;
 };
 
 Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
@@ -136,4 +138,20 @@ void ride_set_price(Ride *ride, double price) {
 
 double ride_get_price(Ride *ride) {
     return ride->price;
+}
+
+void ride_set_user_account_creation_date(Ride *ride, Date date) {
+    ride->user_account_creation_date = date;
+}
+
+Date ride_get_user_account_creation_date(Ride *ride) {
+    return ride->user_account_creation_date;
+}
+
+void ride_set_driver_account_creation_date(Ride *ride, Date date) {
+    ride->driver_account_creation_date = date;
+}
+
+Date ride_get_driver_account_creation_date(Ride *ride) {
+    return ride->driver_account_creation_date;
 }
