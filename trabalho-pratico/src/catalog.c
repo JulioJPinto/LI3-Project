@@ -99,8 +99,6 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
         Gender user_gender = user_get_gender(user);
         Gender driver_gender = driver_get_gender(driver);
         if (user_gender == driver_gender) {
-            int ride_id = ride_get_id(ride);
-
             Date user_account_creation_date = user_get_account_creation_date(user);
             Date driver_account_creation_date = driver_get_account_creation_date(driver);
 

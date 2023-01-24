@@ -24,7 +24,7 @@ int driver_city_info_get_id(DriverCityInfo *driver_city_info) {
 }
 
 char *driver_city_info_get_name(DriverCityInfo *driver_city_info) {
-    return driver_city_info->name;
+    return g_strdup(driver_city_info->name);
 }
 
 void driver_city_info_register_ride_score(DriverCityInfo *driver_city_info, int score) {
