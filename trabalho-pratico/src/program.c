@@ -128,7 +128,7 @@ void program_ask_for_dataset_path(Program *program) {
 
         if (IS_EMPTY(input)) {
             free(input);
-            input = strdup("datasets/data-regular");
+            input = g_strdup("datasets/data-regular");
         }
 
         loaded = program_load_dataset(program, input);
