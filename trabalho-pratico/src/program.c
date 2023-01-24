@@ -13,6 +13,16 @@
 #include "string_util.h"
 #include "terminal_pager.h"
 
+#define RED_BOLD "\033[1;31m"
+#define RED "\033[0;31m"
+#define YELLOW_BOLD "\033[1;33m"
+#define YELLOW "\033[0;33m"
+#define GREEN_BOLD "\033[1;32m"
+#define GREEN "\033[0;32m"
+#define BLUE "\033[0;34m"
+#define BLUE_BOLD "\033[1;34m"
+#define STANDARD "\033[0;37m"
+
 typedef enum ProgramState {
     PROGRAM_STATE_RUNNING,
     PROGRAM_STATE_EXITING,
@@ -46,14 +56,14 @@ gboolean program_should_exit(Program *program) {
 
 void program_run_queries_from_file_command(Program *program, char **args, int arg_size) {
     if (arg_size < 2) {
-        log_warning("Use 'file <file_path>'\n");
+        log_warning(RED_BOLD "Use 'file <file_path>'\n");
         return;
     }
 
     char *input_file_path = args[1];
 
     if (!program_run_queries_from_file(program, input_file_path)) {
-        log_warning("Failed to run queries from file '%s'\n", input_file_path);
+        log_warning(RED_BOLD "Failed to run queries from file '%s'\n", input_file_path);
     }
 }
 
@@ -97,11 +107,11 @@ void program_run_help_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
 
-    log_info("Available commands:\n");
-    log_info("  <query_id> <query> - Runs a query\n");
+    log_info(YELLOW_BOLD "Available commands:\n");
+    log_info(YELLOW_BOLD "  <query_id> <query>" STANDARD "- Runs a query\n");
 
     for (int i = 0; i < program_commands_size; i++) {
-        log_info("  %s - %s\n", program_commands[i].name, program_commands[i].description);
+        log_info(YELLOW_BOLD "  %s" STANDARD "- %s\n", program_commands[i].name, program_commands[i].description);
     }
 }
 
@@ -151,12 +161,12 @@ void execute_command(Program *program, char *input) {
     if (isdigit(args[0][0])) {
         program_run_query(program, input);
     } else {
-        log_warning("Invalid command '%s'\n", args[0]);
+        log_warning(RED_BOLD "Invalid command '%s'\n" STANDARD, args[0]);
     }
 }
 
 void program_ask_for_commands(Program *program) {
-    char *input = readline("> ");
+    char *input = readline(GREEN_BOLD "GRUPO-3 # " STANDARD);
 
     execute_command(program, input);
 
@@ -262,7 +272,7 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
     program->mode = INTERACTIVE_MODE;
 
     g_timer_stop(input_file_execution_timer);
-    BENCHMARK_LOG("%d queries from %s executed in %f seconds\n", program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
+    BENCHMARK_LOG( "%d queries from %s:" BLUE_BOLD " Executed in %f seconds\n" STANDARD, program->current_query_id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
     program->current_query_id = aux_id;
 
     fclose(input_file);

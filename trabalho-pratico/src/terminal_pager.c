@@ -1,8 +1,14 @@
 #include <math.h>
-#include <printf.h>
+#include <stdio.h>
 #include <readline/readline.h>
 #include "terminal_pager.h"
 #include "struct_util.h"
+
+#define YELLOW_BOLD "\033[1;33m"
+#define YELLOW "\033[0;33m"
+#define STANDARD "\033[0;37m"
+#define TERMINAL_GRAY "\x1b[38;5;8m"
+#define TERMINAL_RESET "\x1b[0m"
 
 void clear_terminal_lines(int number_of_lines) {
     for (int i = 0; i < number_of_lines; i++) {
@@ -11,9 +17,6 @@ void clear_terminal_lines(int number_of_lines) {
         fflush(stdout);
     }
 }
-
-#define TERMINAL_GRAY "\x1b[38;5;8m"
-#define TERMINAL_RESET "\x1b[0m"
 
 int string_length_of_number(int number) {
     int length = 0;
@@ -47,7 +50,7 @@ void paginate(GPtrArray *lines) {
     int continue_paging = TRUE;
     while (continue_paging) {
         int number_of_lines_printed = print_page_content(lines, currentPage);
-        printf("\nPage %d of %d\n", currentPage, totalPages);
+        printf(YELLOW_BOLD "\nPage %d of %d\n" STANDARD, currentPage, totalPages);
         char *input = readline("Go to page ('n', 'p', 'q', 'number'): ");
 
         int parse_error = 0;

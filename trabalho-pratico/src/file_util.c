@@ -11,6 +11,10 @@
 
 #define OUTPUT_FOLDER "Resultados"
 
+#define RED_BOLD "\033[1;31m"
+#define RED "\033[0;31m"
+#define STANDARD "\033[0;37m"
+
 FILE *open_file_folder(const char *const folder_path, const char *const file_name) {
     gchar *string = g_build_path(PATH_SEPARATOR, folder_path, file_name, NULL);
     FILE *file = open_file(string);
@@ -23,7 +27,7 @@ FILE *open_file_folder(const char *const folder_path, const char *const file_nam
 FILE *open_file(const char *const file_name) {
     FILE *file = fopen(file_name, "r");
     if (file == NULL) {
-        log_warning("Could not open file %s\n", file_name);
+        log_warning( RED_BOLD "Could not open file %s\n" STANDARD, file_name);
     }
 
     return file;

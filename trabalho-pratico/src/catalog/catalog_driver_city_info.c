@@ -26,6 +26,9 @@ typedef struct {
     GHashTable *driver_city_info_hashtable;
 } DriverCityInfoCollection;
 
+#define BLUE "\033[0;34m"
+#define STANDARD "\033[0;37m"
+
 
 void free_driver_city_info_collection(gpointer value) {
     DriverCityInfoCollection *collection = value;
@@ -47,7 +50,7 @@ void lazy_driver_city_info_collection_hashtable_apply_function(gpointer lazy_val
 
         // Sort the array by average score
         sort_array(collection->driver_city_info_array, compare_driver_city_infos_by_average_score);
-        BENCHMARK_LOG(" - driver_city_info_destroy_and_sort (%s): %lf seconds\n", key, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
+        BENCHMARK_LOG(" - driver_city_info_destroy_and_sort (%s): " BLUE "%lf seconds\n" STANDARD, key, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
     }
 }
 

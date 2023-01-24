@@ -12,6 +12,9 @@ struct CatalogDriver {
     CatalogDriverCityInfo *catalog_driver_city_info;
 };
 
+#define BLUE "\033[0;34m"
+#define STANDARD "\033[0;37m"
+
 /**
  * Function that wraps free driver to be used in GLib g_ptr_array free func.
  */
@@ -22,7 +25,7 @@ void glib_wrapper_free_driver(gpointer driver) {
 void sort_array_by_driver_score(void *drivers_array) {
     BENCHMARK_START(sort_drivers_array);
     sort_array(drivers_array, compare_drivers_by_score);
-    BENCHMARK_END(sort_drivers_array, " - sort_drivers_array: %lf seconds\n");
+    BENCHMARK_END(sort_drivers_array, " - sort_drivers_array: " BLUE "%lf seconds\n" STANDARD);
 }
 
 CatalogDriver *create_catalog_driver(void) {

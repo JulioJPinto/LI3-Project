@@ -9,6 +9,9 @@ struct CatalogUser {
     GHashTable *user_from_username_hashtable;
 };
 
+#define BLUE "\033[0;34m"
+#define STANDARD "\033[0;37m"
+
 /**
  * Function that wraps free user to be used in GLib g_ptr_array free func.
  */
@@ -19,7 +22,7 @@ void glib_wrapper_free_user(gpointer user) {
 void sort_array_by_total_distance(void *users_array) {
     BENCHMARK_START(sort_users_array);
     sort_array(users_array, compare_users_by_total_distance);
-    BENCHMARK_END(sort_users_array, " - sort_users_array: %lf seconds\n");
+    BENCHMARK_END(sort_users_array, " - sort_users_array: " BLUE "%lf seconds\n" STANDARD);
 }
 
 CatalogUser *create_catalog_user(void) {

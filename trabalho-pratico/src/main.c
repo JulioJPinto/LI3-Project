@@ -2,6 +2,8 @@
 #include "program.h"
 #include "program_flags.h"
 
+#define YELLOW_BOLD "\033[1;33m"
+
 /**
  * Main entry point
  */
@@ -34,7 +36,7 @@ int main(int argc, char **argv) {
     g_ptr_array_free(program_args, TRUE);
     free_program_flags(program_flags);
 
-    log_info("Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
+    log_info( YELLOW_BOLD "Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
 
     return result;
 }
