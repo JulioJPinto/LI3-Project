@@ -75,24 +75,20 @@ void sort_array_rides_in_city_array(gpointer rides_array) {
     BENCHMARK_END(sort_rides_array_timer, "sort_rides_in_city_array: %lf seconds\n");
 }
 
-static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride) {
-    char *city = ride_get_city(ride); // Only needs to be freed if the city is already in the hashtable
-
+static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride, char *city) {
     Lazy *rides_in_city = g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city);
     if (rides_in_city == NULL) {
         rides_in_city = lazy_of(g_ptr_array_new(), sort_array_rides_in_city_array);
-        g_hash_table_insert(catalog_ride->rides_in_city_hashtable, city, rides_in_city);
-    } else {
-        free(city);
+        g_hash_table_insert(catalog_ride->rides_in_city_hashtable, g_strdup(city), rides_in_city);
     }
 
     g_ptr_array_add(lazy_get_raw_value(rides_in_city), ride);
 }
 
-void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
+void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, char *city) {
     g_ptr_array_add(lazy_get_raw_value(catalog_ride->lazy_rides_array), ride);
 
-    catalog_ride_index_city(catalog_ride, ride);
+    catalog_ride_index_city(catalog_ride, ride, city);
 }
 
 void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride,

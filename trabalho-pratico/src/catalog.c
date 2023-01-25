@@ -84,7 +84,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     user_add_total_distance(user, ride_get_distance(ride));
     user_register_ride_date(user, ride_get_date(ride));
 
-    catalog_ride_register_ride(catalog->catalog_ride, ride);
+    catalog_ride_register_ride(catalog->catalog_ride, ride, city);
 
     AccountStatus driver_account_status = driver_get_account_status(driver);
     AccountStatus user_account_status = user_get_account_status(user);

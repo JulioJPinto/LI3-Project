@@ -12,7 +12,7 @@ CatalogRide *create_catalog_ride(void);
 
 void free_catalog_ride(CatalogRide *catalog_ride);
 
-void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride);
+void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, char *city);
 
 void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride, Gender gender, Ride *ride);
 
