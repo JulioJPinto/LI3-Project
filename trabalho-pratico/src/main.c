@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     g_ptr_array_free(program_args, TRUE);
     free_program_flags(program_flags);
 
-    log_info("Total runtime:          %lf seconds\n", g_timer_elapsed(global_timer, NULL));
+    log_info("Total runtime:          " TERMINAL_YELLOW_BOLD "%lf seconds\n" TERMINAL_RESET, g_timer_elapsed(global_timer, NULL));
 
     return result;
 }
