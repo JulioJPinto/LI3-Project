@@ -131,6 +131,7 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
     if(!program_run_cat_command(input_file_path, output)) {
         LOG_WARNING_VA("Failed to get file '%s'", input_file_path);
     }
+    close_output_writer(output);
     
 }
 
