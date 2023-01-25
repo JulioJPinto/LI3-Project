@@ -230,10 +230,12 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, Output
     int size = query_7_catalog_get_top_n_drivers_in_city(catalog, n, city, result);
 
     for (int i = 0; i < size; i++) {
-        DriverCityInfo *driver = g_ptr_array_index(result, i);
-        int id = driver_city_info_get_id(driver);
-        char *name = driver_city_info_get_name(driver);
-        double average_score = driver_city_info_get_average_score(driver);
+        DriverCityInfo *driver_city_info = g_ptr_array_index(result, i);
+        int id = driver_city_info_get_id(driver_city_info);
+        Driver *driver = catalog_get_driver(catalog, id);
+
+        char *name = driver_get_name(driver);
+        double average_score = driver_city_info_get_average_score(driver_city_info);
 
         write_output_line(output, "%012d;%s;%.3f\n", id, name, average_score);
         free(name);

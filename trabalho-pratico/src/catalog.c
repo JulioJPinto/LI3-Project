@@ -90,9 +90,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     AccountStatus user_account_status = user_get_account_status(user);
 
     if (driver_account_status == ACTIVE) { // We only need to index for query 7 if the driver is active
-        char *driver_name = driver_get_name(driver);
-        catalog_driver_register_driver_ride(catalog->catalog_driver, driver_id, driver_name, driver_score, city);
-        free(driver_name);
+        catalog_driver_register_driver_ride(catalog->catalog_driver, driver, driver_score, city);
     }
 
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active

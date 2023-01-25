@@ -68,7 +68,7 @@ void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_in
     free(catalog_driver_city_info);
 }
 
-void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city) {
+void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, int driver_score, char *ride_city) {
     GHashTable *driver_city_info_collection_hashtable = lazy_get_raw_value(catalog->lazy_driver_city_info_collection_hashtable);
     DriverCityInfoCollection *driver_city_collection = g_hash_table_lookup(driver_city_info_collection_hashtable, ride_city);
 
@@ -86,7 +86,7 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
 
     if (target == NULL) { // driver is not yet registered in city
     register_driver_city_info:
-        target = create_driver_city_info(driver_id, driver_name);
+        target = create_driver_city_info(driver_id);
 
         g_ptr_array_add(driver_city_collection->driver_city_info_array, target);
         g_hash_table_insert(driver_city_collection->driver_city_info_hashtable, GINT_TO_POINTER(driver_id), target);

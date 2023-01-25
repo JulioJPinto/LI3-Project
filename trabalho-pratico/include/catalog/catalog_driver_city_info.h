@@ -12,7 +12,7 @@ CatalogDriverCityInfo *create_catalog_driver_city_info(void);
 
 void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_info);
 
-void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, char *driver_name, int driver_score, char *ride_city);
+void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, int driver_score, char *ride_city);
 
 void catalog_driver_city_info_force_eager_indexing(CatalogDriverCityInfo *catalog);
 
