@@ -31,10 +31,22 @@
     
     \section{Desenvolvimento}
     O projeto 
-    \subsection{Alterações perante a 1ª fase do projeto}
+    \subsection{Alterações realizadas}
         \subsubsection{Ajustes apontados pelos docentes}
-            TODO: dizer que dividimos os catálogos em 3. e falar 
-            do porque de nao aplicarmos multithreading
+            Após a apresentação da primeira fase do trabalho foram levantados
+            alguns pontos por parte dos docentes. Primeiramente foi levantada
+            a questão quanto à maneira como o Catálogo, \emph{Catalog}, estava
+            estruturado. Originalmente tinhamos os Arrays e Hashtables das estruturas
+            todos juntos, porém foi levantado o ponto que de tal maneira poderiamos
+            estar a quebrar encapsulamento. Assim sendo, decidimos tornar o \emph{Catalog}
+            num struct de catálogos de cada estrutura de dados, catálogos estes opacos
+            ao \emph{Catalog} (será abordado mais abaixo).\\Para além disso, fomos 
+            informados pelos professores que não fazia sentido aplicarmos multithreading, \emph{pthreads}, 
+            visto que a maneira como o trabalho será testado não permitirá a realização de ações
+            em paralelo, isto pois os programas são testado somente numa thread. 
+            Por último, foi nos também aconselhado por um dos professores a transfêrencia
+            de uma estrutura de dados que tinhamos para informações relativamente às rides
+            para a estrutura de dados das rides (será abordado mais abaixo).
 
         \subsubsection{Ajustes de fator escala (Dataset maior)}
             Da forma como tínhamos o projeto implementado, quando 
@@ -67,12 +79,34 @@
         \subsubsection{Catalógo}
             TODO
         \subsubsection{\emph{Lazys}}
-            TODO
+            De maneira a tornar o programa mais efeciente decidimos aplicar 
+            \emph{lazy loading}. Originalmente, na primeira fase do projeto,
+            quando os dados eram \emph{parsed} para o programa limitavamo-nos a 
+            fazer o \emph{sort} destes imediatamente, \emph{eager loading}, porém devido
+            à implementação do modo interativo e visto que o \emph{sort} dos dados é relativamente rápido
+            decidimos então só dar \emph{sort} a estes quando são necessários pela primeira vez.
+            Como é que esta estrutura ,opaca, \emph{Lazy} funciona. Nela temos um
+            value, value este que pode ser qualquer valor que bem entendermos, uma função a aplicar a este
+            value, por exemplo uma função de \emph{sort} ou uma função de \emph{free}, e por último
+            um booleano, este que define se a função guardada na struct já foi previamente utilizada ou
+            não. Através desta estrutura impedimos desperdícios de tempo, que acontecem utilizando \emph{eager
+            loading}, garantindo que desta maneira não realizamos \emph{sort} de dados desnecessários.
         \subsubsection{\emph{Program}}
-            TODO
+            Visto que o nosso modo interativo decidimos fazer um \emph{Command Line Enviorment} tivemos a necessidade de criar a struct \emph{program}. Nesta struct guardamos os diversos estados e modos
+            que o programa está a ser corrido. Tal como todas as flags passadas a este, o Catálogo geral, o valor
+            da query que estamos a passar e um booleano que dita se devemos sair do programa. Desta maneira também conseguimos controlar se corremos o trabalho em \emph{batch mode} ou no modo interativo, assim garantindo que conseguimos realizá-lo de ambas as maneiras.
     \subsection{Modo Interativo}
+            Como sugerido por alguns professores, ao invés de utilizarmos \emph{ncurses} ou outra biblioteca externa de maneira a fazer uma TUI (Terminal User Interface), após diversa discussão decidimos avançar com um modo interativo no estilo de um \emph{Command Line Enviorment}. Para isso usamos bibliotecas como a \emph{readline/readline} e \emph{readline/history}. 
+        \subsubsection{Lista de Comandos}
+            No modo interativo utilizamos diferentes comandos para a realização das necessidades do utilizador.
+            Primeiramente temos um comando help, que lista todos os comandos possíveis do programa. O utilizador de maneira a correr as queries pode chamar um ficheiro, usando o comando \emph{file}, como também pode as escrever diretamente na linha de comando. Enquanto que ao chamar o file, dará output para novos ficheiros, ao escrever diretamente na linha de comando o resultado será exposto no terminal.
+            Para além destes comandos ainda temos o comando \emph{reload} que permite ao utilizador inserir um novo \emph{dataset}, caso este mude durante a utilização do programa ou caso o utlizado pretenda utilizar um \emph{dataset} diferente sem ter que sair do programa e também temos o comando \emph{clear}, que tal como o nome indica, limpa o terminal. Por último temos o comando \emph{exit} de maneira a sair do programa.
         \subsubsection{Histórico de Comandos}
+            Através da utilização da biblioteca \emph{readline/history} decidimos também implementar um histórico de comandos. Desta maneira caso o utilizador necessite de reutilizar um comando anteriror
+            não precisa de se preocupar, visto que os comandos previamente introduzidos são guardados em memória.
         \subsubsection{Paginação}
+            Como em certas queries (Ex: Query 2 e 3) existe a possibilidade de termos um output muito grande de linhas, tal como pedido no enunciado, implementamos um sistema de paginação para essas situações.
+            No nosso sistema de paginação conseguimos percorrer o \emph{output} de duas maneiras diferentes. Conseguimos percorrer este página a página, avançando ou retrocedendo de página, como também conseguimos simplesmente dizer a página que pretendemos e esta será impressa no terminal. De ambas as maneiras a página anterior será apagada do terminal.
     \subsection{Testes Unitários}
         \subsubsection{Actions do Github}
     \subsection{\emph{CSV Generator}}
