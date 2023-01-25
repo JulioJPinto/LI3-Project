@@ -12,7 +12,7 @@ struct Driver {
     Date birthdate;
     Gender gender;
     CarClass car_class;
-    char *license_plate;
+    // char *license_plate;
     char *city;
     Date account_creation_date;
     AccountStatus account_status;
@@ -32,7 +32,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->birthdate = birth_date;
     driver->gender = gender;
     driver->car_class = car_class;
-    driver->license_plate = g_strdup(license_plate);
+    (void) license_plate; // driver->license_plate = g_strdup(license_plate);
     driver->city = g_strdup(city);
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
@@ -148,7 +148,7 @@ void driver_register_ride_date(Driver *driver, Date date) {
 
 void free_driver(Driver *driver) {
     free(driver->name);
-    free(driver->license_plate);
+    // free(driver->license_plate);
     free(driver->city);
     free(driver);
 }
