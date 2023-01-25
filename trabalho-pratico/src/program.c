@@ -57,6 +57,27 @@ void program_run_queries_from_file_command(Program *program, char **args, int ar
     }
 }
 
+void print_output(GPtrArray *output_lines);
+
+gboolean program_run_cat_command(char *input_file_path, OutputWriter *output_file) {
+    FILE *input_file = open_file(input_file_path);
+    if(input_file == NULL) {
+        return FALSE;
+    }
+
+    char line_buffer[65536];
+
+    for(int i = 0; fgets(line_buffer, 65536, input_file) != NULL; i++) {
+        write_output_line(output_file, line_buffer);
+    }
+
+    print_output(get_buffer(output_file));
+
+    fclose(input_file);
+
+    return TRUE;
+}
+
 void program_run_help_command(Program *program, char **args, int arg_size);
 
 void program_exit_command(Program *program, char **args, int arg_size) {
@@ -83,12 +104,45 @@ void program_clear_command(Program *program, char **args, int arg_size) {
     (void) r;
 }
 
+void program_list_output_command(Program *program, char **args, int arg_size) {
+    (void) args;
+    (void) arg_size;
+    (void) program;
+
+    system("ls Resultados/");
+}
+
+void program_cat_files_command(Program *program, char **args, int arg_size) {
+    (void) program;
+
+    if(arg_size < 2) {
+        LOG_WARNING("Use 'cat <file_path>'");
+        return;
+    }
+
+    char *input_file_path =  args[1];
+
+    if(!strncmp("Resultados/", input_file_path, 12) || !strncmp("input", input_file_path, 6)) {
+        LOG_WARNING("File not able to open");
+        return;
+    }
+
+    OutputWriter *output = create_array_of_strings_output_writer();
+    if(!program_run_cat_command(input_file_path, output)) {
+        LOG_WARNING_VA("Failed to get file '%s'", input_file_path);
+    }
+    
+}
+
 const ProgramCommand program_commands[] = {
-        {"file", "Runs all the queries from a file", program_run_queries_from_file_command},
+        {"cat-files", "Prints the output from a result or input file", program_cat_files_command},
         {"clear", "Cleans everything in the terminal", program_clear_command},
-        {"reload", "Reloads the program", program_reload_command},
-        {"help", "Shows this help message", program_run_help_command},
         {"exit", "Exits the program", program_exit_command},
+        {"file", "Runs all the queries from a file", program_run_queries_from_file_command},
+        {"help", "Shows this help message", program_run_help_command},
+        {"list-output", "Shows the output files available", program_list_output_command},
+        {"reload", "Reloads the program", program_reload_command},
+        
 };
 
 const int program_commands_size = sizeof(program_commands) / sizeof(ProgramCommand);
