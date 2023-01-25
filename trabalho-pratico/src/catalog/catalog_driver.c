@@ -53,8 +53,8 @@ void catalog_driver_register_driver(CatalogDriver *catalog_driver, Driver *drive
     g_hash_table_insert(catalog_driver->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
 }
 
-void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, int driver_id, char *driver_name, int driver_score, char *city) {
-    catalog_driver_city_info_register(catalog_driver->catalog_driver_city_info, driver_id, driver_name, driver_score, city);
+void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, Driver *driver, int driver_score, char *city) {
+    catalog_driver_city_info_register(catalog_driver->catalog_driver_city_info, driver_get_id(driver), driver_score, city);
 }
 
 Driver *catalog_driver_get_driver(CatalogDriver *catalog_driver, int driver_id) {
