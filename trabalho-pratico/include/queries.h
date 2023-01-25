@@ -12,7 +12,7 @@
  * OutputWriter*: The output stream to write the result to.
  * char**: The arguments (split by spaces) to the query.
  */
-typedef void (*QueryFunction)(Catalog *, OutputWriter *, char **);
+typedef void (QueryFunction)(Catalog *, OutputWriter *, char **);
 
 /**
  * Executes the query number 1.

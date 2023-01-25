@@ -79,7 +79,8 @@ void program_clear_command(Program *program, char **args, int arg_size) {
     (void) arg_size;
     (void) program;
 
-    system("clear");
+    int r = system("clear");
+    (void) r;
 }
 
 const ProgramCommand program_commands[] = {

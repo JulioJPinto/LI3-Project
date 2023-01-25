@@ -1,5 +1,7 @@
 #include "queries.h"
 
+#include "logger.h"
+
 #define UNUSED(x) (void) (x)
 
 /**
@@ -95,7 +97,7 @@ void execute_query_top_n_drivers(Catalog *catalog, OutputWriter *output, char **
     int error = 0;
     int n = parse_int_safe(args[0], &error);
     if (error) {
-        write_output_debug(output, "Couldn't parse number of size of top drivers '%s'\n", args[0]);
+        LOG_WARNING_VA("Couldn't parse number of size of top drivers '%s'", args[0]);
         return;
     }
 
@@ -126,7 +128,7 @@ void execute_query_longest_n_total_distance(Catalog *catalog, OutputWriter *outp
     int n = parse_int_safe(args[0], &error);
 
     if (error) {
-        write_output_debug(output, "Couldn't parse number of size of top users '%s'\n", args[0]);
+        LOG_WARNING_VA("Couldn't parse number of size of top users '%s'\n", args[0]);
         return;
     }
 
@@ -176,6 +178,16 @@ void execute_query_average_price_in_date_range(Catalog *catalog, OutputWriter *o
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
 
+    if (!is_date_valid(start_date)) {
+        LOG_WARNING_VA("Couldn't parse start date '%s'. Use XX/XX/XXXX format.", start_date_string);
+        return;
+    }
+
+    if (!is_date_valid(end_date)) {
+        LOG_WARNING_VA("Couldn't parse end date '%s'. Use XX/XX/XXXX format.", end_date_string);
+        return;
+    }
+
     double average_price = query_5_catalog_get_average_price_in_date_range(catalog, start_date, end_date);
 
     if (average_price == -1) {
@@ -192,16 +204,26 @@ void execute_query_average_price_in_date_range(Catalog *catalog, OutputWriter *o
 void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, OutputWriter *output, char **args) {
     char *city = args[0];
 
-    if (!catalog_city_exists(catalog, city)) {
-        write_output_debug(output, "City %s not found\n", city);
-        return;
-    }
-
     char *start_date_string = args[1];
     char *end_date_string = args[2];
 
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
+
+    if (!is_date_valid(start_date)) {
+        LOG_WARNING_VA("Couldn't parse start date '%s'. Use XX/XX/XXXX format.", start_date_string);
+        return;
+    }
+
+    if (!is_date_valid(end_date)) {
+        LOG_WARNING_VA("Couldn't parse end date '%s'. Use XX/XX/XXXX format.", end_date_string);
+        return;
+    }
+
+    if (!catalog_city_exists(catalog, city)) {
+        write_output_debug(output, "City %s not found\n", city);
+        return;
+    }
 
     double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
 
@@ -220,7 +242,7 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, Output
     int error = 0;
     int n = parse_int_safe(args[0], &error);
     if (error) {
-        write_output_debug(output, "Couldn't parse number of drivers in city '%s'\n", args[0]);
+        LOG_WARNING_VA("Couldn't parse number of drivers in city '%s'", args[0]);
         return;
     }
 
@@ -254,7 +276,7 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
     int error = 0;
     int min_account_age = parse_int_safe(args[1], &error);
     if (error) {
-        write_output_debug(output, "Couldn't parse number of minimum age '%s'\n", args[1]);
+        LOG_WARNING_VA("Couldn't parse number of minimum age '%s'", args[1]);
         return;
     }
 
@@ -291,6 +313,16 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
 
     Date start_date = parse_date(start_date_string);
     Date end_date = parse_date(end_date_string);
+
+    if (is_date_valid(start_date) == FALSE) {
+        LOG_WARNING_VA("Couldn't parse start date '%s'. Use XX/XX/XXXX format.", start_date_string);
+        return;
+    }
+
+    if (is_date_valid(end_date) == FALSE) {
+        LOG_WARNING_VA("Couldn't parse end date '%s'. Use XX/XX/XXXX format.", end_date_string);
+        return;
+    }
 
     GPtrArray *result = g_ptr_array_new();
     query_9_catalog_get_passengers_that_gave_tip_in_date_range(catalog, result, start_date, end_date);
