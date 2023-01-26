@@ -1,10 +1,10 @@
-#include <math.h>
-#include <stdio.h>
-#include <readline/readline.h>
-#include "terminal_pager.h"
-#include "terminal_colors.h"
+#include "terminal_controller.h"
 
 #include "struct_util.h"
+#include "terminal_colors.h"
+#include <math.h>
+#include <readline/readline.h>
+#include <stdio.h>
 
 void clear_terminal_lines(int number_of_lines) {
     for (int i = 0; i < number_of_lines; i++) {
@@ -37,6 +37,15 @@ int print_page_content(GPtrArray *lines, int page) {
     return end - start;
 }
 
+void print_content(GPtrArray *lines) {
+    if (lines->len <= PAGER_LINES) {
+        print_page_content(lines, 1);
+        return;
+    }
+
+    paginate(lines);
+}
+
 void paginate(GPtrArray *lines) {
     if (lines == NULL || lines->len <= 0) return;
 
@@ -64,7 +73,7 @@ void paginate(GPtrArray *lines) {
 
         free(input);
 
-        clear_terminal_lines(3); // Page number line + Go to page line + Enter from input
+        clear_terminal_lines(3); // Empty line + Page number line + Go to page line
         if (continue_paging) {
             clear_terminal_lines(number_of_lines_printed); // Only delete output lines if user continues paging
         }

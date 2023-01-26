@@ -4,6 +4,17 @@
 
 #include <stdio.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
+#define OUTPUT_FOLDER "Resultados"
+
+#define OUTPUT_FILE_NAME "command%d_output.txt"
+#define OUTPUT_FILE_NAME_S "command%s_output.txt"
+
 /**
  * Opens a file in a given folder path and the file name.
  * If the file does not exist, the program exits with an error message.

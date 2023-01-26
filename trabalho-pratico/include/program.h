@@ -10,6 +10,15 @@
 
 typedef struct Program Program;
 
+typedef enum ProgramState {
+    PROGRAM_STATE_RUNNING,
+    PROGRAM_STATE_EXITING,
+} ProgramState;
+
+void program_set_state(Program *program, ProgramState state);
+
+void program_set_should_exit(Program *program, gboolean should_exit);
+
 gboolean program_should_exit(Program *program);
 
 Program *create_program(ProgramFlags *flags);
@@ -19,8 +28,6 @@ void free_program(Program *program);
 int start_program(Program *program, GPtrArray *program_args);
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path);
-
-void program_run_query(Program *program, char *query);
 
 gboolean program_run_queries_from_file(Program *program, char *input_file_path);
 
