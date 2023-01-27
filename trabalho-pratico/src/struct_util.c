@@ -4,6 +4,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <glib.h>
+
 #include "string_util.h"
 
 const Date invalid_date = {.encoded_date = 0};
@@ -11,10 +13,14 @@ static const int reference_date_day = 9;
 static const int reference_date_month = 10;
 static const int reference_date_year = 2022;
 
+int is_digit(char c) {
+    return c >= '0' && c <= '9';
+}
+
 int parse_int_safe(char *string, int *error) {
     int val = 0;
     while (*string) {
-        if (!isdigit(*string)) {
+        if (G_UNLIKELY(!is_digit(*string))) {
             *error = 1;
             return 0;
         }
@@ -32,12 +38,33 @@ inline int parse_int_unsafe(char *string) {
 }
 
 double parse_double_safe(char *string, int *error) {
-    char *end;
-    double result = strtod(string, &end);
-    if (*end != '\0') {
-        *error = 1;
+    int integer_part = 0;
+    double decimal_part = 0;
+
+    while (*string) {
+        if (*string == '.') {
+            string++;
+            break;
+        }
+        if (G_UNLIKELY(!is_digit(*string))) {
+            *error = 1;
+            return 0;
+        }
+        integer_part = integer_part * 10 + (*string++ - '0');
     }
-    return result;
+
+    double current_decimal_part_divider = 10;
+
+    while (*string) {
+        if (G_UNLIKELY(!is_digit(*string))) {
+            *error = 1;
+            return 0;
+        }
+        decimal_part += (*string++ - '0') / current_decimal_part_divider;
+        current_decimal_part_divider *= 10;
+    }
+
+    return integer_part + decimal_part;
 }
 
 int is_date_valid(Date date) {
