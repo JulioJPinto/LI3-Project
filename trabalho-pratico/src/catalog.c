@@ -15,6 +15,9 @@ struct Catalog {
     CatalogUser *catalog_user;
     CatalogDriver *catalog_driver;
     CatalogRide *catalog_ride;
+
+    GPtrArray *id_map_city_array;
+    GHashTable *city_map_id_hashtable;
 };
 
 Catalog *create_catalog(void) {
@@ -24,6 +27,9 @@ Catalog *create_catalog(void) {
     catalog->catalog_driver = create_catalog_driver();
     catalog->catalog_ride = create_catalog_ride();
 
+    catalog->id_map_city_array = g_ptr_array_new();                                              //Int to String(City)
+    catalog->city_map_id_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL); //String(City) to int
+
     return catalog;
 }
 
@@ -32,7 +38,37 @@ void free_catalog(Catalog *catalog) {
     free_catalog_driver(catalog->catalog_driver);
     free_catalog_ride(catalog->catalog_ride);
 
+    g_ptr_array_free(catalog->id_map_city_array);
+    g_hash_table_destroy(catalog->city_map_id_hashtable);
     free(catalog);
+}
+
+void map_id_for_city(Catalog *catalog, char *city) {
+    g_ptr_array_add(catalog->id_map_city_array, city);
+}
+
+void map_city_for_id(Catalog *catalog, int city_id, char *city) {
+    g_hash_table_insert(catalog->city_map_id_hashtable, city, GUINT_TO_POINTER(city_id));
+}
+
+char *turn_id_to_city(Catalog *catalog, int city_id) {
+    return (char *) g_ptr_array_index(catalog->id_map_city_array, city_id);
+}
+
+int turn_city_to_id(Catalog *catalog, char *city) {
+    if (g_hash_table_lookup(catalog->city_map_id_hashtable, city)) return (int) g_hash_table_lookup(catalog->city_map_id_hashtable, city);
+
+    g_ptr_array_add(catalog->id_map_city_array, city);
+    int city_id = 0;
+    for (int i = 0; i < catalog->id_map_city_array->len; i++) {
+        char *city_indexed = g_ptr_array_index(catalog->id_map_city_array, i);
+        if (!strcmp(city_indexed, city)) {
+            map_city_for_id(catalog, i, city);
+            return i;
+        }
+    }
+
+    return 0;
 }
 
 static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {

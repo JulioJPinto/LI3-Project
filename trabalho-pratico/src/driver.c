@@ -13,7 +13,7 @@ struct Driver {
     Gender gender;
     CarClass car_class;
     // char *license_plate;
-    char *city;
+    int city_id;
     Date account_creation_date;
     AccountStatus account_status;
 
@@ -25,7 +25,7 @@ struct Driver {
 };
 
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
-                      char *city, Date account_creation_date, AccountStatus account_status) {
+                      int city_id, Date account_creation_date, AccountStatus account_status) {
     Driver *driver = malloc(sizeof(Driver));
     driver->id = id;
     driver->name = g_strdup(name);
@@ -33,7 +33,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->gender = gender;
     driver->car_class = car_class;
     (void) license_plate; // driver->license_plate = g_strdup(license_plate);
-    driver->city = g_strdup(city);
+    driver->city_id = city_id;
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
 
@@ -70,6 +70,7 @@ Driver *parse_line_driver(char *line, char delim) {
     if (IS_EMPTY(license_plate)) return NULL;
 
     char *city = next_token(&line, delim);
+    int city_id;
     if (IS_EMPTY(city)) return NULL;
 
     char *creation_date_string = next_token(&line, delim);
@@ -81,7 +82,7 @@ Driver *parse_line_driver(char *line, char delim) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
-    return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
+    return create_driver(id, name, date, gender, car_class, license_plate, city_id, creation_date, acc_status);
 }
 
 int driver_get_id(Driver *driver) {
@@ -149,7 +150,6 @@ void driver_register_ride_date(Driver *driver, Date date) {
 void free_driver(Driver *driver) {
     free(driver->name);
     // free(driver->license_plate);
-    free(driver->city);
     free(driver);
 }
 

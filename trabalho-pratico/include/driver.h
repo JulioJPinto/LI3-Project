@@ -13,7 +13,7 @@ typedef struct Driver Driver;
  * Creates a new Driver.
  */
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
-                      char *city, Date account_creation_date, AccountStatus account_status);
+                      int city_id, Date account_creation_date, AccountStatus account_status);
 
 /**
  + Parses a line of the CSV to a driver   

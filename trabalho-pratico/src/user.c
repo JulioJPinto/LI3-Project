@@ -147,7 +147,7 @@ void user_register_ride_date(User *user, Date date) {
     }
 }
 
-int compare_users_by_total_distance(const void* a, const void* b) {
+int compare_users_by_total_distance(const void *a, const void *b) {
     User *a_user = *((User **) a);
     User *b_user = *((User **) b);
 
