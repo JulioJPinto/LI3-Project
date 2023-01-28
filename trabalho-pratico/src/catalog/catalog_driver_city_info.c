@@ -29,11 +29,9 @@ typedef struct {
 
 void free_driver_city_info_collection(gpointer value) {
     DriverCityInfoCollection *collection = value;
-    g_ptr_array_free(collection->driver_city_info_array, TRUE);
+    if(value) g_ptr_array_free(collection->driver_city_info_array, TRUE);
     free(collection);
 }
-
-
 
 void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) {
     GPtrArray *driver_city_info_array = lazy_get_value(lazy_value);
@@ -50,7 +48,8 @@ void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) 
 CatalogDriverCityInfo *create_catalog_driver_city_info(void) {
     CatalogDriverCityInfo *catalog_driver_city_info = malloc(sizeof(CatalogDriverCityInfo));
     catalog_driver_city_info->lazy_driver_city_info_collection_array =
-            lazy_of(g_ptr_array_new(), lazy_driver_city_info_collection_array_apply_function);
+            lazy_of(g_ptr_array_new_null_terminated(sizeof(DriverCityInfoCollection),free_driver_city_info_collection, TRUE),
+                     lazy_driver_city_info_collection_array_apply_function);
     return catalog_driver_city_info;
 }
 
@@ -65,13 +64,15 @@ void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_in
 
 void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, int driver_score, int city_id) {
     GPtrArray *driver_city_info_collection_array = lazy_get_raw_value(catalog->lazy_driver_city_info_collection_array);
-    DriverCityInfoCollection *driver_city_collection = g_ptr_array_index(driver_city_info_collection_array, city_id - 1);
+    DriverCityInfoCollection *driver_city_collection = g_ptr_array_index(driver_city_info_collection_array, city_id);
 
     DriverCityInfo *target;
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
         driver_city_collection = malloc(sizeof(DriverCityInfoCollection));
         driver_city_collection->driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
+
+        g_ptr_array_set_size(driver_city_info_collection_array, city_id + 1);
 
         g_ptr_array_insert(driver_city_info_collection_array, city_id, driver_city_collection);
         goto register_driver_city_info; // We can skip the lookup because we know it's not in the hashtable
