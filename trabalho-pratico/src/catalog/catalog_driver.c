@@ -7,7 +7,7 @@
 
 struct CatalogDriver {
     Lazy *lazy_drivers_array;
-    GHashTable *driver_from_id_hashtable;
+    GPtrArray *driver_from_id_array; // Index is driver id, value is driver pointer
 
     CatalogDriverCityInfo *catalog_driver_city_info;
 };
@@ -29,7 +29,7 @@ CatalogDriver *create_catalog_driver(void) {
     CatalogDriver *catalog_driver = malloc(sizeof(CatalogDriver));
     GPtrArray *drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
     catalog_driver->lazy_drivers_array = lazy_of(drivers_array, sort_array_by_driver_score);
-    catalog_driver->driver_from_id_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
+    catalog_driver->driver_from_id_array = g_ptr_array_new();
 
     catalog_driver->catalog_driver_city_info = create_catalog_driver_city_info();
     return catalog_driver;
@@ -41,7 +41,7 @@ void free_g_ptr_array(gpointer array) {
 
 void free_catalog_driver(CatalogDriver *catalog_driver) {
     free_lazy(catalog_driver->lazy_drivers_array, free_g_ptr_array);
-    g_hash_table_destroy(catalog_driver->driver_from_id_hashtable);
+    g_ptr_array_free(catalog_driver->driver_from_id_array, TRUE);
     free_catalog_driver_city_info(catalog_driver->catalog_driver_city_info);
     free(catalog_driver);
 }
@@ -50,7 +50,7 @@ void catalog_driver_register_driver(CatalogDriver *catalog_driver, Driver *drive
     GPtrArray *drivers_array = lazy_get_raw_value(catalog_driver->lazy_drivers_array);
     g_ptr_array_add(drivers_array, driver);
 
-    g_hash_table_insert(catalog_driver->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
+    g_ptr_array_set_at_index_safe(catalog_driver->driver_from_id_array, driver_get_id(driver), driver);
 }
 
 void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, Driver *driver, int driver_score, int city_id) {
@@ -58,7 +58,7 @@ void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, Driver *
 }
 
 Driver *catalog_driver_get_driver(CatalogDriver *catalog_driver, int driver_id) {
-    return g_hash_table_lookup(catalog_driver->driver_from_id_hashtable, GINT_TO_POINTER(driver_id));
+    return g_ptr_array_get_at_index_safe(catalog_driver->driver_from_id_array, driver_id);
 }
 
 int catalog_driver_get_top_n_drivers_with_best_score(CatalogDriver *catalog_driver, int n, GPtrArray *result) {
