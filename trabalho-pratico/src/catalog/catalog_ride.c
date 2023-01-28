@@ -1,12 +1,12 @@
 #include "catalog/catalog_ride.h"
 
+#include "array_util.h"
 #include "benchmark.h"
 #include "lazy.h"
-#include "sort_util.h"
 
 struct CatalogRide {
     Lazy *lazy_rides_array;
-    GHashTable *rides_in_city_hashtable;
+    GPtrArray *array_of_rides_in_city_array;
 
     Lazy *lazy_ride_male_array;
     Lazy *lazy_ride_female_array;
@@ -45,13 +45,16 @@ void free_rides_array(gpointer array) {
  * Function that wraps free array to be used in GLib g_hash_table free func.
  */
 void free_lazy_with_rides_array(gpointer lazy) {
+    // Lazy can be NULL if the city has no rides registered.
+    if (lazy == NULL) return;
+
     free_lazy(lazy, free_rides_array);
 }
 
 CatalogRide *create_catalog_ride(void) {
     CatalogRide *catalog_ride = malloc(sizeof(CatalogRide));
     catalog_ride->lazy_rides_array = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_ride), sort_rides_array);
-    catalog_ride->rides_in_city_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, free_lazy_with_rides_array);
+    catalog_ride->array_of_rides_in_city_array = g_ptr_array_new_with_free_func(free_lazy_with_rides_array);
 
     catalog_ride->lazy_ride_male_array = lazy_of(g_ptr_array_new(), sort_male_rides_by_account_creation_date);
     catalog_ride->lazy_ride_female_array = lazy_of(g_ptr_array_new(), sort_female_rides_by_account_creation_date);
@@ -61,7 +64,7 @@ CatalogRide *create_catalog_ride(void) {
 
 void free_catalog_ride(CatalogRide *catalog_ride) {
     free_lazy(catalog_ride->lazy_rides_array, free_rides_array);
-    g_hash_table_destroy(catalog_ride->rides_in_city_hashtable);
+    g_ptr_array_free(catalog_ride->array_of_rides_in_city_array, TRUE);
 
     free_lazy(catalog_ride->lazy_ride_male_array, free_rides_array);
     free_lazy(catalog_ride->lazy_ride_female_array, free_rides_array);
@@ -75,20 +78,25 @@ void sort_array_rides_in_city_array(gpointer rides_array) {
     BENCHMARK_END(sort_rides_array_timer, "sort_rides_in_city_array: %lf seconds\n");
 }
 
-static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride, char *city) {
-    Lazy *rides_in_city = g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city);
+Lazy *catalog_ride_get_rides_in_city(CatalogRide *catalog_ride, int city_id) {
+    return g_ptr_array_get_at_index_safe(catalog_ride->array_of_rides_in_city_array, city_id);
+}
+
+static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride, int city_id) {
+    Lazy *rides_in_city = catalog_ride_get_rides_in_city(catalog_ride, city_id);
     if (rides_in_city == NULL) {
         rides_in_city = lazy_of(g_ptr_array_new(), sort_array_rides_in_city_array);
-        g_hash_table_insert(catalog_ride->rides_in_city_hashtable, g_strdup(city), rides_in_city);
+
+        g_ptr_array_set_at_index_safe(catalog_ride->array_of_rides_in_city_array, city_id, rides_in_city);
     }
 
     g_ptr_array_add(lazy_get_raw_value(rides_in_city), ride);
 }
 
-void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, char *city) {
+void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, int city_id) {
     g_ptr_array_add(lazy_get_raw_value(catalog_ride->lazy_rides_array), ride);
 
-    catalog_ride_index_city(catalog_ride, ride, city);
+    catalog_ride_index_city(catalog_ride, ride, city_id);
 }
 
 void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride,
@@ -98,12 +106,8 @@ void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride,
     g_ptr_array_add(ride_same_gender_array, ride);
 }
 
-gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city) {
-    return g_hash_table_contains(catalog_ride->rides_in_city_hashtable, city);
-}
-
-double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, char *city) {
-    GPtrArray *rides_in_city = lazy_get_value(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
+double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, int city_id) {
+    GPtrArray *rides_in_city = lazy_get_value(catalog_ride_get_rides_in_city(catalog_ride, city_id));
     if (rides_in_city == NULL) return 0;
 
     double price_sum = 0;
@@ -169,8 +173,8 @@ double catalog_ride_get_average_distance_in_date_range(CatalogRide *catalog_ride
     return rides_count != 0 ? price_sum / rides_count : -1;
 }
 
-double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, char *city) {
-    GPtrArray *rides_in_city = lazy_get_value(g_hash_table_lookup(catalog_ride->rides_in_city_hashtable, city));
+double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, int city_id) {
+    GPtrArray *rides_in_city = lazy_get_value(catalog_ride_get_rides_in_city(catalog_ride, city_id));
     if (rides_in_city == NULL) return 0;
 
     long current_value_index = ride_array_find_date_lower_bound(rides_in_city, start_date);
@@ -251,15 +255,12 @@ int catalog_ride_get_rides_with_user_and_driver_with_same_age_above_acc_age(Cata
 void catalog_ride_force_eager_indexing(CatalogRide *catalog_ride) {
     lazy_apply_function(catalog_ride->lazy_rides_array);
 
-    // Sort each rides array in the rides_in_city_hashtable by date for queries that requires date range in a city
+    // Sort each rides array in the array_of_rides_in_city_array by date for queries that requires date range in a city
 
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init(&iter, catalog_ride->rides_in_city_hashtable);
-
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        BENCHMARK_LOG("(%s) ", key);
-        lazy_apply_function(value);
+    for (int i = 0; i < (int) catalog_ride->array_of_rides_in_city_array->len; ++i) {
+        BENCHMARK_LOG("(%d) ", i);
+        gpointer lazy = catalog_ride->array_of_rides_in_city_array->pdata[i];
+        if (lazy != NULL) lazy_apply_function(lazy);
     }
 
     lazy_apply_function(catalog_ride->lazy_ride_male_array);

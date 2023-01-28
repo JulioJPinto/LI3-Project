@@ -12,7 +12,7 @@ typedef struct Ride Ride;
 /**
  * Creates a new Ride.
  */
-Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip);
+Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip);
 
 /**
  * Parses a line of the CSV to a ride
@@ -25,6 +25,8 @@ Ride *parse_line_ride(char *line, char delim);
  * to avoid having to strdup them again when registering the ride in the catalog
  */
 Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char **parsed_user_username);
+
+void ride_set_city_id(Ride *ride, int city_id);
 
 /**
  * Returns the driver id of the ride
@@ -75,7 +77,7 @@ void free_ride(Ride *ride);
 /**
  * Returns the city of the Ride.
  */
-char *ride_get_city(Ride *ride);
+int ride_get_city_id(Ride *ride);
 
 /**
  * Sets the price of the ride

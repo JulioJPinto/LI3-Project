@@ -13,7 +13,7 @@ struct Driver {
     Gender gender;
     CarClass car_class;
     // char *license_plate;
-    char *city;
+    int city_id;
     Date account_creation_date;
     AccountStatus account_status;
 
@@ -24,8 +24,8 @@ struct Driver {
     Date last_ride_date;
 };
 
-Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
-                      char *city, Date account_creation_date, AccountStatus account_status) {
+Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, const char *license_plate,
+                      Date account_creation_date, AccountStatus account_status) {
     Driver *driver = malloc(sizeof(Driver));
     driver->id = id;
     driver->name = g_strdup(name);
@@ -33,7 +33,6 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->gender = gender;
     driver->car_class = car_class;
     (void) license_plate; // driver->license_plate = g_strdup(license_plate);
-    driver->city = g_strdup(city);
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
 
@@ -46,6 +45,10 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 }
 
 Driver *parse_line_driver(char *line, char delim) {
+    return parse_line_driver_detailed(line, delim, NULL);
+}
+
+Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
     char *id_string = next_token(&line, delim);
     if (IS_EMPTY(id_string)) return NULL;
 
@@ -81,7 +84,13 @@ Driver *parse_line_driver(char *line, char delim) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
-    return create_driver(id, name, date, gender, car_class, license_plate, city, creation_date, acc_status);
+    if (parsed_city) *parsed_city = city;
+
+    return create_driver(id, name, date, gender, car_class, license_plate, creation_date, acc_status);
+}
+
+void driver_set_city_id(Driver *driver, int city_id) {
+    driver->city_id = city_id;
 }
 
 int driver_get_id(Driver *driver) {
@@ -90,6 +99,10 @@ int driver_get_id(Driver *driver) {
 
 char *driver_get_name(Driver *driver) {
     return g_strdup(driver->name);
+}
+
+int driver_get_city_id(Driver *driver) {
+    return driver->city_id;
 }
 
 Date driver_get_birthdate(Driver *driver) {
@@ -149,7 +162,6 @@ void driver_register_ride_date(Driver *driver, Date date) {
 void free_driver(Driver *driver) {
     free(driver->name);
     // free(driver->license_plate);
-    free(driver->city);
     free(driver);
 }
 

@@ -6,9 +6,9 @@
 #include "logger.h"
 
 typedef struct {
-    QueryFunction* function;
+    QueryFunction *function;
     int min_args;
-    char* usage;
+    char *usage;
 } QueryFunctionInfo;
 
 static const QueryFunctionInfo query_functions[] = {
@@ -53,6 +53,6 @@ void run_query(Catalog *catalog, OutputWriter *output, int query_id, char **args
         LOG_WARNING_VA("Usage: '%s'", query_function_info.usage);
         return;
     }
-    
+
     query_function_info.function(catalog, output, args);
 }

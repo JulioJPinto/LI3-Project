@@ -24,6 +24,12 @@ Catalog *create_catalog(void);
  */
 void free_catalog(Catalog *catalog);
 
+char *catalog_get_city_name(Catalog *catalog, int city_id);
+
+int catalog_get_city_id(Catalog *catalog, char *city);
+
+int catalog_get_or_register_city_id(Catalog *catalog, char *city);
+
 /**
  * Registers a user in the catalog.
  * Receives a catalog as void pointer to be used as a generic function.
@@ -86,15 +92,9 @@ int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPt
 int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, int n, GPtrArray *result);
 
 /**
- * Returns true if the city is registered in the catalog.
- * False otherwise.
- */
-gboolean catalog_city_exists(Catalog *catalog, char *city);
-
-/**
  * Returns the average price of rides in the given city.
  */
-double query_4_catalog_get_average_price_in_city(Catalog *catalog, char *city);
+double query_4_catalog_get_average_price_in_city(Catalog *catalog, int city_id);
 
 /**
  * Returns the average price of rides between the given dates.
@@ -108,9 +108,9 @@ double query_5_catalog_get_average_price_in_date_range(Catalog *catalog, Date st
  * If there are no rides in the city between the given dates, returns -1.
  * `catalog_force_eager_indexing(Catalog*)` should be called before calling this function.
  */
-double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city);
+double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, int city_id);
 
-int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result);
+int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, int city_id, GPtrArray *result);
 
 int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age);
 

@@ -3,8 +3,8 @@
 #include "struct_util.h"
 #include "terminal_colors.h"
 #include <math.h>
-#include <readline/readline.h>
 #include <stdio.h>
+#include <readline/readline.h>
 
 void clear_terminal_lines(int number_of_lines) {
     for (int i = 0; i < number_of_lines; i++) {

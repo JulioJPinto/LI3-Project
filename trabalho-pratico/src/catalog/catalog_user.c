@@ -2,7 +2,7 @@
 
 #include "benchmark.h"
 #include "lazy.h"
-#include "sort_util.h"
+#include "array_util.h"
 
 struct CatalogUser {
     Lazy *lazy_users_array;

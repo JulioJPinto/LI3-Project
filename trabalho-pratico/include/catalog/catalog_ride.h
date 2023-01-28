@@ -12,17 +12,15 @@ CatalogRide *create_catalog_ride(void);
 
 void free_catalog_ride(CatalogRide *catalog_ride);
 
-void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, char *city);
+void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, int city_id);
 
 void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride, Gender gender, Ride *ride);
 
-gboolean catalog_ride_city_has_rides(CatalogRide *catalog_ride, char *city);
-
-double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, char *city);
+double catalog_ride_get_average_price_in_city(CatalogRide *catalog_ride, int city_id);
 
 double catalog_ride_get_average_distance_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date);
 
-double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, char *city);
+double catalog_ride_get_average_distance_in_city_and_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, int city_id);
 
 void catalog_ride_get_passengers_that_gave_tip_in_date_range(CatalogRide *catalog_ride, Date start_date, Date end_date, GPtrArray *result);
 
