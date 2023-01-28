@@ -45,29 +45,30 @@ void free_catalog(Catalog *catalog) {
 }
 
 void map_id_for_city(Catalog *catalog, char *city) {
-    g_ptr_array_add(catalog->id_map_city_array, city);
+    g_ptr_array_add(catalog->id_map_city_array, city); //Maps a string to and ID by inserting it in the array
 }
 
 void map_city_for_id(Catalog *catalog, int city_id, char *city) {
-    g_hash_table_insert(catalog->city_map_id_hashtable, g_strdup(city), GUINT_TO_POINTER(city_id));
+    g_hash_table_insert(catalog->city_map_id_hashtable, g_strdup(city), GUINT_TO_POINTER(city_id)); //Maps an ID to a string (hash key) 
+                                                                                                    //by inserting it in the hashtable
 }
 
 
-char *turn_id_to_city(Catalog *catalog, int city_id) {
-    return (char *) g_ptr_array_index(catalog->id_map_city_array, city_id);
+char *transform_id_to_city(Catalog *catalog, int city_id) {
+    return (char *) g_ptr_array_index(catalog->id_map_city_array, city_id); 
 }
 
-int turn_city_to_id(Catalog *catalog, char *city) {
+int transform_city_to_id(Catalog *catalog, char *city) {
     if (!city) return -1;
-    if (g_hash_table_lookup(catalog->city_map_id_hashtable, city)) return (int) g_hash_table_lookup(catalog->city_map_id_hashtable, city);
-
-    g_ptr_array_add(catalog->id_map_city_array, city);
-    int city_id = 0;
+    if (g_hash_table_lookup(catalog->city_map_id_hashtable, city)) return (int) g_hash_table_lookup(catalog->city_map_id_hashtable, city);  //Checks if the city is in the hashtable
+                                                                                                                                            //If so it returns the id stored in it
+    g_ptr_array_add(catalog->id_map_city_array, city);                          //If the city is not in the hashtable it will add
+    int city_id = 0;                                                            //it to the array
     for (int i = 0; i < catalog->id_map_city_array->len; i++) {
-        char *city_indexed = g_ptr_array_index(catalog->id_map_city_array, i);
-        if (!strcmp(city_indexed, city)) {
-            map_city_for_id(catalog, i, city);
-            return i;
+        char *city_indexed = g_ptr_array_index(catalog->id_map_city_array, i);  //the loop goes through the array until it finds the city
+        if (!strcmp(city_indexed, city)) {                                      //Even though the complexety its O(N) it shouldnt affect much of 
+            map_city_for_id(catalog, i, city);                                  // the process.
+            return i;                                                           // Once it finds the city it will map it to the id
         }
     }
 

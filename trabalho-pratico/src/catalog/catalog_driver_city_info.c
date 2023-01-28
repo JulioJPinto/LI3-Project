@@ -48,9 +48,9 @@ void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) 
 CatalogDriverCityInfo *create_catalog_driver_city_info(void) {
     CatalogDriverCityInfo *catalog_driver_city_info = malloc(sizeof(CatalogDriverCityInfo));
     catalog_driver_city_info->lazy_driver_city_info_collection_array =
-            lazy_of(g_ptr_array_new_null_terminated(sizeof(DriverCityInfoCollection),free_driver_city_info_collection, TRUE),
-                     lazy_driver_city_info_collection_array_apply_function);
-    return catalog_driver_city_info;
+            lazy_of(g_ptr_array_new_null_terminated(sizeof(DriverCityInfoCollection),free_driver_city_info_collection, TRUE),   //We initialize the array with null terminated
+                     lazy_driver_city_info_collection_array_apply_function);                                                    // so that once we make the register it will return NULL if not found
+    return catalog_driver_city_info;                                                                                            // or isnt initialized in the array
 }
 
 void free_gpt_array(gpointer value) {
@@ -72,7 +72,7 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
         driver_city_collection->driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
-        g_ptr_array_set_size(driver_city_info_collection_array, city_id + 1);
+        g_ptr_array_set_size(driver_city_info_collection_array, city_id + 1);   //Set size city_id +1 since its not resizing the array ¯\_(ツ)_/¯
 
         g_ptr_array_insert(driver_city_info_collection_array, city_id, driver_city_collection);
         goto register_driver_city_info; // We can skip the lookup because we know it's not in the hashtable

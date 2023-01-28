@@ -87,7 +87,7 @@ Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
-    if (parsed_city) *parsed_city = city;
+    if (parsed_city) *parsed_city = city; //Stores city value if detailed
 
     return create_driver(id, name, date, gender, car_class, license_plate, city_id, creation_date, acc_status);
 }
