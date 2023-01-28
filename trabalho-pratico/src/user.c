@@ -9,18 +9,16 @@
 struct User {
     char *username;
     char *name;
-    Gender gender;
+    double total_spent;
     Date birthdate;
     Date account_create_date;
-    PaymentMethod payment_method;
-    AccountStatus account_status;
-
-    // query specific
+    Date most_recent_ride;
     int rides_amount;
     int accumulated_score;
-    double total_spent;
     int total_distance;
-    Date most_recent_ride;
+    Gender gender;
+    PaymentMethod payment_method;
+    AccountStatus account_status;
 };
 
 User *create_user(char *username, char *name, Gender gender, Date birthdate, Date acc_creation, PaymentMethod pay_method, AccountStatus acc_status) {

@@ -8,21 +8,18 @@
  * Struct that represents a ride.
  */
 struct Ride {
-    int id;
-    Date date;
-    int driver_id;
     char *user_username;
+    double price;
+    double tip;
+    Date date;
+    Date user_account_creation_date;
+    Date driver_account_creation_date;
+    int id;
+    int driver_id;
     int city_id;
     int distance;
     int score_user;
     int score_driver;
-    double tip;
-    // GString comment;
-
-    // Query specific
-    double price;
-    Date user_account_creation_date;
-    Date driver_account_creation_date;
 };
 
 Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip) {

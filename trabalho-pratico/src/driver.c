@@ -7,21 +7,19 @@
  * Struct that represents a driver.
  */
 struct Driver {
-    int id;
     char *name;
-    Date birthdate;
-    Gender gender;
-    CarClass car_class;
     // char *license_plate;
-    int city_id;
+    double total_earned;
+    Date birthdate;
+    Date last_ride_date;
     Date account_creation_date;
-    AccountStatus account_status;
-
-    // query specific
+    int id;
+    int city_id;
     int rides_amount;
     int accumulated_score;
-    double total_earned;
-    Date last_ride_date;
+    AccountStatus account_status;
+    Gender gender;
+    CarClass car_class;
 };
 
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, const char *license_plate,
