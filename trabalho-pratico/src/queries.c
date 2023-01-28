@@ -332,7 +332,8 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
         int id = ride_get_id(ride);
         Date date = ride_get_date(ride);
         int distance = ride_get_distance(ride);
-        char *city = ride_get_city(ride);
+        int city_id = ride_get_city_id(ride);
+        char *city = turn_id_to_city(catalog, city_id);
         double tip = ride_get_tip(ride);
 
         int day = date_get_day(date);
@@ -340,7 +341,6 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
         int year = date_get_year(date);
 
         write_output_line(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
-        free(city);
     }
 
     g_ptr_array_free(result, TRUE);

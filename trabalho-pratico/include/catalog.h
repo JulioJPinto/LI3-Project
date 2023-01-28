@@ -24,6 +24,10 @@ Catalog *create_catalog(void);
  */
 void free_catalog(Catalog *catalog);
 
+char *turn_id_to_city(Catalog *catalog, int city_id);
+
+int turn_city_to_id(Catalog *catalog, char *city);
+
 /**
  * Registers a user in the catalog.
  * Receives a catalog as void pointer to be used as a generic function.

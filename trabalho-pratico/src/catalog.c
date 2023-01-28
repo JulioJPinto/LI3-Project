@@ -1,5 +1,5 @@
 #include "catalog.h"
-
+#include <stdio.h>
 #include "catalog/catalog_driver.h"
 #include "catalog/catalog_ride.h"
 #include "catalog/catalog_user.h"
@@ -38,8 +38,9 @@ void free_catalog(Catalog *catalog) {
     free_catalog_driver(catalog->catalog_driver);
     free_catalog_ride(catalog->catalog_ride);
 
-    g_ptr_array_free(catalog->id_map_city_array);
+    g_ptr_array_free(catalog->id_map_city_array, TRUE);
     g_hash_table_destroy(catalog->city_map_id_hashtable);
+
     free(catalog);
 }
 
@@ -48,14 +49,16 @@ void map_id_for_city(Catalog *catalog, char *city) {
 }
 
 void map_city_for_id(Catalog *catalog, int city_id, char *city) {
-    g_hash_table_insert(catalog->city_map_id_hashtable, city, GUINT_TO_POINTER(city_id));
+    g_hash_table_insert(catalog->city_map_id_hashtable, g_strdup(city), GUINT_TO_POINTER(city_id));
 }
+
 
 char *turn_id_to_city(Catalog *catalog, int city_id) {
     return (char *) g_ptr_array_index(catalog->id_map_city_array, city_id);
 }
 
 int turn_city_to_id(Catalog *catalog, char *city) {
+    if (!city) return -1;
     if (g_hash_table_lookup(catalog->city_map_id_hashtable, city)) return (int) g_hash_table_lookup(catalog->city_map_id_hashtable, city);
 
     g_ptr_array_add(catalog->id_map_city_array, city);
@@ -68,7 +71,7 @@ int turn_city_to_id(Catalog *catalog, char *city) {
         }
     }
 
-    return 0;
+    return -1;
 }
 
 static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
@@ -83,8 +86,11 @@ void parse_and_register_user(void *catalog, char *line, char separator) {
 }
 
 static inline void internal_parse_and_register_driver(Catalog *catalog, char *line, char separator) {
-    Driver *driver = parse_line_driver(line, separator);
+    char *city;
+    Driver *driver = parse_line_driver_detailed(line, separator, &city);
     if (driver == NULL) return;
+    int city_id = turn_city_to_id(catalog, city);
+    driver_set_city_id(driver, city_id);
 
     catalog_driver_register_driver(catalog->catalog_driver, driver);
 }
@@ -99,6 +105,8 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
 
     Ride *ride = parse_line_ride_detailed(line, separator, &city, &user_username);
     if (ride == NULL) return;
+    int city_id = turn_city_to_id(catalog, city);
+    ride_set_city_id(ride, city_id);
 
     int driver_id = ride_get_driver_id(ride);
     Driver *driver = catalog_get_driver(catalog, driver_id);

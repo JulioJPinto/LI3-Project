@@ -1,5 +1,7 @@
 #include "driver.h"
 
+#include <stdio.h>
+
 #include <glib.h>
 #include "string_util.h"
 
@@ -46,6 +48,10 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 }
 
 Driver *parse_line_driver(char *line, char delim) {
+    parse_line_driver_detailed(line, delim, NULL);
+}
+
+Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
     char *id_string = next_token(&line, delim);
     if (IS_EMPTY(id_string)) return NULL;
 
@@ -70,8 +76,7 @@ Driver *parse_line_driver(char *line, char delim) {
     if (IS_EMPTY(license_plate)) return NULL;
 
     char *city = next_token(&line, delim);
-    int city_id;
-    if (IS_EMPTY(city)) return NULL;
+    int city_id = 0;
 
     char *creation_date_string = next_token(&line, delim);
     Date creation_date = parse_date(creation_date_string);
@@ -82,7 +87,13 @@ Driver *parse_line_driver(char *line, char delim) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
+    if (parsed_city) *parsed_city = city;
+
     return create_driver(id, name, date, gender, car_class, license_plate, city_id, creation_date, acc_status);
+}
+
+void driver_set_city_id(Driver *driver, int city_id) {
+    driver->city_id = city_id;
 }
 
 int driver_get_id(Driver *driver) {
@@ -91,6 +102,10 @@ int driver_get_id(Driver *driver) {
 
 char *driver_get_name(Driver *driver) {
     return g_strdup(driver->name);
+}
+
+int driver_get_city_id(Driver *driver) {
+    return driver->city_id;
 }
 
 Date driver_get_birthdate(Driver *driver) {

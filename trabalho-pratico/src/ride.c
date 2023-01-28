@@ -12,7 +12,7 @@ struct Ride {
     Date date;
     int driver_id;
     char *user_username;
-    char *city;
+    int city_id;
     int distance;
     int score_user;
     int score_driver;
@@ -25,14 +25,14 @@ struct Ride {
     Date driver_account_creation_date;
 };
 
-Ride *create_ride(int id, Date date, int driver_id, char *username, char *city, int distance, int score_user, int score_driver, double tip) {
+Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip) {
     Ride *ride = malloc(sizeof(Ride));
 
     ride->id = id;
     ride->date = date;
     ride->driver_id = driver_id;
     ride->user_username = g_strdup(username);
-    ride->city = g_strdup(city);
+    ride->city_id = city_id;
     ride->distance = distance;
     ride->score_user = score_user;
     ride->score_driver = score_driver;
@@ -63,6 +63,7 @@ Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char 
 
     char *city = next_token(&line, delim);
     if (IS_EMPTY(city)) return NULL;
+    int city_id = 0;
 
     int error = 0;
 
@@ -87,13 +88,16 @@ Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char 
     if (parsed_city) *parsed_city = city;
     if (parsed_user_username) *parsed_user_username = user;
 
-    return create_ride(id, date, driver_id, user, city, distance, user_score, driver_score, tip);
+    return create_ride(id, date, driver_id, user, city_id, distance, user_score, driver_score, tip);
 }
 
 void free_ride(Ride *ride) {
     free(ride->user_username);
-    free(ride->city);
     free(ride);
+}
+
+void ride_set_city_id(Ride *ride, int city_id) {
+    ride->city_id = city_id;
 }
 
 int ride_get_driver_id(Ride *ride) {
@@ -128,8 +132,8 @@ double ride_get_tip(Ride *ride) {
     return ride->tip;
 }
 
-char *ride_get_city(Ride *ride) {
-    return g_strdup(ride->city);
+int ride_get_city_id(Ride *ride) {
+    return ride->city_id;
 }
 
 void ride_set_price(Ride *ride, double price) {
