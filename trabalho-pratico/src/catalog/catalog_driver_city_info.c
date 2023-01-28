@@ -5,9 +5,9 @@
 #include "sort_util.h"
 
 struct CatalogDriverCityInfo {
-    Lazy *lazy_driver_city_info_collection_hashtable;
-    // Lazy of GHashTable<key: city (char*), value: DriverCityInfoCollection>
-    //GHashTable <City, Struct<GHashTable<driver_id, DriverCityInfo>, GPtrArray<DriverCityInfo>>
+    Lazy *lazy_driver_city_info_collection_array;
+    //Lazy of GPtrArray<value: GDriverCityInfoCollection>
+    //each index represents a
 };
 
 typedef struct {
@@ -33,44 +33,39 @@ void free_driver_city_info_collection(gpointer value) {
     free(collection);
 }
 
-void lazy_driver_city_info_collection_hashtable_apply_function(gpointer lazy_value) {
-    GHashTableIter iter;
-    gpointer key, value;
 
-    g_hash_table_iter_init(&iter, lazy_value);
-    BENCHMARK_START(driver_city_info_destroy_and_sort);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        g_timer_start(driver_city_info_destroy_and_sort);
-        DriverCityInfoCollection *collection = value;
-        // We don't need the hashtable anymore, so we can free it
+
+void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) {
+    GPtrArray *driver_city_info_array = lazy_get_value(lazy_value);
+
+    for(guint i = 0; i < driver_city_info_array->len; i++) {
+        DriverCityInfoCollection *collection = g_ptr_array_index(driver_city_info_array, i);
         g_hash_table_destroy(collection->driver_city_info_hashtable);
 
-        // Sort the array by average score
         sort_array(collection->driver_city_info_array, compare_driver_city_infos_by_average_score);
-        BENCHMARK_LOG("driver_city_info_destroy_and_sort (%s): %lf seconds\n", key, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
     }
+    
 }
 
 CatalogDriverCityInfo *create_catalog_driver_city_info(void) {
     CatalogDriverCityInfo *catalog_driver_city_info = malloc(sizeof(CatalogDriverCityInfo));
-    catalog_driver_city_info->lazy_driver_city_info_collection_hashtable =
-            lazy_of(g_hash_table_new_full(g_str_hash, g_str_equal, free, free_driver_city_info_collection),
-                    lazy_driver_city_info_collection_hashtable_apply_function);
+    catalog_driver_city_info->lazy_driver_city_info_collection_array =
+            lazy_of(g_ptr_array_new(), lazy_driver_city_info_collection_array_apply_function);
     return catalog_driver_city_info;
 }
 
-void free_hash_table(gpointer value) {
-    g_hash_table_destroy(value);
+void free_gpt_array(gpointer value) {
+    g_ptr_array_free(value, TRUE);
 }
 
 void free_catalog_driver_city_info(CatalogDriverCityInfo *catalog_driver_city_info) {
-    free_lazy(catalog_driver_city_info->lazy_driver_city_info_collection_hashtable, free_hash_table);
+    free_lazy(catalog_driver_city_info->lazy_driver_city_info_collection_array, free_gpt_array);
     free(catalog_driver_city_info);
 }
 
-void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, int driver_score, char *ride_city) {
-    GHashTable *driver_city_info_collection_hashtable = lazy_get_raw_value(catalog->lazy_driver_city_info_collection_hashtable);
-    DriverCityInfoCollection *driver_city_collection = g_hash_table_lookup(driver_city_info_collection_hashtable, ride_city);
+void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int driver_id, int driver_score, int city_id) {
+    GPtrArray *driver_city_info_collection_array = lazy_get_raw_value(catalog->lazy_driver_city_info_collection_array);
+    DriverCityInfoCollection *driver_city_collection = g_ptr_array_index(driver_city_info_collection_array, city_id - 1);
 
     DriverCityInfo *target;
     if (driver_city_collection == NULL) { // ride_city is not in the hashtable
@@ -78,7 +73,7 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
         driver_city_collection->driver_city_info_array = g_ptr_array_new_with_free_func(free_driver_city_info_voidp);
         driver_city_collection->driver_city_info_hashtable = g_hash_table_new(g_direct_hash, g_direct_equal);
 
-        g_hash_table_insert(driver_city_info_collection_hashtable, g_strdup(ride_city), driver_city_collection);
+        g_ptr_array_insert(driver_city_info_collection_array, city_id, driver_city_collection);
         goto register_driver_city_info; // We can skip the lookup because we know it's not in the hashtable
     }
 
@@ -96,12 +91,12 @@ void catalog_driver_city_info_register(CatalogDriverCityInfo *catalog, int drive
 }
 
 void catalog_driver_city_info_force_eager_indexing(CatalogDriverCityInfo *catalog) {
-    lazy_apply_function(catalog->lazy_driver_city_info_collection_hashtable);
+    lazy_apply_function(catalog->lazy_driver_city_info_collection_array);
 }
 
-int catalog_driver_city_info_get_top_best_drivers_by_city(CatalogDriverCityInfo *catalog, char *city, int n, GPtrArray *result) {
-    DriverCityInfoCollection *driver_city_info_collection =
-            g_hash_table_lookup(lazy_get_value(catalog->lazy_driver_city_info_collection_hashtable), city);
+int catalog_driver_city_info_get_top_best_drivers_by_city(CatalogDriverCityInfo *catalog, int city_id, int n, GPtrArray *result) {
+    GPtrArray *driver_city_info_array = lazy_get_value(catalog->lazy_driver_city_info_collection_array);
+    DriverCityInfoCollection *driver_city_info_collection = g_ptr_array_index(driver_city_info_array, city_id);
     if (driver_city_info_collection == NULL) return 0; // city doesn't exist
 
     GPtrArray *top_drivers_in_city = driver_city_info_collection->driver_city_info_array;

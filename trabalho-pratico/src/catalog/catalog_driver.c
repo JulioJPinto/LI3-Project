@@ -53,8 +53,8 @@ void catalog_driver_register_driver(CatalogDriver *catalog_driver, Driver *drive
     g_hash_table_insert(catalog_driver->driver_from_id_hashtable, GINT_TO_POINTER(driver_get_id(driver)), driver);
 }
 
-void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, Driver *driver, int driver_score, char *city) {
-    catalog_driver_city_info_register(catalog_driver->catalog_driver_city_info, driver_get_id(driver), driver_score, city);
+void catalog_driver_register_driver_ride(CatalogDriver *catalog_driver, Driver *driver, int driver_score, int city_id) {
+    catalog_driver_city_info_register(catalog_driver->catalog_driver_city_info, driver_get_id(driver), driver_score, city_id);
 }
 
 Driver *catalog_driver_get_driver(CatalogDriver *catalog_driver, int driver_id) {
@@ -72,8 +72,8 @@ int catalog_driver_get_top_n_drivers_with_best_score(CatalogDriver *catalog_driv
     return length;
 }
 
-int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *catalog_driver, char *city, int n, GPtrArray *result) {
-    return catalog_driver_city_info_get_top_best_drivers_by_city(catalog_driver->catalog_driver_city_info, city, n, result);
+int catalog_driver_get_top_n_drivers_with_best_score_by_city(CatalogDriver *catalog_driver, int city_id, int n, GPtrArray *result) {
+    return catalog_driver_city_info_get_top_best_drivers_by_city(catalog_driver->catalog_driver_city_info, city_id, n, result);
 }
 
 void catalog_driver_force_eager_indexing(CatalogDriver *catalog_driver) {

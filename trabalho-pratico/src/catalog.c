@@ -134,7 +134,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     AccountStatus user_account_status = user_get_account_status(user);
 
     if (driver_account_status == ACTIVE) { // We only need to index for query 7 if the driver is active
-        catalog_driver_register_driver_ride(catalog->catalog_driver, driver, driver_score, city);
+        catalog_driver_register_driver_ride(catalog->catalog_driver, driver, driver_score, city_id);
     }
 
     if (driver_account_status == ACTIVE && user_account_status == ACTIVE) { // We only need to index for query 8 if both driver and user is active
@@ -189,7 +189,7 @@ double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Da
 }
 
 int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result) {
-    return catalog_driver_get_top_n_drivers_with_best_score_by_city(catalog->catalog_driver, city, n, result);
+    return catalog_driver_get_top_n_drivers_with_best_score_by_city(catalog->catalog_driver, turn_city_to_id(catalog, city), n, result);
 }
 
 int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age) {
@@ -198,7 +198,7 @@ int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_ag
 
 void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {
     catalog_ride_get_passengers_that_gave_tip_in_date_range(catalog->catalog_ride, start_date, end_date, result);
-}
+} 
 
 void catalog_force_eager_indexing(Catalog *catalog) {
     BENCHMARK_START(load_timer);
