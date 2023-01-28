@@ -158,12 +158,13 @@ void execute_query_longest_n_total_distance(Catalog *catalog, OutputWriter *outp
 void execute_query_average_price_in_city(Catalog *catalog, OutputWriter *output, char **args) {
     char *city = args[0];
 
-    if (!catalog_city_exists(catalog, city)) {
+    int city_id = catalog_get_city_id(catalog, city);
+    if (city_id == -1) {
         write_output_debug(output, "City %s not found\n", city);
         return;
     }
 
-    double average_price = query_4_catalog_get_average_price_in_city(catalog, city);
+    double average_price = query_4_catalog_get_average_price_in_city(catalog, city_id);
 
     write_output_line(output, "%.3f\n", average_price);
 }
@@ -220,12 +221,13 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, Outp
         return;
     }
 
-    if (!catalog_city_exists(catalog, city)) {
+    int city_id = catalog_get_city_id(catalog, city);
+    if (city_id == -1) {
         write_output_debug(output, "City %s not found\n", city);
         return;
     }
 
-    double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city);
+    double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city_id);
 
     if (average_distance == -1) {
         write_output_debug(output, "No rides in date range\n");
@@ -248,8 +250,14 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, Output
 
     char *city = args[1];
 
+    int city_id = catalog_get_city_id(catalog, city);
+    if (city_id == -1) {
+        write_output_debug(output, "City %s not found\n", city);
+        return;
+    }
+
     GPtrArray *result = g_ptr_array_sized_new(n);
-    int size = query_7_catalog_get_top_n_drivers_in_city(catalog, n, city, result);
+    int size = query_7_catalog_get_top_n_drivers_in_city(catalog, n, city_id, result);
 
     for (int i = 0; i < size; i++) {
         DriverCityInfo *driver_city_info = g_ptr_array_index(result, i);
@@ -333,7 +341,7 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
         Date date = ride_get_date(ride);
         int distance = ride_get_distance(ride);
         int city_id = ride_get_city_id(ride);
-        char *city = turn_id_to_city(catalog, city_id);
+        char *city = catalog_get_city_name(catalog, city_id);
         double tip = ride_get_tip(ride);
 
         int day = date_get_day(date);
@@ -341,6 +349,8 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
         int year = date_get_year(date);
 
         write_output_line(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
+
+        free(city);
     }
 
     g_ptr_array_free(result, TRUE);

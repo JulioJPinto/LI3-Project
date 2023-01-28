@@ -1,12 +1,11 @@
 #include "catalog.h"
-#include <stdio.h>
 #include "catalog/catalog_driver.h"
 #include "catalog/catalog_ride.h"
 #include "catalog/catalog_user.h"
 
 #include "benchmark.h"
 #include "price_util.h"
-#include "sort_util.h"
+#include "array_util.h"
 
 /**
  * Struct that represents a catalog.
@@ -16,8 +15,8 @@ struct Catalog {
     CatalogDriver *catalog_driver;
     CatalogRide *catalog_ride;
 
-    GPtrArray *id_map_city_array;
-    GHashTable *city_map_id_hashtable;
+    GPtrArray *city_id_to_city_name_array;
+    GHashTable *city_name_to_city_id_hashtable;
 };
 
 Catalog *create_catalog(void) {
@@ -27,8 +26,8 @@ Catalog *create_catalog(void) {
     catalog->catalog_driver = create_catalog_driver();
     catalog->catalog_ride = create_catalog_ride();
 
-    catalog->id_map_city_array = g_ptr_array_new();                                              //Int to String(City)
-    catalog->city_map_id_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL); //String(City) to int
+    catalog->city_id_to_city_name_array = g_ptr_array_new();
+    catalog->city_name_to_city_id_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
 
     return catalog;
 }
@@ -38,41 +37,37 @@ void free_catalog(Catalog *catalog) {
     free_catalog_driver(catalog->catalog_driver);
     free_catalog_ride(catalog->catalog_ride);
 
-    g_ptr_array_free(catalog->id_map_city_array, TRUE);
-    g_hash_table_destroy(catalog->city_map_id_hashtable);
+    g_ptr_array_free(catalog->city_id_to_city_name_array, TRUE);
+    g_hash_table_destroy(catalog->city_name_to_city_id_hashtable);
 
     free(catalog);
 }
 
-void map_id_for_city(Catalog *catalog, char *city) {
-    g_ptr_array_add(catalog->id_map_city_array, city); //Maps a string to and ID by inserting it in the array
+char *catalog_get_city_name(Catalog *catalog, int city_id) {
+    char *city_name = g_ptr_array_get_at_index_safe(catalog->city_id_to_city_name_array, city_id);
+    return city_name ? g_strdup(city_name) : NULL;
 }
 
-void map_city_for_id(Catalog *catalog, int city_id, char *city) {
-    g_hash_table_insert(catalog->city_map_id_hashtable, g_strdup(city), GUINT_TO_POINTER(city_id)); //Maps an ID to a string (hash key) 
-                                                                                                    //by inserting it in the hashtable
-}
-
-
-char *transform_id_to_city(Catalog *catalog, int city_id) {
-    return (char *) g_ptr_array_index(catalog->id_map_city_array, city_id); 
-}
-
-int transform_city_to_id(Catalog *catalog, char *city) {
+int catalog_get_city_id(Catalog *catalog, char *city) {
     if (!city) return -1;
-    if (g_hash_table_lookup(catalog->city_map_id_hashtable, city)) return (int) g_hash_table_lookup(catalog->city_map_id_hashtable, city);  //Checks if the city is in the hashtable
-                                                                                                                                            //If so it returns the id stored in it
-    g_ptr_array_add(catalog->id_map_city_array, city);                          //If the city is not in the hashtable it will add
-    int city_id = 0;                                                            //it to the array
-    for (int i = 0; i < catalog->id_map_city_array->len; i++) {
-        char *city_indexed = g_ptr_array_index(catalog->id_map_city_array, i);  //the loop goes through the array until it finds the city
-        if (!strcmp(city_indexed, city)) {                                      //Even though the complexety its O(N) it shouldnt affect much of 
-            map_city_for_id(catalog, i, city);                                  // the process.
-            return i;                                                           // Once it finds the city it will map it to the id
-        }
-    }
 
-    return -1;
+    gpointer city_id_ptr;
+    gboolean found = g_hash_table_lookup_extended(catalog->city_name_to_city_id_hashtable, city, NULL, &city_id_ptr);
+
+    return found ? GPOINTER_TO_INT(city_id_ptr) : -1;
+}
+
+int catalog_get_or_register_city_id(Catalog *catalog, char *city) {
+    int city_id = catalog_get_city_id(catalog, city);
+    if (city_id != -1) return city_id;
+
+    city_id = (int) catalog->city_id_to_city_name_array->len;
+    city = g_strdup(city);
+
+    g_ptr_array_set_at_index_safe(catalog->city_id_to_city_name_array, city_id, city);
+    g_hash_table_insert(catalog->city_name_to_city_id_hashtable, city, GINT_TO_POINTER(city_id));
+
+    return city_id;
 }
 
 static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
@@ -90,7 +85,8 @@ static inline void internal_parse_and_register_driver(Catalog *catalog, char *li
     char *city;
     Driver *driver = parse_line_driver_detailed(line, separator, &city);
     if (driver == NULL) return;
-    int city_id = turn_city_to_id(catalog, city);
+
+    int city_id = catalog_get_or_register_city_id(catalog, city);
     driver_set_city_id(driver, city_id);
 
     catalog_driver_register_driver(catalog->catalog_driver, driver);
@@ -106,7 +102,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
 
     Ride *ride = parse_line_ride_detailed(line, separator, &city, &user_username);
     if (ride == NULL) return;
-    int city_id = turn_city_to_id(catalog, city);
+    int city_id = catalog_get_or_register_city_id(catalog, city);
     ride_set_city_id(ride, city_id);
 
     int driver_id = ride_get_driver_id(ride);
@@ -129,7 +125,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     user_add_total_distance(user, ride_get_distance(ride));
     user_register_ride_date(user, ride_get_date(ride));
 
-    catalog_ride_register_ride(catalog->catalog_ride, ride, city);
+    catalog_ride_register_ride(catalog->catalog_ride, ride, city_id);
 
     AccountStatus driver_account_status = driver_get_account_status(driver);
     AccountStatus user_account_status = user_get_account_status(user);
@@ -165,10 +161,6 @@ Driver *catalog_get_driver(Catalog *catalog, int id) {
     return catalog_driver_get_driver(catalog->catalog_driver, id);
 }
 
-gboolean catalog_city_exists(Catalog *catalog, char *city) {
-    return catalog_ride_city_has_rides(catalog->catalog_ride, city);
-}
-
 int query_2_catalog_get_top_drivers_with_best_score(Catalog *catalog, int n, GPtrArray *result) {
     return catalog_driver_get_top_n_drivers_with_best_score(catalog->catalog_driver, n, result);
 }
@@ -177,20 +169,20 @@ int query_3_catalog_get_top_users_with_longest_total_distance(Catalog *catalog, 
     return catalog_user_get_top_n_users(catalog->catalog_user, n, result);
 }
 
-double query_4_catalog_get_average_price_in_city(Catalog *catalog, char *city) {
-    return catalog_ride_get_average_price_in_city(catalog->catalog_ride, city);
+double query_4_catalog_get_average_price_in_city(Catalog *catalog, int city_id) {
+    return catalog_ride_get_average_price_in_city(catalog->catalog_ride, city_id);
 }
 
 double query_5_catalog_get_average_price_in_date_range(Catalog *catalog, Date start_date, Date end_date) {
     return catalog_ride_get_average_distance_in_date_range(catalog->catalog_ride, start_date, end_date);
 }
 
-double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, char *city) {
-    return catalog_ride_get_average_distance_in_city_and_date_range(catalog->catalog_ride, start_date, end_date, city);
+double query_6_catalog_get_average_distance_in_city_by_date(Catalog *catalog, Date start_date, Date end_date, int city_id) {
+    return catalog_ride_get_average_distance_in_city_and_date_range(catalog->catalog_ride, start_date, end_date, city_id);
 }
 
-int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, char *city, GPtrArray *result) {
-    return catalog_driver_get_top_n_drivers_with_best_score_by_city(catalog->catalog_driver, turn_city_to_id(catalog, city), n, result);
+int query_7_catalog_get_top_n_drivers_in_city(Catalog *catalog, int n, int city_id, GPtrArray *result) {
+    return catalog_driver_get_top_n_drivers_with_best_score_by_city(catalog->catalog_driver, city_id, n, result);
 }
 
 int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_age(Catalog *catalog, GPtrArray *result, Gender gender, int min_account_age) {
@@ -199,7 +191,7 @@ int query_8_catalog_get_rides_with_user_and_driver_with_same_gender_above_acc_ag
 
 void query_9_catalog_get_passengers_that_gave_tip_in_date_range(Catalog *catalog, GPtrArray *result, Date start_date, Date end_date) {
     catalog_ride_get_passengers_that_gave_tip_in_date_range(catalog->catalog_ride, start_date, end_date, result);
-} 
+}
 
 void catalog_force_eager_indexing(Catalog *catalog) {
     BENCHMARK_START(load_timer);

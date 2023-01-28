@@ -3,7 +3,7 @@
 #include "benchmark.h"
 #include "catalog/catalog_driver_city_info.h"
 #include "lazy.h"
-#include "sort_util.h"
+#include "array_util.h"
 
 struct CatalogDriver {
     Lazy *lazy_drivers_array;

@@ -12,8 +12,8 @@ typedef struct Driver Driver;
 /**
  * Creates a new Driver.
  */
-Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
-                      int city_id, Date account_creation_date, AccountStatus account_status);
+Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, const char *license_plate,
+                      Date account_creation_date, AccountStatus account_status);
 
 Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city);
 

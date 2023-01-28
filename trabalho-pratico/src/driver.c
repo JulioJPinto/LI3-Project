@@ -1,7 +1,5 @@
 #include "driver.h"
 
-#include <stdio.h>
-
 #include <glib.h>
 #include "string_util.h"
 
@@ -26,8 +24,8 @@ struct Driver {
     Date last_ride_date;
 };
 
-Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, char *license_plate,
-                      int city_id, Date account_creation_date, AccountStatus account_status) {
+Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, const char *license_plate,
+                      Date account_creation_date, AccountStatus account_status) {
     Driver *driver = malloc(sizeof(Driver));
     driver->id = id;
     driver->name = g_strdup(name);
@@ -35,7 +33,6 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     driver->gender = gender;
     driver->car_class = car_class;
     (void) license_plate; // driver->license_plate = g_strdup(license_plate);
-    driver->city_id = city_id;
     driver->account_creation_date = account_creation_date;
     driver->account_status = account_status;
 
@@ -48,7 +45,7 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
 }
 
 Driver *parse_line_driver(char *line, char delim) {
-    parse_line_driver_detailed(line, delim, NULL);
+    return parse_line_driver_detailed(line, delim, NULL);
 }
 
 Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
@@ -76,7 +73,7 @@ Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
     if (IS_EMPTY(license_plate)) return NULL;
 
     char *city = next_token(&line, delim);
-    int city_id = 0;
+    if (IS_EMPTY(city)) return NULL;
 
     char *creation_date_string = next_token(&line, delim);
     Date creation_date = parse_date(creation_date_string);
@@ -87,9 +84,9 @@ Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city) {
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 
-    if (parsed_city) *parsed_city = city; //Stores city value if detailed
+    if (parsed_city) *parsed_city = city;
 
-    return create_driver(id, name, date, gender, car_class, license_plate, city_id, creation_date, acc_status);
+    return create_driver(id, name, date, gender, car_class, license_plate, creation_date, acc_status);
 }
 
 void driver_set_city_id(Driver *driver, int city_id) {
