@@ -18,7 +18,8 @@ typedef struct {
     GPtrArray *driver_city_info_array;
     /**
      * Hash table that maps driver ids to DriverCityInfo structs.
-     * This is used to get the DriverCityInfo of a driver id in O(1) for faster insertions.
+     * We need this because not all drivers will have rides in all cities.
+     * This is used to get the DriverCityInfo of a driver id in O(1) (instead of looping through an array) for faster insertions.
      * This hashtable is only valid during the insertion of rides, and is freed after the insertion.
      * You can't use this hashtable after the insertion ends (when `catalog_force_eager_indexing` is called).
      */
