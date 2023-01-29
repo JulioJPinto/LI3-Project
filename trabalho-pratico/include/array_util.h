@@ -20,6 +20,6 @@ void g_ptr_array_set_at_index_safe(GPtrArray *array, int index, gpointer data);
  * Gets the element at the given index.
  * If the index is greater than the array's length or less than 0, NULL is returned.
  */
-void* g_ptr_array_get_at_index_safe(GPtrArray *array, int index);
+void *g_ptr_array_get_at_index_safe(GPtrArray *array, int index);
 
 #endif //LI3_ARRAY_UTIL_H

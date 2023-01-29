@@ -14,7 +14,7 @@ void g_ptr_array_set_at_index_safe(GPtrArray *array, int index, gpointer data) {
     array->pdata[index] = data;
 }
 
-void* g_ptr_array_get_at_index_safe(GPtrArray *array, int index) {
+void *g_ptr_array_get_at_index_safe(GPtrArray *array, int index) {
     if (index >= (int) array->len || index < 0) {
         return NULL;
     }

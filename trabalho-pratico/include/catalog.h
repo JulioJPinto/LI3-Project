@@ -75,7 +75,7 @@ User *catalog_get_user_by_user_id(Catalog *catalog, int user_id);
 /**
  * Returns the user associated with the given username.
  */
-User *catalog_get_user_by_username(Catalog *catalog, char* username);
+User *catalog_get_user_by_username(Catalog *catalog, char *username);
 
 /**
  * Returns a pointer to the driver already registered with the given id.

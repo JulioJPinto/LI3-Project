@@ -22,13 +22,13 @@
     Nesta fase como objetivos o trabalho necessitava a implementação de todas as queries
     , de um modo de operação interativo (incluindo menu de interação e um módulo de 
     paginação para apresentação de resultados longos) e evolução de aspetos relacionados
-    a modularidade, encapsulamento e qualidade de código.
-    \\
-    \\Este relatório irá abranger as decisões tomadas pelo grupo tal como o método de 
+    a modularidade, encapsulamento e qualidade de código. \\
+    
+    Este relatório irá abranger as decisões tomadas pelo grupo tal como o método de 
     raciocínio para desenvolvimento do mesmo.
     
     \section{Desenvolvimento}
-    O projeto 
+    
     \subsection{Alterações realizadas}
         \subsubsection{Ajustes apontados pelos docentes}
             Após a apresentação da primeira fase do trabalho foram levantados
@@ -61,7 +61,7 @@
             implementadas, exceto o \emph{lazy loading} que foi
             útil no modo interativo (será abordado mais abaixo).
 
-        \subsubsection{Ajustes de localidade espacial e temporal}
+        \subsubsection{Otimizações localidade espacial e temporal}
             Apesar da estrutura previeamente implementada permitir a realização
             do trabalho dentro dos limites de tempo com grandes margens, decidimos
             mesmo assim otimizá-lo para além do que o que já tinhamos. Para tal
@@ -76,11 +76,24 @@
             diminuir o número de \emph{strdups} necessários, assim por consequência, 
             diminuindo também o tempo necessário para a alocação e libertação destes 
             \emph{strdups} tal como o número de bytes necessários para os Condutores e
-            Viagens.
+            Viagens. No mesmo contexto, após alguma discussão, decidimos alterar também
+            a maneira como as viagens guardam os utilizadores. Dando a cada utilizador um
+            id único permite nos então poupar na quantidade de espaço necessário para as mesmas.
+            Ao invés de guardarmos uma string, assim simplesmente, guardamos um inteiro, diminuindo
+            o tamanho necessário para as mesmas tal como torna a pesquisa pelo utilizador 
+            mais fácil e rápida.
 
-        \subsubsection{Pequena Otimizações}
-            
-        
+        \subsubsection{Pequenas Otimizações}
+            De maneira a gerir melhor a memória usada pelo programa decidimos então
+            fazer diversas, mas eficazes alterações para a dimensão do projeto.
+            Para começar:
+            Decidimos alterar a maneira como as datas, a struct \emph{Date},
+            funciona. Alteramos então a maneira deste de três ints de 32 bits para um int de 32 bits.
+            Pode não parecer muito porém num dataset de 10 mil rides, poupamos cerca de 
+            640 000 bits.
+            Ainda mais, decidimos também substituir o uso da função \emph{strtol}
+            pelas nossa próprias funções de parsing para inteiros.
+
     \subsection{Pipeline}
         Neste momento o nosso programa funciona da seguinte maneira:
         \begin{itemize}
@@ -123,7 +136,14 @@
             Para a query 7 decidimos implementar uma nova estrutura de dados. Adicionando ao 
             \emph{CatalogDriver} um \emph{CatalogDriverCityInfo}, este \emph{CatalogDriverCityInfo} 
             permite nos guardar as informações de um certo condutor numa cidade específica 
-            (Guardamos o número de viagens e \emph{Score} para esta cidade, para o condutor). 
+            (Guardamos o número de viagens e \emph{Score} para esta cidade, para o condutor).
+            Com esta estrutura, guardamos um array, composto por um array de condutores 
+            e uma hashtable (Esta hashtable é puramente usada para um tempo de inserção O(1), após 
+            a inserção esta é libertada), cada um destes indíces representa uma cidade do dataset.
+            Quando a query é chamada damos \emph{sort}, pela primeira vez, por score do condutor, a 
+            todos os arrays que representam cidades assim facilmente ordenando os Top N Condutores 
+            de todas as cidades de maneira a dar a facilmente dar o \emph{output} da query.
+            
         \subsubsection{Query 8}
             TODO
         \subsubsection{Query 9}
@@ -165,10 +185,11 @@
             o comando \emph{file}, como também pode as escrever diretamente na linha de comando. Enquanto 
             que ao chamar o file, dará output para novos ficheiros, ao escrever diretamente na linha de 
             comando o resultado será exposto no terminal. Para além destes comandos ainda temos o comando 
-            \emph{reload} que permite ao utilizador inserir um novo \emph{dataset}, caso este mude durante 
-            a utilização do programa ou caso o utlizado pretenda utilizar um \emph{dataset} diferente sem 
-            ter que sair do programa e também temos o comando \emph{clear}, que tal como o nome indica, 
-            limpa o terminal. Por último temos o comando \emph{exit} de maneira a sair do programa.
+            \emph{reload} que permite ao utilizador inserir um novo \emph{dataset}, caso este mude 
+            durante a utilização do programa ou caso o utlizado pretenda utilizar um \emph{dataset}
+            diferente sem ter que sair do programa e também temos o comando \emph{clear}, que tal como
+            o nome indica, impa o terminal. Por último temos o comando \emph{exit} de maneira a sair do 
+            programa.
         \subsubsection{Histórico de Comandos}
             Através da utilização da biblioteca \emph{readline/history} decidimos também implementar um 
             histórico de comandos. Desta maneira caso o utilizador necessite de reutilizar um comando 
@@ -176,13 +197,18 @@
             guardados em memória.
         \subsubsection{Paginação}
             Como em certas queries (Ex: Query 2 e 3) existe a possibilidade de termos um output muito 
-            grande de linhas, tal como pedido no enunciado, implementamos um sistema de paginação para essas situações.
-            No nosso sistema de paginação conseguimos percorrer o \emph{output} de duas maneiras diferentes.
-            Conseguimos percorrer este página a página, avançando ou retrocedendo de página, como também 
-            conseguimos simplesmente dizer a página que pretendemos e esta será impressa no terminal. De 
-            ambas as maneiras a página anterior será apagada do terminal.
+            grande de linhas, tal como pedido no enunciado, implementamos um sistema de paginação para
+            essas situações. No nosso sistema de paginação conseguimos percorrer o \emph{output} de duas 
+            maneiras diferentes. Conseguimos percorrer este página a página, avançando ou retrocedendo de
+            página, como também conseguimos simplesmente dizer a página que pretendemos e esta será impressa 
+            no terminal. De ambas as maneiras a página anterior será apagada do terminal.
     \subsection{Testes Unitários}
         \subsubsection{Actions do Github}
+        De maneira a conseguirmos garantir que o código presente no nosso repositório passaria sempre os
+        testes dos professores, decidimos criar algumas Actions para o mesmo. Assim mesmo que não
+        conseguissemos testar na nossa máquina local, saberiamos caso o projeto tivesse \emph{memory
+        leaks} ou falhas nos testes, seriamos alertados, tal como nos seria demonstrado onde errou ou a o
+        output do valgrind.
     \subsection{\emph{CSV Generator}}
     \section{Testes de Performance}
         \begin{table}[hbt!]
