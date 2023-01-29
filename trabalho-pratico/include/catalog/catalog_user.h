@@ -27,9 +27,15 @@ void free_catalog_user(CatalogUser *catalog_user);
 void catalog_user_register_user(CatalogUser *catalog_user, User *user);
 
 /**
+ * Returns the user with the given id.
+ * This id is generated when the user is added to the catalog.
+ */
+User *catalog_user_get_user_by_user_id(CatalogUser *catalog_user, int user_id);
+
+/**
  * Returns the user with the given username.
  */
-User *catalog_user_get_user(CatalogUser *catalog_user, char *username);
+User *catalog_user_get_user_by_username(CatalogUser *catalog_user, char *username);
 
 /**
  * Forces the catalog to index all the users.

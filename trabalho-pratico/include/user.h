@@ -33,6 +33,19 @@ char *user_get_username(User *user);
 char *user_get_name(User *user);
 
 /**
+ * Returns the id associated with the User
+ * This id is generated when the User is added to the catalog
+ * The id is used to link the User to the Ride without having to store the username
+ */
+int user_get_id(User *user);
+
+/**
+ * Sets the id associated with the User
+ * Used when the User is added to the catalog
+ */
+void user_set_id(User *user, int id);
+
+/**
  * Returns the gender of the User
  */
 Gender user_get_gender(User *user);

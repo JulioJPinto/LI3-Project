@@ -23,7 +23,7 @@ void write_output_debug(OutputWriter *stream, const char *format, ...) {
  * Query 1 for users
  */
 void execute_query_find_user_by_name(Catalog *catalog, OutputWriter *output, char *username) {
-    User *user = catalog_get_user(catalog, username);
+    User *user = catalog_get_user_by_username(catalog, username);
 
     if (user == NULL) {
         write_output_debug(output, "User %s not found\n", username);
@@ -298,8 +298,9 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
         Driver *driver = catalog_get_driver(catalog, driver_id);
         char *driver_name = driver_get_name(driver);
 
-        char *user_username = ride_get_user_username(ride);
-        User *user = catalog_get_user(catalog, user_username);
+        int user_id = ride_get_user_id(ride);
+        User *user = catalog_get_user_by_user_id(catalog, user_id);
+        char *user_username = user_get_username(user);
         char *user_name = user_get_name(user);
 
         write_output_line(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);

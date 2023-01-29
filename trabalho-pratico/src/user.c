@@ -13,6 +13,7 @@ struct User {
     Date birthdate;
     Date account_create_date;
     Date most_recent_ride;
+    u_int32_t id;
     u_int16_t accumulated_score;
     u_int16_t total_distance;
     u_int16_t rides_amount;
@@ -83,6 +84,14 @@ char *user_get_username(User *user) {
 
 char *user_get_name(User *user) {
     return g_strdup(user->name);
+}
+
+int user_get_id(User *user) {
+    return user->id;
+}
+
+void user_set_id(User *user, int id) {
+    user->id = id;
 }
 
 Gender user_get_gender(User *user) {

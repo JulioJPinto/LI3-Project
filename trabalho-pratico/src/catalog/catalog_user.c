@@ -10,6 +10,7 @@
 struct CatalogUser {
     Lazy *lazy_users_array;
     GHashTable *user_from_username_hashtable;
+    GPtrArray *user_from_user_id_array;
 };
 
 /**
@@ -33,6 +34,7 @@ CatalogUser *create_catalog_user(void) {
 
     catalog_user->lazy_users_array = lazy_of(g_ptr_array_new_with_free_func(glib_wrapper_free_user), sort_array_by_total_distance);
     catalog_user->user_from_username_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
+    catalog_user->user_from_user_id_array = g_ptr_array_new();
 
     return catalog_user;
 }
@@ -47,6 +49,7 @@ void free_users_array(gpointer array) {
 void free_catalog_user(CatalogUser *catalog_user) {
     g_hash_table_destroy(catalog_user->user_from_username_hashtable);
     free_lazy(catalog_user->lazy_users_array, free_users_array);
+    g_ptr_array_free(catalog_user->user_from_user_id_array, TRUE);
 
     free(catalog_user);
 }
@@ -58,9 +61,17 @@ void catalog_user_register_user(CatalogUser *catalog_user, User *user) {
     // No need to free the key, it's freed by the hashtable when the user is removed
 
     g_hash_table_insert(catalog_user->user_from_username_hashtable, key, user);
+
+    int user_id = catalog_user->user_from_user_id_array->len;
+    user_set_id(user, user_id);
+    g_ptr_array_set_at_index_safe(catalog_user->user_from_user_id_array, user_id, user);
 }
 
-User *catalog_user_get_user(CatalogUser *catalog_user, char *username) {
+User *catalog_user_get_user_by_user_id(CatalogUser *catalog_user, int user_id) {
+    return g_ptr_array_get_at_index_safe(catalog_user->user_from_user_id_array, user_id);
+}
+
+User *catalog_user_get_user_by_username(CatalogUser *catalog_user, char *username) {
     return g_hash_table_lookup(catalog_user->user_from_username_hashtable, username);
 }
 

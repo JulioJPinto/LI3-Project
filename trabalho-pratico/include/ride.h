@@ -12,7 +12,7 @@ typedef struct Ride Ride;
 /**
  * Creates a new Ride.
  */
-Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip);
+Ride *create_ride(int id, Date date, int driver_id, int city_id, int distance, int score_user, int score_driver, double tip);
 
 /**
  * Parses a line of the CSV to a ride
@@ -48,10 +48,16 @@ int ride_get_id(Ride *ride);
 Date ride_get_date(Ride *ride);
 
 /**
- * Returns a copy of the user's username of the ride
- * The caller is responsible for freeing the memory allocated for the username
+ * Returns the user id of the ride
+ * The user id is set when the ride is registered in the catalog
  */
-char *ride_get_user_username(Ride *ride);
+int ride_get_user_id(Ride *ride);
+
+/**
+ * Sets the user id of the ride
+ * The user id is set when the ride is registered in the catalog
+ */
+void ride_set_user_id(Ride *ride, int user_id);
 
 /**
  * Returns the distance of the ride

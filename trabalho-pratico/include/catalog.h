@@ -68,11 +68,14 @@ void parse_and_register_ride(void *catalog, char *line, char separator);
 void catalog_force_eager_indexing(Catalog *catalog);
 
 /**
- * Returns a pointer to the user already registered with the given username.
- * Returns NULL if no user with the given username exists.
- * The returned pointer is owned by the catalog and must not be freed.
+ * Returns the user associated with the given user id.
  */
-User *catalog_get_user(Catalog *catalog, char *username);
+User *catalog_get_user_by_user_id(Catalog *catalog, int user_id);
+
+/**
+ * Returns the user associated with the given username.
+ */
+User *catalog_get_user_by_username(Catalog *catalog, char* username);
 
 /**
  * Returns a pointer to the driver already registered with the given id.

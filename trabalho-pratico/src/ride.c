@@ -8,27 +8,26 @@
  * Struct that represents a ride.
  */
 struct Ride {
-    char *user_username;
     double price;
     double tip;
     Date date;
     Date user_account_creation_date;
     Date driver_account_creation_date;
-    int id;
-    int driver_id;
+    u_int32_t user_id;
+    u_int32_t id;
+    u_int32_t driver_id;
     u_int8_t distance;
     u_int8_t city_id;
     u_int8_t score_user;
     u_int8_t score_driver;
 };
 
-Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip) {
+Ride *create_ride(int id, Date date, int driver_id, int city_id, int distance, int score_user, int score_driver, double tip) {
     Ride *ride = malloc(sizeof(Ride));
 
     ride->id = id;
     ride->date = date;
     ride->driver_id = driver_id;
-    ride->user_username = g_strdup(username);
     ride->city_id = city_id;
     ride->distance = distance;
     ride->score_user = score_user;
@@ -85,11 +84,10 @@ Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char 
     if (parsed_city) *parsed_city = city;
     if (parsed_user_username) *parsed_user_username = user;
 
-    return create_ride(id, date, driver_id, user, city_id, distance, user_score, driver_score, tip);
+    return create_ride(id, date, driver_id, city_id, distance, user_score, driver_score, tip);
 }
 
 void free_ride(Ride *ride) {
-    free(ride->user_username);
     free(ride);
 }
 
@@ -109,8 +107,12 @@ Date ride_get_date(Ride *ride) {
     return ride->date;
 }
 
-char *ride_get_user_username(Ride *ride) {
-    return g_strdup(ride->user_username);
+int ride_get_user_id(Ride *ride) {
+    return ride->user_id;
+}
+
+void ride_set_user_id(Ride *ride, int user_id) {
+    ride->user_id = user_id;
 }
 
 int ride_get_distance(Ride *ride) {
