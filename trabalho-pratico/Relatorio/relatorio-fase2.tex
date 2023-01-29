@@ -33,20 +33,24 @@
     O projeto 
     \subsection{Alterações realizadas}
         \subsubsection{Ajustes apontados pelos docentes}
-            Após a apresentação da primeira fase do trabalho foram levantados
-            alguns pontos por parte dos docentes. Primeiramente foi levantada
-            a questão quanto à maneira como o Catálogo, \emph{Catalog}, estava
-            estruturado. Originalmente tinhamos os Arrays e Hashtables das estruturas
-            todos juntos, porém foi levantado o ponto que de tal maneira poderiamos
-            estar a quebrar encapsulamento. Assim sendo, decidimos tornar o \emph{Catalog}
-            num struct de catálogos de cada estrutura de dados, catálogos estes opacos
-            ao \emph{Catalog} (será abordado mais abaixo).\\Para além disso, fomos 
-            informados pelos professores que não fazia sentido aplicarmos multithreading, \emph{pthreads}, 
-            visto que a maneira como o trabalho será testado não permitirá a realização de ações
-            em paralelo, isto pois os programas são testado somente numa thread. 
-            Por último, foi nos também aconselhado por um dos professores a transfêrencia
-            de uma estrutura de dados que tinhamos para informações relativamente às rides
-            para a estrutura de dados das rides (será abordado mais abaixo).
+            Após a apresentação da primeira fase do trabalho 
+            foram levantados alguns pontos por parte dos docentes. 
+            Primeiramente foi levantada a questão quanto à maneira como 
+            o Catálogo, \emph{Catalog}, estava estruturado. 
+            Originalmente tinhamos os Arrays e Hashtables das estruturas
+            todos juntos, porém foi levantado o ponto que de tal maneira 
+            poderiamos estar a quebrar encapsulamento. Assim sendo, 
+            decidimos tornar o \emph{Catalog} num struct de catálogos de 
+            cada estrutura de dados, catálogos estes opacos ao \emph{Catalog} 
+            (será abordado mais abaixo).\\Para além disso, fomos informados 
+            pelos professores que não fazia sentido aplicarmos multithreading, 
+            \emph{pthreads}, visto que a maneira como o trabalho será testado 
+            não permitirá a realização de ações em paralelo, isto pois os 
+            programas são testado somente numa thread. Por último, foi nos 
+            também aconselhado por um dos professores a transfêrencia
+            de uma estrutura de dados que tinhamos para informações 
+            relativamente às rides para a estrutura de dados das rides 
+            (será abordado mais abaixo).
 
         \subsubsection{Ajustes de fator escala (Dataset maior)}
             Da forma como tínhamos o projeto implementado, quando 
@@ -59,10 +63,42 @@
             mencionadas na fase 1 não foram necessárias de serem
             implementadas, exceto o \emph{lazy loading} que foi
             útil no modo interativo (será abordado mais abaixo).
+
+        \subsubsection{Ajustes de localidade espacial e temporal}
+            Apesar da estrutura previeamente implementada permitir 
+            a realização do trabalho dentro dos limites de tempo 
+            com grandes margens, decidimos mesmo assim otimizá-lo 
+            para além do que o que já tinhamos alcançado. Para tal
+            alteramos certas estruturas de dados e certos métodos de 
+            guardar informações destes de maneira se adequar à melhor 
+            a uma melhor localidade temporal e espacial. Decidimos então 
+            alterar a maneira como guardamos os nossos condutores no 
+            \emph{CatalogDrivers}, trocando a Hashtable (Hashtable para um 
+            acesso constante aos condutores pelo ID) por um array onde o índice 
+            da posição do Condutor no array é igual ao ID deste mesmo condutor.
+            Ainda mais decidimos também, ao invés de guardar em cada condutor 
+            e viagem a cidade, guardar um ID único para cada, de maneira a 
+            diminuir o número de \emph{strdups} necessários, assim por consequência,
+            diminuindo também o tempo necessário para a alocação e libertação destes
+             \emph{strdups}.
+            
         
     \subsection{Pipeline}
-        TODO: Escrever como funciona o novo pipeline no caso de Batch e Interativo.
-        Adicionar desenho/fluxograma.
+        Neste momento o nosso programa funciona da seguinte maneira:
+        \begin{itemize}
+            \item A nossa main recebe os argumentos, caso não receba nenhum 
+            argumento está inicializar o programa no modo intertativo (Command Line Enviroment), 
+            que já dentro do programa irá pedir o \emph{dataset} usado para este. Caso esta 
+            receba a \emph{path} para o \emph{dataset} e para o \emph{input} o programa será 
+            realizado no modo \emph{Batch}.
+            \item Após receber o a \emph{path} para o \emph{dataset} o nosso programa da 
+            \emph{parse} dos dados encontrados em cada CSV. Este ainda mapaeia os mesmos
+             para o catálogo e deixa o catálogo pronto para ser utilizado.
+            \item De seguida, dependendo do modo (\emph{Batch} ou Interativo), este irá 
+            correr os comandos/\emph{inputs} passados.
+            \item No caso do modo \emph{Batch}, este vai ler o ficheiro de \emph{input} e 
+            vai fazer cada uma das queries passadas neste. Quando uma query é chamada o programa acede ao nosso \emph{Query Manager} (Gestor de Queries) onde é mapeado para a \emph{Query} respetiva. Após este processo este será enviado para o fichei
+        \end{itemize}
     \subsection{Queries Implementadas}
         Para a segunda fase do trabalho foram aplicadas todas as queries em falta
         (Queries 1 a 5 realizadas na fase anterior) seguindo a nosso ver a melhor
@@ -112,9 +148,10 @@
     \subsection{\emph{CSV Generator}}
     \section{Testes de Performance}
         \begin{table}[hbt!]
+            \centering
             \begin{tabular}{|*{3}{c|}}
                 \hline
-                & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
+                & \thead{PC 1}&\thead{PC 2}\\
                 \hline
                 CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 4-core \\
                 RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz \\
@@ -125,6 +162,21 @@
             \end{tabular}
             \caption{Especificações dos PCs}
         \end{table}
+         
+
+        \begin{table}[hbt!]
+                \centering
+                \begin{tabular}{|*{4}{c|}}
+                    \hline
+                    & \thead{PC 1}&\thead{PC 2}&\thead{Testes dos Professores}\\
+                    \hline
+                    Loading de ficheiros                  & 767.1ms & 1466.1ms & 1427.4ms \\
+                    Regular Dataset (with invalid entries)   & 8.0ms   & 23.3ms & 32.7ms \\
+                    Regular Dataset (without invalid entries) & 14.1ms  & 45.2ms &  66.5 ms \\
+                    \hline
+                \end{tabular}
+                \caption{Tempos de execução para o Regular Dataset}
+            \end{table} 
 
         
 
