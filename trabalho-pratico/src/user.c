@@ -13,9 +13,9 @@ struct User {
     Date birthdate;
     Date account_create_date;
     Date most_recent_ride;
-    int rides_amount;
-    int accumulated_score;
-    int total_distance;
+    u_int16_t accumulated_score;
+    u_int16_t total_distance;
+    u_int16_t rides_amount;
     Gender gender;
     PaymentMethod payment_method;
     AccountStatus account_status;

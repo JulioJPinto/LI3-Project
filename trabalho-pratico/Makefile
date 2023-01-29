@@ -95,6 +95,11 @@ test: build-test build-release
 	@diff Resultados datasets/data-regular/expected-results-2
 	@echo "ok /end-to-end/regular_2"
 
+	# @rm -rf Resultados
+	# @./build/release/li3-release datasets/data-large datasets/data-large/input1.txt > /dev/null
+	# @diff Resultados datasets/data-large/expected-results-1
+	# @echo "ok /end-to-end/large_1"
+
 	@rm -rf Resultados
 	@echo "# End of end-to-end tests"
 	@echo "\nTests passed!"

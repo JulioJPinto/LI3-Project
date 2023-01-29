@@ -14,9 +14,9 @@ struct Driver {
     Date last_ride_date;
     Date account_creation_date;
     int id;
-    int city_id;
-    int rides_amount;
-    int accumulated_score;
+    uint16_t accumulated_score;
+    uint8_t city_id;
+    uint8_t rides_amount;
     AccountStatus account_status;
     Gender gender;
     CarClass car_class;

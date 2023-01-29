@@ -16,10 +16,10 @@ struct Ride {
     Date driver_account_creation_date;
     int id;
     int driver_id;
-    int city_id;
-    int distance;
-    int score_user;
-    int score_driver;
+    u_int8_t distance;
+    u_int8_t city_id;
+    u_int8_t score_user;
+    u_int8_t score_driver;
 };
 
 Ride *create_ride(int id, Date date, int driver_id, char *username, int city_id, int distance, int score_user, int score_driver, double tip) {

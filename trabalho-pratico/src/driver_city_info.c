@@ -7,8 +7,8 @@
  */
 struct DriverCityInfo {
     int id;
-    int accumulated_score;
-    int amount_rides;
+    u_int16_t accumulated_score;
+    u_int16_t amount_rides;
 };
 
 DriverCityInfo *create_driver_city_info(int id) {
