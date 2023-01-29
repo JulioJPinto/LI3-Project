@@ -5,6 +5,9 @@
 #include "lazy.h"
 #include "array_util.h"
 
+/**
+ * Struct that holds all the drivers and their information.
+ */
 struct CatalogDriver {
     Lazy *lazy_drivers_array;
     GPtrArray *driver_from_id_array; // Index is driver id, value is driver pointer
@@ -13,13 +16,9 @@ struct CatalogDriver {
 };
 
 /**
- * Function that wraps free driver to be used in GLib g_ptr_array free func.
+ * Sorts the drivers array by score.
  */
-void glib_wrapper_free_driver(gpointer driver) {
-    free_driver(driver);
-}
-
-void sort_array_by_driver_score(void *drivers_array) {
+static void sort_array_by_driver_score(void *drivers_array) {
     BENCHMARK_START(sort_drivers_array);
     sort_array(drivers_array, compare_drivers_by_score);
     BENCHMARK_END(sort_drivers_array, "sort_drivers_array: %lf seconds\n");
@@ -27,7 +26,7 @@ void sort_array_by_driver_score(void *drivers_array) {
 
 CatalogDriver *create_catalog_driver(void) {
     CatalogDriver *catalog_driver = malloc(sizeof(CatalogDriver));
-    GPtrArray *drivers_array = g_ptr_array_new_with_free_func(glib_wrapper_free_driver);
+    GPtrArray *drivers_array = g_ptr_array_new_with_free_func(free_driver);
     catalog_driver->lazy_drivers_array = lazy_of(drivers_array, sort_array_by_driver_score);
     catalog_driver->driver_from_id_array = g_ptr_array_new();
 
@@ -35,6 +34,9 @@ CatalogDriver *create_catalog_driver(void) {
     return catalog_driver;
 }
 
+/**
+ * Frees the GPtrArray and its contents.
+ */
 void free_g_ptr_array(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }

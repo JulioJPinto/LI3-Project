@@ -6,7 +6,10 @@
 #include <stdio.h>
 #include <readline/readline.h>
 
-void clear_terminal_lines(int number_of_lines) {
+/**
+ * Clears `number_of_lines` from the terminal using ANSI escape codes.
+ */
+static void clear_terminal_lines(int number_of_lines) {
     for (int i = 0; i < number_of_lines; i++) {
         printf("\x1b[1F");
         printf("\x1b[2K");
@@ -14,7 +17,10 @@ void clear_terminal_lines(int number_of_lines) {
     }
 }
 
-int string_length_of_number(int number) {
+/**
+ * Returns the length of the given number.
+ */
+static int string_length_of_number(int number) {
     int length = 0;
     while (number > 0) {
         number /= 10;

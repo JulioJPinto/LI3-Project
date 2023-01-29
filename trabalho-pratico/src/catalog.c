@@ -70,6 +70,9 @@ int catalog_get_or_register_city_id(Catalog *catalog, char *city) {
     return city_id;
 }
 
+/**
+ * Internal function that parses a line and registers the parsed user.
+ */
 static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
     User *user = parse_line_user(line, separator);
     if (user == NULL) return;
@@ -81,6 +84,9 @@ void parse_and_register_user(void *catalog, char *line, char separator) {
     internal_parse_and_register_user(catalog, line, separator);
 }
 
+/**
+ * Internal function that parses a line and registers the parsed driver.
+ */
 static inline void internal_parse_and_register_driver(Catalog *catalog, char *line, char separator) {
     char *city;
     Driver *driver = parse_line_driver_detailed(line, separator, &city);
@@ -96,6 +102,9 @@ void parse_and_register_driver(void *catalog, char *line, char separator) {
     internal_parse_and_register_driver(catalog, line, separator);
 }
 
+/**
+ * Internal function that parses a line and registers the parsed ride.
+ */
 static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
     char *city;
     char *user_username;
@@ -125,7 +134,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     user_add_total_distance(user, ride_get_distance(ride));
     user_register_ride_date(user, ride_get_date(ride));
 
-    catalog_ride_register_ride(catalog->catalog_ride, ride, city_id);
+    catalog_ride_register_ride(catalog->catalog_ride, ride);
 
     AccountStatus driver_account_status = driver_get_account_status(driver);
     AccountStatus user_account_status = user_get_account_status(user);

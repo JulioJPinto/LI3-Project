@@ -2,6 +2,9 @@
 
 #include <glib.h>
 
+/**
+ * Ensures `lazy_get_raw_value` and `lazy_get_value` work as expected when the apply function is NULL.
+ */
 void test_lazy_behavior_null_apply_function(void) {
     int value = 5;
     Lazy *lazy = lazy_of(&value, NULL);
@@ -21,10 +24,16 @@ void test_lazy_behavior_null_apply_function(void) {
     free_lazy(lazy, NULL);
 }
 
+/**
+ * Increases the value inside of an int pointer by 1.
+*/
 void increase_int(void *value) {
     (*(int *) value)++;
 }
 
+/**
+ * Ensures `lazy_get_raw_value` and `lazy_get_value` work as expected when the apply function is not NULL.
+ */
 void test_lazy_behavior_int_apply_function(void) {
     int value = 5;
     Lazy *lazy = lazy_of(&value, increase_int);

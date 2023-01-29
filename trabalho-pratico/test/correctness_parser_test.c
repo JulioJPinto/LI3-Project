@@ -4,8 +4,14 @@
 #include "driver.h"
 #include "ride.h"
 
+/**
+ * Number of lines that failed to parse.
+*/
 static int failed_lines = 0;
 
+/**
+ * Parses an user line and ensures that it returns NULL.
+ */
 void parse_user_and_check_for_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -18,6 +24,9 @@ void parse_user_and_check_for_null(void *first_arg, char *line, char separator) 
     free(new_line);
 }
 
+/**
+ * Parses a driver line and ensures that it returns NULL.
+ */
 void parse_driver_and_check_for_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -30,6 +39,9 @@ void parse_driver_and_check_for_null(void *first_arg, char *line, char separator
     free(new_line);
 }
 
+/**
+ * Parses a ride line and ensures that it returns NULL.
+ */
 void parse_ride_and_check_for_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -42,6 +54,9 @@ void parse_ride_and_check_for_null(void *first_arg, char *line, char separator) 
     free(new_line);
 }
 
+/**
+ * Parses an user line and ensures that it does not return NULL.
+ */
 void parse_user_and_check_for_non_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -55,6 +70,9 @@ void parse_user_and_check_for_non_null(void *first_arg, char *line, char separat
     free(new_line);
 }
 
+/**
+ * Parses a driver line and ensures that it does not return NULL.
+ */
 void parse_driver_and_check_for_non_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -68,6 +86,9 @@ void parse_driver_and_check_for_non_null(void *first_arg, char *line, char separ
     free(new_line);
 }
 
+/**
+ * Parses a ride line and ensures that it does not return NULL.
+ */
 void parse_ride_and_check_for_non_null(void *first_arg, char *line, char separator) {
     (void) first_arg;
     char *new_line = g_strdup(line);
@@ -81,6 +102,9 @@ void parse_ride_and_check_for_non_null(void *first_arg, char *line, char separat
     free(new_line);
 }
 
+/**
+ * Asserts that the given dataset folder path having CSV files with invalid only lines does not load any user, driver or ride from the CSVs.
+ */
 void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
     FILE *users_file = open_file_folder(dataset_folder_path, "users.csv");
     FILE *drivers_file = open_file_folder(dataset_folder_path, "drivers.csv");
@@ -97,14 +121,23 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
     }
 }
 
+/**
+ * Asserts that no user, driver or ride is loaded from `datasets/data-regular-errors-invalid`.
+ */
 void assert_invalid_csv_loads_nothing_regular(void) {
     assert_invalid_csv_loads_nothing("datasets/data-regular-errors-invalid");
 }
 
+/**
+ * Asserts that no user, driver or ride is loaded from `datasets/data-large-errors-invalid`.
+ */
 void assert_invalid_csv_loads_nothing_large(void) {
     assert_invalid_csv_loads_nothing("datasets/data-large-errors-invalid");
 }
 
+/**
+ * Asserts that CSVs in `datasets/data-regular-errors-valid` that have valid lines only loads all users, drivers and rides from the CSV.
+ */
 void assert_valid_csv_loads_everything_regular(void) {
     char *dataset_folder_path = "datasets/data-regular-errors-valid";
 

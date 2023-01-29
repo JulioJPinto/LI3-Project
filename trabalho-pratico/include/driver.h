@@ -15,6 +15,11 @@ typedef struct Driver Driver;
 Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarClass car_class, const char *license_plate,
                       Date account_creation_date, AccountStatus account_status);
 
+/**
+ * Parses a line of the CSV to a driver
+ * parsed_city is used to return the city name of the ride because
+ * the driver saves a city id and not a city name
+ */
 Driver *parse_line_driver_detailed(char *line, char delim, char **parsed_city);
 
 /**
@@ -25,9 +30,7 @@ Driver *parse_line_driver(char *line, char delim);
 /**
  * Frees the memory allocated for the Driver.
  */
-void free_driver(Driver *driver);
-
-void driver_set_city_id(Driver *driver, int city_id);
+void free_driver(void *driver);
 
 /**
  * Returns the id of the Driver
@@ -39,6 +42,17 @@ int driver_get_id(Driver *driver);
  * The caller is responsible for freeing the memory allocated for the name
  */
 char *driver_get_name(Driver *driver);
+
+/**
+ * Sets the city id of the Driver
+ * The city id is set when the driver is registered in the catalog
+ */
+void driver_set_city_id(Driver *driver, int city_id);
+
+/**
+ * Returns the city id of the Driver
+ */
+int driver_get_city_id(Driver *driver);
 
 /**
  * Returns the birthdate of the Driver

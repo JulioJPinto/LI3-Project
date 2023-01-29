@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
         g_ptr_array_add(program_args, argv[i]);
     }
 
-    ProgramFlags *program_flags = retrieve_program_flags(program_args);
+    ProgramFlags *program_flags = steal_program_flags(program_args);
 
     int result;
 

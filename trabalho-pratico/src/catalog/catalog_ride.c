@@ -4,6 +4,9 @@
 #include "benchmark.h"
 #include "lazy.h"
 
+/**
+ * Struct that holds all the rides and indexed information.
+ */
 struct CatalogRide {
     Lazy *lazy_rides_array;
     GPtrArray *array_of_rides_in_city_array;
@@ -19,24 +22,36 @@ void glib_wrapper_free_ride(gpointer ride) {
     free_ride(ride);
 }
 
-void sort_rides_array(gpointer rides_array) {
+/**
+ * Function that sorts the rides array by date.
+ */
+static void sort_rides_array(gpointer rides_array) {
     BENCHMARK_START(sort_rides_array_timer);
     sort_array(rides_array, compare_rides_by_date);
     BENCHMARK_END(sort_rides_array_timer, "sort_rides_array: %lf seconds\n");
 }
 
-void sort_male_rides_by_account_creation_date(gpointer male_rides_array) {
+/**
+ * Function that sorts the male rides array by driver and user account creation date.
+ */
+static void sort_male_rides_by_account_creation_date(gpointer male_rides_array) {
     BENCHMARK_START(sort_rduinfo_male_array_timer);
     sort_array(male_rides_array, compare_ride_by_driver_and_user_account_creation_date);
     BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_male_array: %lf seconds\n");
 }
 
+/**
+ * Function that sorts the female rides array by driver and user account creation date.
+ */
 void sort_female_rides_by_account_creation_date(gpointer female_rides_array) {
-    BENCHMARK_START(sort_rduinfo_male_array_timer);
+    BENCHMARK_START(sort_rduinfo_female_array_timer);
     sort_array(female_rides_array, compare_ride_by_driver_and_user_account_creation_date);
-    BENCHMARK_END(sort_rduinfo_male_array_timer, "sort_ride_female_array: %lf seconds\n");
+    BENCHMARK_END(sort_rduinfo_female_array_timer, "sort_ride_female_array: %lf seconds\n");
 }
 
+/**
+ * Frees the rides array.
+ */
 void free_rides_array(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }
@@ -72,16 +87,27 @@ void free_catalog_ride(CatalogRide *catalog_ride) {
     free(catalog_ride);
 }
 
-void sort_array_rides_in_city_array(gpointer rides_array) {
+/**
+ * Function that sorts the rides in city array by date.
+ */
+static void sort_array_rides_in_city_array(gpointer rides_array) {
     BENCHMARK_START(sort_rides_array_timer);
     sort_array(rides_array, compare_rides_by_date);
     BENCHMARK_END(sort_rides_array_timer, "sort_rides_in_city_array: %lf seconds\n");
 }
 
-Lazy *catalog_ride_get_rides_in_city(CatalogRide *catalog_ride, int city_id) {
+/**
+ * Returns a Lazy with an array of rides in a city.
+ */
+static Lazy *catalog_ride_get_rides_in_city(CatalogRide *catalog_ride, int city_id) {
     return g_ptr_array_get_at_index_safe(catalog_ride->array_of_rides_in_city_array, city_id);
 }
 
+/**
+ * Indexes a ride by city id. 
+ * If the city has no rides registered, it creates a new array and adds the ride to it.
+ * If the city already has rides registered, it adds the ride to the array.
+ */
 static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride, int city_id) {
     Lazy *rides_in_city = catalog_ride_get_rides_in_city(catalog_ride, city_id);
     if (rides_in_city == NULL) {
@@ -93,10 +119,10 @@ static inline void catalog_ride_index_city(CatalogRide *catalog_ride, Ride *ride
     g_ptr_array_add(lazy_get_raw_value(rides_in_city), ride);
 }
 
-void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride, int city_id) {
+void catalog_ride_register_ride(CatalogRide *catalog_ride, Ride *ride) {
     g_ptr_array_add(lazy_get_raw_value(catalog_ride->lazy_rides_array), ride);
 
-    catalog_ride_index_city(catalog_ride, ride, city_id);
+    catalog_ride_index_city(catalog_ride, ride, ride_get_city_id(ride));
 }
 
 void catalog_ride_register_ride_same_gender(CatalogRide *catalog_ride,

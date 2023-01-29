@@ -157,10 +157,11 @@ void driver_register_ride_date(Driver *driver, Date date) {
     }
 }
 
-void free_driver(Driver *driver) {
-    free(driver->name);
-    // free(driver->license_plate);
-    free(driver);
+void free_driver(void *driver) {
+    Driver *actual_driver = (Driver *) driver;
+    free(actual_driver->name);
+    // free(actual_driver->license_plate);
+    free(actual_driver);
 }
 
 int compare_drivers_by_score(const void *a, const void *b) {

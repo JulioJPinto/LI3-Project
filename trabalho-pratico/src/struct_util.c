@@ -13,7 +13,10 @@ static const int reference_date_day = 9;
 static const int reference_date_month = 10;
 static const int reference_date_year = 2022;
 
-int is_digit(char c) {
+/**
+ * Returns 1 if the char is a digit, 0 otherwise
+ */
+static int is_digit(char c) {
     return c >= '0' && c <= '9';
 }
 
@@ -71,7 +74,10 @@ int is_date_valid(Date date) {
     return date.encoded_date != 0;
 }
 
-int is_date(int day, int month, int year) {
+/**
+ * Returns if the given day, month and year form a valid date (1<=dd<=31 && 1<=mm<=12 && 0<=year)
+ */
+static int is_date(int day, int month, int year) {
     return day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 0;
 }
 

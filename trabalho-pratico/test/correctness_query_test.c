@@ -2,8 +2,19 @@
 #include "catalog_loader.h"
 #include "query_manager.h"
 
+/**
+ * Gets the index-th element of the array. If the index is out of bounds, the default value is returned.
+ */
 #define GET_INDEX_SAFE(array, index, default_value) (index < (int) array->len ? array->pdata[index] : default_value)
 
+/**
+ * Loads the catalog from the given dataset folder path.
+ * If lazy_loading is TRUE, the catalog is indexed lazily.
+ * Executes the queries from the given queries file path.
+ * Loads the expected output of the queries from the given expected query result folder path.
+ * Checks if the output of the queries is the same as the expected output.
+ * If not the same, prints the query, the actual and the expected output.
+ */
 void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folder_path,
                                                              char *queries_file_path,
                                                              char *expected_query_result_folder_path,
@@ -50,8 +61,7 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
                 fprintf(stderr, "Query %d (%s) failed:\n", current_query_id, query);
                 fprintf(stderr, "Expected: '%s'\n", expectedLine);
-                fprintf(stderr, "Actual: '%s'\n", actualLine);
-                fprintf(stderr, "");
+                fprintf(stderr, "Actual: '%s'\n\n", actualLine);
             }
         }
         current_query_id++;
@@ -67,6 +77,9 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
     free_catalog(catalog);
 }
 
+/**
+ * Checks if all the queries from `data-regular/input1.txt` return the expected output with eager indexing.
+ */
 void load_catalog_execute_queries_and_check_expected_outputs_regular_1(void) {
     load_catalog_execute_queries_and_check_expected_outputs("datasets/data-regular",
                                                             "datasets/data-regular/input1.txt",
@@ -74,6 +87,9 @@ void load_catalog_execute_queries_and_check_expected_outputs_regular_1(void) {
                                                             FALSE);
 }
 
+/**
+ * Checks if all the queries from `data-regular/input2.txt` return the expected output with eager indexing.
+ */
 void load_catalog_execute_queries_and_check_expected_outputs_regular_2(void) {
     load_catalog_execute_queries_and_check_expected_outputs("datasets/data-regular",
                                                             "datasets/data-regular/input2.txt",
@@ -81,6 +97,9 @@ void load_catalog_execute_queries_and_check_expected_outputs_regular_2(void) {
                                                             FALSE);
 }
 
+/**
+ * Checks if all the queries from `data-regular/input1.txt` return the expected output with lazy indexing.
+ */
 void load_catalog_execute_queries_and_check_expected_outputs_regular_1_lazy(void) {
     load_catalog_execute_queries_and_check_expected_outputs("datasets/data-regular",
                                                             "datasets/data-regular/input1.txt",
@@ -88,6 +107,9 @@ void load_catalog_execute_queries_and_check_expected_outputs_regular_1_lazy(void
                                                             TRUE);
 }
 
+/**
+ * Checks if all the queries from `data-regular/input2.txt` return the expected output with lazy indexing.
+ */
 void load_catalog_execute_queries_and_check_expected_outputs_regular_2_lazy(void) {
     load_catalog_execute_queries_and_check_expected_outputs("datasets/data-regular",
                                                             "datasets/data-regular/input2.txt",

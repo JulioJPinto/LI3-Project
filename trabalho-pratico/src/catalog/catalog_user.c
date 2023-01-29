@@ -4,6 +4,9 @@
 #include "lazy.h"
 #include "array_util.h"
 
+/**
+ * Struct that holds all the users and their indexed information.
+ */
 struct CatalogUser {
     Lazy *lazy_users_array;
     GHashTable *user_from_username_hashtable;
@@ -16,7 +19,10 @@ void glib_wrapper_free_user(gpointer user) {
     free_user(user);
 }
 
-void sort_array_by_total_distance(void *users_array) {
+/**
+ * Function that sorts the users array by total distance.
+ */
+static void sort_array_by_total_distance(void *users_array) {
     BENCHMARK_START(sort_users_array);
     sort_array(users_array, compare_users_by_total_distance);
     BENCHMARK_END(sort_users_array, "sort_users_array: %lf seconds\n");
@@ -31,6 +37,9 @@ CatalogUser *create_catalog_user(void) {
     return catalog_user;
 }
 
+/**
+ * Frees the user array.
+ */
 void free_users_array(gpointer array) {
     g_ptr_array_free(array, TRUE);
 }

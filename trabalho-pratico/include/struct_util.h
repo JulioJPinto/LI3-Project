@@ -98,10 +98,22 @@ Date parse_date(char *string);
  */
 Date create_date(int day, int month, int year);
 
+/**
+ * Returns the day of the date
+ * As the date is encoded, this function will extract the day from the encoded date
+ */
 int date_get_day(Date date);
 
+/**
+ * Returns the month of the date
+ * As the date is encoded, this function will extract the month from the encoded date
+ */
 int date_get_month(Date date);
 
+/**
+ * Returns the year of the date
+ * As the date is encoded, this function will extract the year from the encoded date
+ */
 int date_get_year(Date date);
 
 /**

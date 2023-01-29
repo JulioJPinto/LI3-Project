@@ -5,12 +5,18 @@
 #include "queries.h"
 #include "logger.h"
 
+/**
+ * Struct that holds information about a query command.
+ */
 typedef struct {
     QueryFunction *function;
     int min_args;
     char *usage;
 } QueryFunctionInfo;
 
+/**
+ * Array that holds every query command.
+ */
 static const QueryFunctionInfo query_functions[] = {
         {execute_query_find_user_or_driver_by_name_or_id, 1, "1 <username|id>"},
         {execute_query_top_n_drivers, 1, "2 <n>"},
@@ -23,6 +29,9 @@ static const QueryFunctionInfo query_functions[] = {
         {execute_query_passenger_that_gave_tip, 2, "9 <start_date> <end_date>"},
 };
 
+/**
+ * Size of the query_functions array.
+ */
 static const size_t query_functions_size = sizeof(query_functions) / sizeof(QueryFunctionInfo);
 
 void parse_and_run_query(Catalog *catalog, OutputWriter *output, char *query) {

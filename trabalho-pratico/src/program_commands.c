@@ -6,12 +6,19 @@
 #include "terminal_controller.h"
 #include "file_util.h"
 
+/**
+ * Struct that holds information about a program command.
+ */
 typedef struct ProgramCommand {
     char *name;
     char *description;
     void (*function)(Program *program, char **args, int arg_size);
 } ProgramCommand;
 
+/**
+ * `file` command implementation.
+ * Runs all the queries from the given file.
+ */
 void program_run_queries_from_file_command(Program *program, char **args, int arg_size) {
     if (arg_size < 2) {
         LOG_WARNING("Usage: 'file <file_path>'");
@@ -27,6 +34,10 @@ void program_run_queries_from_file_command(Program *program, char **args, int ar
 
 void program_run_help_command(Program *program, char **args, int arg_size);
 
+/**
+ * `exit` command implementation.
+ * Exits the program.
+ */
 void program_exit_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
@@ -34,6 +45,10 @@ void program_exit_command(Program *program, char **args, int arg_size) {
     program_set_state(program, PROGRAM_STATE_EXITING);
 }
 
+/**
+ * `restart` command implementation.
+ * Restarts the program (asks for a new catalog).
+ */
 void program_restart_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
@@ -42,6 +57,10 @@ void program_restart_command(Program *program, char **args, int arg_size) {
     program_set_should_exit(program, FALSE);
 }
 
+/**
+ * `clear` command implementation.
+ * Clears the terminal.
+ */
 void program_clear_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
@@ -51,15 +70,24 @@ void program_clear_command(Program *program, char **args, int arg_size) {
     (void) r;
 }
 
+/**
+ * `list-output` command implementation.
+ * Lists the output files in the output folder.
+ */
 void program_list_output_command(Program *program, char **args, int arg_size) {
     (void) args;
     (void) arg_size;
     (void) program;
 
-    int r = system("ls Resultados/");
+    int r = system("ls " OUTPUT_FOLDER PATH_SEPARATOR);
     (void) r;
 }
 
+/**
+ * `cat` command implementation.
+ * Prints the content of the given file.
+ * The file can be a path to a file, an output file or an output file id.
+ */
 void program_cat_files_command(Program *program, char **args, int arg_size) {
     (void) program;
 
@@ -99,6 +127,9 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
     fclose(input_file);
 }
 
+/**
+ * Array that holds all the available program commands.
+ */
 const ProgramCommand program_commands[] = {
         {"cat", "Prints the output from a result or input file", program_cat_files_command},
         {"clear", "Cleans everything in the terminal", program_clear_command},
@@ -109,8 +140,15 @@ const ProgramCommand program_commands[] = {
         {"restart", "Restarts the program", program_restart_command},
 };
 
+/**
+ * Size of the `program_commands` array.
+ */
 const int program_commands_size = sizeof(program_commands) / sizeof(ProgramCommand);
 
+/**
+ * `help` command implementation.
+ * Prints all the available commands and their description.
+ */
 void program_run_help_command(Program *program, char **args, int arg_size) {
     (void) program;
     (void) args;

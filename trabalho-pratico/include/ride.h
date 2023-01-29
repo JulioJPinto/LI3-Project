@@ -26,6 +26,10 @@ Ride *parse_line_ride(char *line, char delim);
  */
 Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char **parsed_user_username);
 
+/**
+ * Sets the city id of the ride
+ * The city id is set when the ride is registered in the catalog
+ */
 void ride_set_city_id(Ride *ride, int city_id);
 
 /**
@@ -91,12 +95,26 @@ void ride_set_price(Ride *ride, double price);
  */
 double ride_get_price(Ride *ride);
 
+/**
+ * Sets the user account creation date of the ride
+ * The date is set when the ride is registered in the catalog
+ */
 void ride_set_user_account_creation_date(Ride *ride, Date date);
 
+/**
+ * Returns the user account creation date of the ride
+ */
 Date ride_get_user_account_creation_date(Ride *ride);
 
+/**
+ * Sets the driver account creation date of the ride
+ * The date is set when the ride is registered in the catalog
+ */
 void ride_set_driver_account_creation_date(Ride *ride, Date date);
 
+/**
+ * Returns the driver account creation date of the ride
+ */
 Date ride_get_driver_account_creation_date(Ride *ride);
 
 /**

@@ -2,6 +2,9 @@
 
 #include <glib.h>
 
+/**
+ * Tests if parsing and encoding/decoding of the date is done correctly.
+ */
 void test_date(char *date, int expected_day, int expected_month, int expected_year) {
     char *date_copy = g_strdup(date);
     Date parsed_date = parse_date(date_copy);
@@ -17,6 +20,9 @@ void test_date(char *date, int expected_day, int expected_month, int expected_ye
     free(date_copy);
 }
 
+/**
+ * Tests if valid dates are parsed correctly and invalid dates are loaded as invalid.
+ */
 void assert_test_date_parse_and_encoding(void) {
     test_date("01/01/2022", 1, 1, 2022);
     test_date("31/12/2000", 31, 12, 2000);
@@ -27,6 +33,9 @@ void assert_test_date_parse_and_encoding(void) {
     }
 }
 
+/**
+ * Tests if the date comparison works correctly.
+ */
 void assert_test_date_compare(void) {
     Date date1 = create_date(1, 1, 2000);
     Date date3 = create_date(1, 1, 2001);
@@ -51,8 +60,9 @@ void assert_test_date_compare(void) {
     }
 }
 
-
-// 9/10/2022
+/**
+ * Tests if the age calculation works correctly.
+*/
 void assert_test_date_age(void) {
     Date date1 = create_date(1, 1, 2000);
     Date date2 = create_date(7, 2, 2005);

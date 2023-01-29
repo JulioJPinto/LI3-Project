@@ -14,6 +14,9 @@
 #include "terminal_controller.h"
 #include "program_commands.h"
 
+/**
+ * Struct that holds information about the program.
+ */
 struct Program {
     ProgramFlags *flags;
     Catalog *catalog;
@@ -48,6 +51,11 @@ void free_program(Program *program) {
     free(program);
 }
 
+/**
+ * Function that asks the user for the path to the dataset folder.
+ * If the user doesn't enter anything, the default path is used.
+ * Keeps asking until a valid path is entered.
+ */
 void program_ask_for_dataset_path(Program *program) {
     gboolean loaded = FALSE;
     while (!loaded) {
@@ -63,6 +71,9 @@ void program_ask_for_dataset_path(Program *program) {
     }
 }
 
+/**
+ * Function that runs a query and prints the output to the terminal (paginated if big enough).
+ */
 void run_query_and_print_output(Catalog *catalog, char *query) {
     OutputWriter *writer = create_array_of_strings_output_writer();
     parse_and_run_query(catalog, writer, query);
@@ -70,6 +81,9 @@ void run_query_and_print_output(Catalog *catalog, char *query) {
     close_output_writer(writer);
 }
 
+/**
+ * Function that runs a query and saves the output to the file according to the given query number.
+ */
 void run_query_and_save_in_output_file(Catalog *catalog, char *query, int query_number) {
     create_output_folder_if_not_exists();
     FILE *output_file = create_command_output_file(query_number);
@@ -81,6 +95,10 @@ void run_query_and_save_in_output_file(Catalog *catalog, char *query, int query_
     fclose(output_file);
 }
 
+/**
+ * Function that executes a program command.
+ * If the input is a number, it will execute it as a query and the output will be printed to the terminal (paginated if needed).
+ */
 void program_execute_command(Program *program, char *input) {
     char **args = g_strsplit(input, " ", 0);
     int arg_size = (int) g_strv_length(args);
@@ -91,7 +109,6 @@ void program_execute_command(Program *program, char *input) {
 
     if (program_command != NULL) {
         run_program_command(program_command, program, args, arg_size);
-        return;
     } else if (isdigit(args[0][0])) {
         run_query_and_print_output(program->catalog, input);
     } else {
@@ -99,6 +116,10 @@ void program_execute_command(Program *program, char *input) {
     }
 }
 
+/**
+ * Function that asks the user for a command and executes it.
+ * Also saves the command in the history.
+ */
 void program_ask_for_command(Program *program) {
     char *input = readline(TERMINAL_GREEN "> " TERMINAL_RESET);
 

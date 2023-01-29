@@ -1,6 +1,9 @@
 #include "lazy.h"
 #include "benchmark.h"
 
+/**
+ * Struct that represents a lazy.
+ */
 struct Lazy {
     void *value;
     ApplyFunction function_to_apply;

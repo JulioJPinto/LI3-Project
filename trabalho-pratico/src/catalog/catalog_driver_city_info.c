@@ -4,11 +4,17 @@
 #include "lazy.h"
 #include "array_util.h"
 
+/**
+ * Struct that holds an array of DriverCityInfoCollection for each city.
+ */
 struct CatalogDriverCityInfo {
     Lazy *lazy_driver_city_info_collection_array;
     //Lazy of GPtrArray<index: city_id, value: DriverCityInfoCollection>
 };
 
+/**
+ * Struct that holds DriverCityInfo structs for a city.
+ */
 typedef struct {
     /**
      * Array of all DriverCityInfo structs for the city.
@@ -26,6 +32,9 @@ typedef struct {
     GHashTable *driver_city_info_hashtable;
 } DriverCityInfoCollection;
 
+/**
+ * Free function for DriverCityInfoCollection.
+ */
 void free_driver_city_info_collection(gpointer value) {
     // This can happen if the array has not been fully populated with city ids, thus some indexes are NULL.
     if (value == NULL) return;
@@ -35,6 +44,10 @@ void free_driver_city_info_collection(gpointer value) {
     free(collection);
 }
 
+/**
+ * Function that is called when the lazy value is accessed (or when `lazy_force_eager_indexing` is called).
+ * For each city, the hash table is freed and the array is sorted by the driver's average score in that city.
+ */
 void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) {
     GPtrArray *driver_city_info_array = lazy_value;
 
@@ -58,6 +71,9 @@ CatalogDriverCityInfo *create_catalog_driver_city_info(void) {
     return catalog_driver_city_info;
 }
 
+/**
+ * Frees the array of DriverCityInfoCollection.
+*/
 void free_array(gpointer value) {
     g_ptr_array_free(value, TRUE);
 }

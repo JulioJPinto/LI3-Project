@@ -2,6 +2,9 @@
 
 #include <glib.h>
 
+/**
+ * Struct that holds the information of a driver in a city.
+ */
 struct DriverCityInfo {
     int id;
     int accumulated_score;
@@ -29,12 +32,8 @@ double driver_city_info_get_average_score(DriverCityInfo *driver_city_info) {
     return (double) driver_city_info->accumulated_score / (double) driver_city_info->amount_rides;
 }
 
-void free_driver_city_info(DriverCityInfo *driver_city_info) {
-    free(driver_city_info);
-}
-
 void free_driver_city_info_voidp(void *driver_city_info) {
-    free_driver_city_info(driver_city_info);
+    free(driver_city_info);
 }
 
 int compare_driver_city_infos_by_average_score(const void *a_driver_city_info, const void *b_driver_city_info) {

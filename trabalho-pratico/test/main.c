@@ -6,11 +6,17 @@
 
 #include <glib.h>
 
+/**
+ * Entry point for the test suite.
+*/
 int main(int argc, char *argv[]) {
     g_test_init(&argc, &argv, NULL);
 
     g_test_set_nonfatal_assertions();
 
+/**
+ * Adds a test to the test suite with the testpath concatenated with the function name.
+*/
 #define ADD_TEST(testpath, function) g_test_add_func(testpath #function, function)
 
     ADD_TEST("/struct_utils/", assert_test_date_parse_and_encoding);

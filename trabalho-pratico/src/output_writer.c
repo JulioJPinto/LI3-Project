@@ -7,21 +7,36 @@
 
 #include "output_writer.h"
 
+/**
+ * Struct that represents an output writer.
+ */
 struct OutputWriter {
     void *buffer;
     void (*write)(void *, const char *, va_list);
     void (*close)(void *);
 };
 
+/**
+ * Function to be saved in `write` field of `OutputWriter` struct.
+ * Writes the given string to the given file.
+ */
 static void write_to_file(void *file, const char *format, va_list args) {
     vfprintf(file, format, args);
 }
 
+/**
+ * Function to be saved in `write` field of `OutputWriter` struct.
+ * Writes the given string to the given array of strings.
+ */
 static void write_to_array_of_strings(void *array, const char *format, va_list args) {
     char *string = g_strdup_vprintf(format, args);
     g_ptr_array_add(array, string);
 }
 
+/**
+ * Function to be saved in `close` field of `OutputWriter` struct.
+ * Frees the given array of strings.
+ */
 static void free_array_of_strings(void *array) {
     g_ptr_array_free(array, TRUE);
 }
