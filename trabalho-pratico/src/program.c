@@ -89,7 +89,11 @@ void run_query_and_save_in_output_file(Catalog *catalog, char *query, int query_
     FILE *output_file = create_command_output_file(query_number);
 
     OutputWriter *writer = create_file_output_writer(output_file);
+
+    BENCHMARK_START(query_benchmark);
     parse_and_run_query(catalog, writer, query);
+    BENCHMARK_LOG("'%s' resolved in %lfs\n", query, g_timer_elapsed(query_benchmark, NULL));
+
     close_output_writer(writer);
 
     fclose(output_file);

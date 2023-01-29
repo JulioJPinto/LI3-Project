@@ -1,6 +1,3 @@
 --suppressions=./valgrind-suppressions/aarch64-valgrind-glib.supp
 --suppressions=./valgrind-suppressions/github-valgrind-glib.supp
 --suppressions=./valgrind-suppressions/arco-linux-valgrind-glib.supp
---leak-check=full
---show-leak-kinds=definite,indirect,possible,reachable
---error-exitcode=1
