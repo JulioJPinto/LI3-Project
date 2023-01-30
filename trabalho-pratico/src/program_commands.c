@@ -5,6 +5,7 @@
 #include "output_writer.h"
 #include "terminal_controller.h"
 #include "file_util.h"
+#include "string_util.h"
 
 /**
  * Struct that holds information about a program command.
@@ -97,6 +98,11 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
     }
 
     char *input_file_path = args[1];
+
+    if(!atoi(input_file_path) && !ends_with(input_file_path, ".txt")) {
+        LOG_WARNING_VA("Can't open '%s' file, can only open .txt files", input_file_path);
+        return;
+    }  
 
     OutputWriter *output = create_array_of_strings_output_writer();
 

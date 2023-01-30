@@ -21,4 +21,9 @@ void str_to_upper(char *string);
  */
 void str_to_lower(char *string);
 
+/**
+ * Compares a suffix to the end of a string.
+ */
+int ends_with(char *string, char *suffix);
+
 #endif //LI3_STRING_UTIL_H
