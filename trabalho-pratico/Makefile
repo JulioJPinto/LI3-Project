@@ -81,24 +81,27 @@ else
 	./build/debug/li3-debug datasets/data-regular datasets/data-regular/input1.txt 
 endif
 
+PEAK_MEMORY_USAGE_MB_THRESHOLD_REGULAR := 200
+PEAK_MEMORY_USAGE_MB_THRESHOLD_LARGE := 2000
+
 test: build-test build-release
 	@./build/test/li3-test
 
 	@echo "# Start of end-to-end tests"
 	@rm -rf Resultados
-	@./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt > /dev/null
+	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_REGULAR) ./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
 	@diff Resultados datasets/data-regular/expected-results-1
 	@echo "ok /end-to-end/regular_1"
 
 	@rm -rf Resultados
-	@./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt > /dev/null
+	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_REGULAR) ./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
 	@diff Resultados datasets/data-regular/expected-results-2
 	@echo "ok /end-to-end/regular_2"
 
-	# @rm -rf Resultados
-	# @./build/release/li3-release datasets/data-large datasets/data-large/input1.txt > /dev/null
-	# @diff Resultados datasets/data-large/expected-results-1
-	# @echo "ok /end-to-end/large_1"
+	@rm -rf Resultados
+	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_LARGE) ./build/release/li3-release datasets/data-large datasets/data-large/input1.txt
+	@diff Resultados datasets/data-large/expected-results-1
+	@echo "ok /end-to-end/large_1"
 
 	@rm -rf Resultados
 	@echo "# End of end-to-end tests"
