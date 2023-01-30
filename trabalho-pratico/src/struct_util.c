@@ -77,11 +77,11 @@ int is_date_valid(Date date) {
 /**
  * Returns if the given day, month and year form a valid date (1<=dd<=31 && 1<=mm<=12 && 0<=year)
  */
-static int is_date(int day, int month, int year) {
+int is_date(int day, int month, int year) {
     return day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 0;
 }
 
-inline Date parse_date(char *string) {
+Date parse_date(char *string) {
     // 18/12/2022
     if (string[2] != '/' || string[5] != '/' || string[10] != '\0') {
         return invalid_date;

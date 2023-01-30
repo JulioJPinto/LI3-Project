@@ -88,20 +88,24 @@ test: build-test build-release
 	@./build/test/li3-test
 
 	@echo "# Start of end-to-end tests"
+
+	@printf "regular dataset 1: "
 	@rm -rf Resultados
 	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_REGULAR) ./build/release/li3-release datasets/data-regular datasets/data-regular/input1.txt
 	@diff Resultados datasets/data-regular/expected-results-1
-	@echo "ok /end-to-end/regular_1"
+	@echo "regular dataset 1: Results match expected results"
 
+	@printf "regular dataset 2: "
 	@rm -rf Resultados
 	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_REGULAR) ./build/release/li3-release datasets/data-regular datasets/data-regular/input2.txt
 	@diff Resultados datasets/data-regular/expected-results-2
-	@echo "ok /end-to-end/regular_2"
+	@echo "regular dataset 2: Results match expected results"
 
+	@printf "large dataset 1: "
 	@rm -rf Resultados
 	@./test/check_memory_usage.sh $(PEAK_MEMORY_USAGE_MB_THRESHOLD_LARGE) ./build/release/li3-release datasets/data-large datasets/data-large/input1.txt
 	@diff Resultados datasets/data-large/expected-results-1
-	@echo "ok /end-to-end/large_1"
+	@echo "large dataset 1: Results match expected results"
 
 	@rm -rf Resultados
 	@echo "# End of end-to-end tests"

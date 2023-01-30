@@ -30,11 +30,11 @@ void str_to_lower(char *string) {
     }
 }
 
-int ends_with(char *string, char *suffix) {
-    int string_lenght = strlen(string);
-    int suffix_lenght = strlen(suffix);
+int string_ends_with(char *string, char *suffix) {
+    int string_lenght = (int) strlen(string);
+    int suffix_lenght = (int) strlen(suffix);
 
     int lenght_dif = string_lenght - suffix_lenght;
 
-    return string_lenght >= suffix_lenght && strcmp(string + lenght_dif, suffix) == 0 ;
+    return string_lenght >= suffix_lenght && strcmp(string + lenght_dif, suffix) == 0;
 }
