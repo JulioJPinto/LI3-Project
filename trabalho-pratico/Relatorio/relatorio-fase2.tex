@@ -62,6 +62,7 @@
             útil no modo interativo (será abordado mais abaixo).
 
         \subsubsection{Otimizações localidade espacial e temporal}
+        // TODO: METER ISTO APOS A EXPLICAÇÃO DAS QUERIES
             Apesar da estrutura previeamente implementada permitir a realização
             do trabalho dentro dos limites de tempo com grandes margens, decidimos
             mesmo assim otimizá-lo para além do que o que já tinhamos. Para tal
@@ -83,7 +84,8 @@
             o tamanho necessário para as mesmas tal como torna a pesquisa pelo utilizador 
             mais fácil e rápida.
 
-        \subsubsection{Pequenas Otimizações}
+        \subsubsection{Micro-Otimizações}
+        // TODO: METER ISTO APOS A EXPLICAÇÃO DAS QUERIES
             De maneira a gerir melhor a memória usada pelo programa decidimos então
             fazer diversas, mas eficazes alterações para a dimensão do projeto.
             Para começar:
@@ -121,29 +123,36 @@
         \end{itemize}
     \subsection{Queries Implementadas}
         Para a segunda fase do trabalho foram aplicadas todas as queries em falta
-        (Queries 1 a 5 realizadas na fase anterior) seguindo a nosso ver a melhor
-        estratégia possível. Foram implementadas as queries 6, 7, 8 e 9.
+        (Queries 1 a 5 realizadas na fase anterior). Foram implementadas as queries 6, 7, 8 e 9.
+        A implementação das queries anteriores não foi alterada, apenas foi otimizado
+        algumas partes do catálogo para que o indexamento dos dados fosse mais rápido.
         \subsubsection{Query 6}
-            De maneira a conseguirmos calcular o preço médio dentro de uma data decidimos 
-            então implementar utilizar um \emph{sorting} do \emph{array} (\emph{Array de Rides}
-            presente no \emph{CatalogRides}). Após isso utilizamos \emph{Binary Search} para
-            encontrar a primeira data, e percorremos o array, linearmente, até a segunda data.
-            Enquanto isto acontece vamos sumando a distância de cada elemento à distância global,
-            entre as datas, e incrementamos o número de viagens, para depois no final este ser 
-            calculado. (Garantimos também que não existe uma divisão da distância global por 0, 
-            caso não existam viagens).
+            De maneira a conseguirmos calcular o preço médio dentro de uma data usamos
+            o \emph{array} de rides que está ordenado por data. Com ele fazemos \emph{binary search} para
+            encontrar a data do começo (ou a próxima maior caso não exista) e percorremos o array, 
+            linearmente, até a segunda data, fazendo média dos preços das viagens. O preço
+            de cada viagem foi calculado e guardado na ride durante a inserção nos catálogos para evitar
+            \emph{lookups} às informações do condutor quando necessário.
         \subsubsection{Query 7}
-            Para a query 7 decidimos implementar uma nova estrutura de dados. Adicionando ao 
-            \emph{CatalogDriver} um \emph{CatalogDriverCityInfo}, este \emph{CatalogDriverCityInfo} 
-            permite nos guardar as informações de um certo condutor numa cidade específica 
-            (Guardamos o número de viagens e \emph{Score} para esta cidade, para o condutor).
-            Com esta estrutura, guardamos um array, composto por um array de condutores 
-            e uma hashtable (Esta hashtable é puramente usada para um tempo de inserção O(1), após 
-            a inserção esta é libertada), cada um destes indíces representa uma cidade do dataset.
-            Quando a query é chamada damos \emph{sort}, pela primeira vez, por score do condutor, a 
-            todos os arrays que representam cidades assim facilmente ordenando os Top N Condutores 
-            de todas as cidades de maneira a dar a facilmente dar o \emph{output} da query.
+            Para a query 7 tivemos que recorrer a uma nova estrutura de dados separado dos condutores: \emph{DriverCityInfo}. 
+            Essa estrutura de dados guarda o score de um condutor numa cidade específica.
+            Conforme a inserção de rides no catálogo, vamos somando o score do condutor daquela ride
+            a um valor acumulado dentro da tal estrutura de dados. Para cada cidade, existe um array de \emph{DriverCityInfo} e
+            uma \emph{hashtable} temporária para fazer com que na inserção não
+            seja necessário percorrer o array inteiro para encontrar (ou ver que ainda não existe)
+            o \emph{DriverCityInfo} onde queremos somar o score de tal ride. 
+            Quando surge uma nova cidade, é criado um novo \emph{array} e uma nova \emph{hashtable} temporária.
+            Após a inserção de todas as rides, os \emph{hashtables} são libertados e cada array é ordenado por score.
             
+            Não foi possível, por exemplo, guardar um array na própria estrutura de dados do condutor
+            porque não sabemos a quantidade de cidades que existem no dataset até o lermos por completo,
+            pelo que teríamos que fazer \emph{reallocs} muito constantes, o que não é de todo eficiente.
+
+            Assim, com esta implementação, conseguimos fazer com que cidades sejam lidas e adicionadas dinâmicamente
+            de forma eficiente.
+
+            Quando a query é chamada, simplesmente pegamos nos primeiros \emph{n} elementos do array
+            da cidade pedida e imprimimos o resultado formatado, visto que os arrays estão ordenados por score.
         \subsubsection{Query 8}
             TODO
         \subsubsection{Query 9}
@@ -151,20 +160,26 @@
     \subsection{Estruturas de Dados}
         \subsubsection{Catalógo}
             TODO
-        \subsubsection{\emph{Lazys}}
-            De maneira a tornar o programa mais efeciente decidimos aplicar 
-            \emph{lazy loading}. Originalmente, na primeira fase do projeto,
-            quando os dados eram \emph{parsed} para o programa limitavamo-nos a 
-            fazer o \emph{sort} destes imediatamente, \emph{eager loading}, porém devido à 
-            implementação do modo interativo e visto que o \emph{sort} dos dados é relativamente 
-            rápido decidimos então só dar \emph{sort} a estes quando são necessários pela primeira 
-            vez. Como é que esta estrutura ,opaca, \emph{Lazy} funciona. Nela temos um value, value 
-            este que pode ser qualquer valor que bem entendermos, uma função a aplicar a este value, 
-            por exemplo uma função de \emph{sort} ou uma função de \emph{free}, e por último um booleano, 
-            este que define se a função guardada na struct já foi previamente utilizada ou não. 
-            Através desta estrutura impedimos desperdícios de tempo, que acontecem utilizando 
-            \emph{eager loading}, garantindo que desta maneira não realizamos \emph{sort} de dados 
-            desnecessários.
+        \subsubsection{\emph{Lazy}}
+            De maneira a tornar o programa mais eficiente decidimos criar uma
+            estrutura de dados já presente ou semelhante em outras linguagens de programação.
+            Para otimizar o tempo de carregamento dos dados, implementamos o '\emph{Lazy}' que é uma
+            estrutura que permite aplicar uma função a um valor quando este é requisitado.
+
+            A função e o valor são passados como parametros na criação da estrutura.
+
+            A estrutura foi implementada da forma mais genérica possível, de forma a que
+            possa ser usada para qualquer tipo de dados.
+
+            Isto permite então que, por exemplo, várias funções de \emph{sort} sejam aplicadas
+            apenas quando necessário, pelo que quando uma query nunca é chamada, as estruturas necessárias
+            não sejam indexadas desnecessariamente. Também torna o carregamento do modo interativo
+            mais leve. 
+
+            Este \emph{lazy sorting} é feito por defeito, mas para dar escolha ao utilizador,
+            pode ser desativado passando \emph{flag} \emph{--lazy-loading=false}
+            como argumento ao programa (esta \emph{flag} pode estar em qualquer
+            posição não interferindo com os datasets passados como argumento).
         \subsubsection{\emph{Program}}
             Visto que o nosso modo interativo decidimos fazer um \emph{Command Line Enviorment} tivemos
             a necessidade de criar a struct \emph{program}. Nesta struct guardamos os diversos estados e
