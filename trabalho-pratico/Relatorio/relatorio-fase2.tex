@@ -61,41 +61,6 @@
             implementadas, exceto o \emph{lazy loading} que foi
             útil no modo interativo (será abordado mais abaixo).
 
-        \subsubsection{Otimizações localidade espacial e temporal}
-        // TODO: METER ISTO APOS A EXPLICAÇÃO DAS QUERIES
-            Apesar da estrutura previeamente implementada permitir a realização
-            do trabalho dentro dos limites de tempo com grandes margens, decidimos
-            mesmo assim otimizá-lo para além do que o que já tinhamos. Para tal
-            alteramos certas estruturas de dados e certos métodos de guardar 
-            informações destes de maneira se adequar à melhor a uma melhor localidade 
-            temporal e espacial. Decidimos então alterar a maneira como guardamos os 
-            nossos condutores no \emph{CatalogDrivers}, trocando a Hashtable presente
-            neste (Hashtable para um acesso constante aos condutores pelo ID) por um 
-            array onde o índice da posição do Condutor no array é igual ao ID deste 
-            mesmo condutor. Ainda mais decidimos também, ao invés de guardar em cada 
-            condutor e viagem a cidade, guardar um ID único para cada, de maneira a 
-            diminuir o número de \emph{strdups} necessários, assim por consequência, 
-            diminuindo também o tempo necessário para a alocação e libertação destes 
-            \emph{strdups} tal como o número de bytes necessários para os Condutores e
-            Viagens. No mesmo contexto, após alguma discussão, decidimos alterar também
-            a maneira como as viagens guardam os utilizadores. Dando a cada utilizador um
-            id único permite nos então poupar na quantidade de espaço necessário para as mesmas.
-            Ao invés de guardarmos uma string, assim simplesmente, guardamos um inteiro, diminuindo
-            o tamanho necessário para as mesmas tal como torna a pesquisa pelo utilizador 
-            mais fácil e rápida.
-
-        \subsubsection{Micro-Otimizações}
-        // TODO: METER ISTO APOS A EXPLICAÇÃO DAS QUERIES
-            De maneira a gerir melhor a memória usada pelo programa decidimos então
-            fazer diversas, mas eficazes alterações para a dimensão do projeto.
-            Para começar:
-            Decidimos alterar a maneira como as datas, a struct \emph{Date},
-            funciona. Alteramos então a maneira deste de três ints de 32 bits para um int de 32 bits.
-            Pode não parecer muito porém num dataset de 10 mil rides, poupamos cerca de 
-            640 000 bits.
-            Ainda mais, decidimos também substituir o uso da função \emph{strtol}
-            pelas nossa próprias funções de parsing para inteiros.
-
     \subsection{Pipeline}
         Neste momento o nosso programa funciona da seguinte maneira:
         \begin{itemize}
@@ -117,8 +82,7 @@
             \emph{OutuputWriter} onde guardamos o resultado. Caso este quando chega ao mesmo 
             dependendo do modo, \emph{Batch} ou Interativo este será impresso para um ficheiro
             de \emph{output} ou para o terminal. No modo interativo caso seja maior que o 
-            \emph{PAGE-SIZE} definido (10 linhas) este passará a modo de paginação.
-            \item 
+            \emph{PAGE-SIZE} definido (10 linhas) este passará a modo de paginação. 
             
         \end{itemize}
     \subsection{Queries Implementadas}
@@ -154,12 +118,43 @@
             Quando a query é chamada, simplesmente pegamos nos primeiros \emph{n} elementos do array
             da cidade pedida e imprimimos o resultado formatado, visto que os arrays estão ordenados por score.
         \subsubsection{Query 8}
-            TODO
+        REVIEW NESTAS QUERIES TB
+            De maneira a fazer a query 8 decidimos adcionar dois arrays ao Catálogo de Viagens. Adicionamos um
+            array para cada gênero, assim no \emph{loading} das viagens, guardamos cada viagem com o 
+            condutor e utilizador com o mesmo gênero no array respetivo. Depois quando a query for chamada
+            o array será ordenado pela data de criação da conta do utilizador e do condutor.
         \subsubsection{Query 9}
-            TODO
+            Por último, para a query 9, decidimos seguir um raciocínio parecido ao da Query 2 e 3.
+            Para este tal como na query 6, utilizamos o \emph{array} de rides ordenado por data e pesquisamos
+            pela primeira data. Enquanto que percorremos o \emph{array} guardamos as viagens em que gorjeta foi
+            dada num \emph{array} de resultados. Até chegarmos ao final do array ou à segunda data.
+            
     \subsection{Estruturas de Dados}
         \subsubsection{Catalógo}
-            TODO
+            Como foi dito na parte de ajustes, tivemos a necessidade de alterar a maneira como fazemos
+            o nosso catálogo. Para isso decidimos criar estruturas de dados para guardar os dados para
+            os Utilizadores, os Condutores e as Viagens. Um catálogo único para cada um deles, depois
+            agrupado num Catálogo Geral.
+            Em cada um dos catálogos guardamos pelo menos um array.
+
+            No Catálogo dos Utilizadores guardamos um array, ordenado pela distância total percorrida
+            pelo utilizador. Uma hashtable para a procura rápida de um utilizador pelo username e
+            ainda também outro array para indexarmos os utilizadores por ID (ID criado por nós no
+            momento de inserção no array).
+
+            No Catálogo dos Condutores guardamos um array, ordenado pelo \emph{score} do Condutor.
+            Ainda mais guardamos um array para procurar rápida do condutor e indexado pelo ID do
+            condutor. Para além destes dados temos uma struct, utilizada para a realização da query 7, 
+            (\emph{CatalogDriverCityInfo}) onde mapeamos as informações de cada condutor numa cidade 
+            específica.
+
+            No Catálogo das Viagens também guardamos um array, ordenado pela data da
+            viagem. Para além desse array guardamos mais 3 arrays, um para mapearmos o ID dos utilizadores
+            , outro para mapearmos as viagens com ambos o utilizador e condutor com o gênero masculino e o
+            último para mapearmos as viagens com ambos o utilizador e condutor com o gênero feminino.
+
+            Por último, temos um array e uma hashtable para mapearmos facilmente um ID a uma cidade.            
+            
         \subsubsection{\emph{Lazy}}
             De maneira a tornar o programa mais eficiente decidimos criar uma
             estrutura de dados já presente ou semelhante em outras linguagens de programação.
@@ -182,11 +177,53 @@
             posição não interferindo com os datasets passados como argumento).
         \subsubsection{\emph{Program}}
             Visto que o nosso modo interativo decidimos fazer um \emph{Command Line Enviorment} tivemos
-            a necessidade de criar a struct \emph{program}. Nesta struct guardamos os diversos estados e
-            modos que o programa está a ser corrido. Tal como todas as flags passadas a este, o Catálogo 
-            geral, o valor da query que estamos a passar e um booleano que dita se devemos sair do programa.
-            Desta maneira também conseguimos controlar se corremos o trabalho em \emph{batch mode} ou no 
-            modo interativo, assim garantindo que conseguimos realizá-lo de ambas as maneiras.
+            a necessidade de criar a struct \emph{program}. 
+
+            Aqui temos uma hashtable (\emph{ProgramFlags}) onde guardamos as flags passadas na incialização
+            do projeto.
+            Para além disso também guardamos o Catálogo e o estado do programa.
+
+            Por último, guardamos um booleano que nos indica se devemos ou não sair do programa.
+
+    \subsection{Otimizações}
+        \subsubsection{Otimizações localidade espacial e temporal}
+            Apesar da estrutura previeamente implementada permitir a realização
+            do trabalho dentro dos limites de tempo com grandes margens, decidimos
+            mesmo assim otimizá-lo para além do que o que já tinhamos. Para tal alteramos 
+            certas estruturas de dados e certos métodos de guardar informações destes de 
+            maneira se adequar à melhor a uma melhor localidade temporal e espacial.
+            
+            Decidimos então alterar a maneira como guardamos os nossos condutores tanto 
+            como no Catálogo do Condutores como no Catálogo das Viagens, trocando a 
+            Hashtable presente neste por um array onde o índice da posição do condutor 
+            no array é igual ao ID desto condutor. 
+            
+            Ainda mais decidimos também, ao invés de guardar em cada condutor e viagem a cidade, 
+            guardar um ID único para cada, de maneira a diminuir o número de \emph{strdups} necessários,
+            assim por consequência, diminuindo também o tempo necessário para a alocação e libertação 
+            destes \emph{strdups} tal como o número de bytes necessários para os condutores e
+            viagens. 
+            
+            No mesmo contexto, após alguma discussão, decidimos alterar também
+            a maneira como as viagens guardam os utilizadores. Dando a cada utilizador um
+            ID único permite nos então poupar na quantidade de espaço necessário para as mesmas.
+            Ao invés de guardarmos uma string, assim simplesmente, guardamos um inteiro, assim também
+            tornando a pesquisa pelo utilizador mais fácil (Utilizando o array de utilizadores onde cada
+            índice representa o array do utilizador).
+
+        \subsubsection{Micro-Otimizações}
+            De maneira a gerir melhor a memória usada pelo programa decidimos então
+            fazer diversas, mas eficazes alterações para a dimensão do projeto.
+            Para começar:
+            
+            Decidimos alterar a maneira como as datas, a struct \emph{Date},
+            funciona. Alteramos então a maneira deste de três ints de 32 bits para um int de 32 bits.
+            Pode não parecer muito porém num dataset de 10 mil rides, poupamos cerca de 
+            640 000 bits.
+            
+            Ainda mais, decidimos também substituir o uso da função \emph{strtol} e \emph{atoi}
+            pelas nossa próprias funções de parsing para inteiros.
+    \newpage
     \subsection{Modo Interativo}
             Como sugerido por alguns professores, ao invés de utilizarmos \emph{ncurses} ou outra 
             biblioteca externa de maneira a fazer uma TUI (Terminal User Interface), após diversa 
@@ -194,17 +231,23 @@
             Enviorment}. Para isso usamos bibliotecas como a \emph{readline/readline} e 
             \emph{readline/history}. 
         \subsubsection{Lista de Comandos}
-            No modo interativo utilizamos diferentes comandos para a realização das necessidades do
-            utilizador. Primeiramente temos um comando help, que lista todos os comandos possíveis 
-            do programa. O utilizador de maneira a correr as queries pode chamar um ficheiro, usando 
-            o comando \emph{file}, como também pode as escrever diretamente na linha de comando. Enquanto 
-            que ao chamar o file, dará output para novos ficheiros, ao escrever diretamente na linha de 
-            comando o resultado será exposto no terminal. Para além destes comandos ainda temos o comando 
-            \emph{reload} que permite ao utilizador inserir um novo \emph{dataset}, caso este mude 
-            durante a utilização do programa ou caso o utlizado pretenda utilizar um \emph{dataset}
-            diferente sem ter que sair do programa e também temos o comando \emph{clear}, que tal como
-            o nome indica, impa o terminal. Por último temos o comando \emph{exit} de maneira a sair do 
-            programa.
+            No modo interativo decidimos aplicar diversos comandos.
+            Para começar aplicamos o comando \emph{help} que dá display de todos os comandos do programa.
+
+            De maneira a correr as \emph{queries} o utilizador pode seguir dois métodos, escrevendo a query
+            no formato da mesma, ou então pode utilizar o comando \emph{file} e passar lhe um ficheiro de 
+            onde corre as \emph{queries}. 
+
+            Enquanto que ao correr as \emph{queries} diretamente no modo interativo, no terminal, porém a
+            correr com o comando \emph{file} não conseguimos dar display. Para isso criamos o comando
+            \emph{list-output}, que lista os ficheiros/IDs do output, e o comando \emph{cat} que abre um 
+            ficheiro pelo ID, ou caso ele seja .txt.
+
+            Por último temos o comando \emph{clear} e \emph{restart} que, respetivamente, limpa todas as
+            linhas no terminal e recomeça o programa.
+
+            Caso o utilizador pretenda fechar o programa basta escrever o comando \emph{exit}.
+            
         \subsubsection{Histórico de Comandos}
             Através da utilização da biblioteca \emph{readline/history} decidimos também implementar um 
             histórico de comandos. Desta maneira caso o utilizador necessite de reutilizar um comando 
@@ -218,13 +261,21 @@
             página, como também conseguimos simplesmente dizer a página que pretendemos e esta será impressa 
             no terminal. De ambas as maneiras a página anterior será apagada do terminal.
     \subsection{Testes Unitários}
+            COMMENT: REVIEW NESTA SECTION PLS
+            Como pedido no enunciado aplicamos testes de performance, uso de memória e resposta das queries.
+            Ainda mais também aplicamos testes para as nossas estruturas, o nosso \emph{parser} e para os \emph{
+            lazys}.
         \subsubsection{Actions do Github}
-        De maneira a conseguirmos garantir que o código presente no nosso repositório passaria sempre os
-        testes dos professores, decidimos criar algumas Actions para o mesmo. Assim mesmo que não
-        conseguissemos testar na nossa máquina local, saberiamos caso o projeto tivesse \emph{memory
-        leaks} ou falhas nos testes, seriamos alertados, tal como nos seria demonstrado onde errou ou a o
-        output do valgrind.
-    \subsection{\emph{CSV Generator}}
+            De maneira a conseguirmos garantir que o código presente no nosso repositório passaria sempre os
+            testes dos professores, decidimos criar algumas Actions para o mesmo. Assim mesmo que não
+            conseguissemos testar na nossa máquina local, saberiamos caso o projeto tivesse \emph{memory
+            leaks} ou falhas nos testes, seriamos alertados, tal como nos seria demonstrado onde errou ou a o
+            output do valgrind.
+        \subsubsection{\emph{CSV Generator}}
+            COMMENT: Provavelmente vou tirar esta parte
+            De maneira a garantir que o nosso programa funcionava independente do \emph{dataset} fornecido
+            decidimos criar um gerador de CSVs em Rust e Python. Este permitiu nos, como o nome indica, gerar mais
+            CSVs e aumentar a possibilidade de testes realizados.
     \section{Testes de Performance}
         \begin{table}[hbt!]
             \centering
