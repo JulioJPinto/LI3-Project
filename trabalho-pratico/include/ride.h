@@ -3,7 +3,7 @@
 #define LI3_RIDE_H
 
 #include "struct_util.h"
-#include "line_iterator.h"
+#include "token_iterator.h"
 
 /**
  * Struct that represents a user.
@@ -18,14 +18,14 @@ Ride *create_ride(int id, Date date, int driver_id, int city_id, int distance, i
 /**
  * Parses a line of the CSV to a ride
  */
-Ride *parse_line_ride(LineIterator *line_iterator);
+Ride *parse_line_ride(TokenIterator *line_iterator);
 
 /**
  * Parses a line of the CSV to a ride
  * parsed_city and parsed_user_username are used to return the strings city and user_username of the ride
  * to avoid having to strdup them again when registering the ride in the catalog
  */
-Ride *parse_line_ride_detailed(LineIterator *line_iterator, char **parsed_city, char **parsed_user_username);
+Ride *parse_line_ride_detailed(TokenIterator *line_iterator, char **parsed_city, char **parsed_user_username);
 
 /**
  * Sets the city id of the ride

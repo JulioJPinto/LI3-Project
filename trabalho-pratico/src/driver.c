@@ -42,42 +42,42 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
     return driver;
 }
 
-Driver *parse_line_driver(LineIterator *line_iterator) {
+Driver *parse_line_driver(TokenIterator *line_iterator) {
     return parse_line_driver_detailed(line_iterator, NULL);
 }
 
-Driver *parse_line_driver_detailed(LineIterator *line_iterator, char **parsed_city) {
-    char *id_string = line_iterator_next(line_iterator);
+Driver *parse_line_driver_detailed(TokenIterator *line_iterator, char **parsed_city) {
+    char *id_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(id_string)) return NULL;
 
     int id = parse_int_unsafe(id_string);
 
-    char *name = line_iterator_next(line_iterator);
+    char *name = token_iterator_next(line_iterator);
     if (IS_EMPTY(name)) return NULL;
 
-    char *date_string = line_iterator_next(line_iterator);
+    char *date_string = token_iterator_next(line_iterator);
     Date date = parse_date(date_string);
     if (!is_date_valid(date)) return NULL;
 
-    char *gender_string = line_iterator_next(line_iterator);
+    char *gender_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(gender_string)) return NULL;
     Gender gender = parse_gender(gender_string);
 
-    char *car_class_string = line_iterator_next(line_iterator);
+    char *car_class_string = token_iterator_next(line_iterator);
     CarClass car_class = parse_car_class(car_class_string);
     if (car_class == INVALID_CAR_CLASS) return NULL;
 
-    char *license_plate = line_iterator_next(line_iterator);
+    char *license_plate = token_iterator_next(line_iterator);
     if (IS_EMPTY(license_plate)) return NULL;
 
-    char *city = line_iterator_next(line_iterator);
+    char *city = token_iterator_next(line_iterator);
     if (IS_EMPTY(city)) return NULL;
 
-    char *creation_date_string = line_iterator_next(line_iterator);
+    char *creation_date_string = token_iterator_next(line_iterator);
     Date creation_date = parse_date(creation_date_string);
     if (!is_date_valid(creation_date)) return NULL;
 
-    char *acc_status_string = line_iterator_next(line_iterator);
+    char *acc_status_string = token_iterator_next(line_iterator);
 
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;

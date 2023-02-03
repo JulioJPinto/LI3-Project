@@ -2,7 +2,6 @@
 
 #include <glib.h>
 #include "struct_util.h"
-#include "line_iterator.h"
 #include "string_util.h"
 
 /**
@@ -38,45 +37,45 @@ Ride *create_ride(int id, Date date, int driver_id, int city_id, int distance, i
     return ride;
 }
 
-Ride *parse_line_ride(LineIterator *line_iterator) {
+Ride *parse_line_ride(TokenIterator *line_iterator) {
     return parse_line_ride_detailed(line_iterator, NULL, NULL);
 }
 
-Ride *parse_line_ride_detailed(LineIterator *line_iterator, char **parsed_city, char **parsed_user_username) {
-    char *id_string = line_iterator_next(line_iterator);
+Ride *parse_line_ride_detailed(TokenIterator *line_iterator, char **parsed_city, char **parsed_user_username) {
+    char *id_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(id_string)) return NULL;
     int id = parse_int_unsafe(id_string);
 
-    char *date_string = line_iterator_next(line_iterator);
+    char *date_string = token_iterator_next(line_iterator);
     Date date = parse_date(date_string);
     if (!is_date_valid(date)) return NULL;
 
-    char *driver_string = line_iterator_next(line_iterator);
+    char *driver_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(driver_string)) return NULL;
     int driver_id = parse_int_unsafe(driver_string);
 
-    char *user = line_iterator_next(line_iterator);
+    char *user = token_iterator_next(line_iterator);
     if (IS_EMPTY(user)) return NULL;
 
-    char *city = line_iterator_next(line_iterator);
+    char *city = token_iterator_next(line_iterator);
     if (IS_EMPTY(city)) return NULL;
     int city_id = 0;
 
     int error = 0;
 
-    char *distance_string = line_iterator_next(line_iterator);
+    char *distance_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(distance_string)) return NULL;
     int distance = parse_int_safe(distance_string, &error);
 
-    char *user_score_string = line_iterator_next(line_iterator);
+    char *user_score_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(user_score_string)) return NULL;
     int user_score = parse_int_safe(user_score_string, &error);
 
-    char *driver_score_string = line_iterator_next(line_iterator);
+    char *driver_score_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(driver_score_string)) return NULL;
     int driver_score = parse_int_safe(driver_score_string, &error);
 
-    char *tip_string = line_iterator_next(line_iterator);
+    char *tip_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(tip_string)) return NULL;
     double tip = parse_double_safe(tip_string, &error);
 

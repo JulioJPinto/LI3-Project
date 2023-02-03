@@ -42,30 +42,30 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(LineIterator *line_iterator) {
-    char *username = line_iterator_next(line_iterator);
+User *parse_line_user(TokenIterator *line_iterator) {
+    char *username = token_iterator_next(line_iterator);
     if (IS_EMPTY(username)) return NULL;
 
-    char *name = line_iterator_next(line_iterator);
+    char *name = token_iterator_next(line_iterator);
     if (IS_EMPTY(name)) return NULL;
 
-    char *gender_string = line_iterator_next(line_iterator);
+    char *gender_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(gender_string)) return NULL;
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = line_iterator_next(line_iterator);
+    char *birth_date_string = token_iterator_next(line_iterator);
     Date birth_date = parse_date(birth_date_string);
     if (!is_date_valid(birth_date)) return NULL;
 
-    char *acc_creation_string = line_iterator_next(line_iterator);
+    char *acc_creation_string = token_iterator_next(line_iterator);
     Date acc_creation = parse_date(acc_creation_string);
     if (!is_date_valid(acc_creation)) return NULL;
 
-    char *pay_method_string = line_iterator_next(line_iterator);
+    char *pay_method_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(pay_method_string)) return NULL;
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = line_iterator_next(line_iterator);
+    char *acc_status_string = token_iterator_next(line_iterator);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 

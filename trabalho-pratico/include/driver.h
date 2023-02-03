@@ -3,7 +3,7 @@
 #define LI3_DRIVER_H
 
 #include "struct_util.h"
-#include "line_iterator.h"
+#include "token_iterator.h"
 
 /**
  * Struct that represents a driver.
@@ -21,12 +21,12 @@ Driver *create_driver(int id, char *name, Date birth_date, Gender gender, CarCla
  * parsed_city is used to return the city name of the ride because
  * the driver saves a city id and not a city name
  */
-Driver *parse_line_driver_detailed(LineIterator *line_iterator, char **parsed_city);
+Driver *parse_line_driver_detailed(TokenIterator *line_iterator, char **parsed_city);
 
 /**
  + Parses a line of the CSV to a driver   
  */
-Driver *parse_line_driver(LineIterator *line_iterator);
+Driver *parse_line_driver(TokenIterator *line_iterator);
 
 /**
  * Frees the memory allocated for the Driver.

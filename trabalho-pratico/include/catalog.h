@@ -44,13 +44,13 @@ int catalog_get_or_register_city_id(Catalog *catalog, char *city);
  * Registers a user in the catalog.
  * Receives a catalog as void pointer to be used as a generic function.
  */
-void parse_and_register_user(void *catalog, LineIterator *line_iterator);
+void parse_and_register_user(void *catalog, TokenIterator *line_iterator);
 
 /**
  * Registers a driver in the catalog.
  * Receives a catalog as void pointer to be used as a generic function.
  */
-void parse_and_register_driver(void *catalog, LineIterator *line_iterator);
+void parse_and_register_driver(void *catalog, TokenIterator *line_iterator);
 
 /**
  * Registers a ride in the catalog.
@@ -58,7 +58,7 @@ void parse_and_register_driver(void *catalog, LineIterator *line_iterator);
  * as it updates the user and driver information related to this ride.
  * Receives a catalog as void pointer to be used as a generic function.
  */
-void parse_and_register_ride(void *catalog, LineIterator *line_iterator);
+void parse_and_register_ride(void *catalog, TokenIterator *line_iterator);
 
 /**
  * Notifies the catalog that the program won't register any more data.

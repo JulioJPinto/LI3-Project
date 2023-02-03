@@ -12,9 +12,9 @@ static int failed_lines = 0;
 /**
  * Parses an user line and ensures that it returns NULL.
  */
-void parse_user_and_check_for_null(void *first_arg, LineIterator *iterator) {
+void parse_user_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     User *user = parse_line_user(iterator);
     if (user != NULL) {
         fprintf(stderr, "User should've been NULL for line '%s'\n", line);
@@ -27,9 +27,9 @@ void parse_user_and_check_for_null(void *first_arg, LineIterator *iterator) {
 /**
  * Parses a driver line and ensures that it returns NULL.
  */
-void parse_driver_and_check_for_null(void *first_arg, LineIterator *iterator) {
+void parse_driver_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     Driver *driver = parse_line_driver(iterator);
     if (driver != NULL) {
         fprintf(stderr, "Driver should've been NULL for line '%s'\n", line);
@@ -42,9 +42,9 @@ void parse_driver_and_check_for_null(void *first_arg, LineIterator *iterator) {
 /**
  * Parses a ride line and ensures that it returns NULL.
  */
-void parse_ride_and_check_for_null(void *first_arg, LineIterator *iterator) {
+void parse_ride_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     Ride *ride = parse_line_ride(iterator);
     if (ride != NULL) {
         fprintf(stderr, "Ride should've been NULL for line '%s'\n", line);
@@ -57,9 +57,9 @@ void parse_ride_and_check_for_null(void *first_arg, LineIterator *iterator) {
 /**
  * Parses an user line and ensures that it does not return NULL.
  */
-void parse_user_and_check_for_non_null(void *first_arg, LineIterator *iterator) {
+void parse_user_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     User *user = parse_line_user(iterator);
     if (user == NULL) {
         fprintf(stderr, "User should've been non-NULL for line '%s'\n", line);
@@ -73,9 +73,9 @@ void parse_user_and_check_for_non_null(void *first_arg, LineIterator *iterator) 
 /**
  * Parses a driver line and ensures that it does not return NULL.
  */
-void parse_driver_and_check_for_non_null(void *first_arg, LineIterator *iterator) {
+void parse_driver_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     Driver *driver = parse_line_driver(iterator);
     if (driver == NULL) {
         fprintf(stderr, "Driver should've been non-NULL for line '%s'\n", line);
@@ -89,9 +89,9 @@ void parse_driver_and_check_for_non_null(void *first_arg, LineIterator *iterator
 /**
  * Parses a ride line and ensures that it does not return NULL.
  */
-void parse_ride_and_check_for_non_null(void *first_arg, LineIterator *iterator) {
+void parse_ride_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *line = g_strdup(line_iterator_current(iterator));
+    char *line = g_strdup(token_iterator_current(iterator));
     Ride *ride = parse_line_ride(iterator);
     if (ride == NULL) {
         fprintf(stderr, "Ride should've been non-NULL for line '%s'\n", line);

@@ -3,15 +3,15 @@
 #define LI3_PARSER_H
 
 #include <stdio.h>
-#include "line_iterator.h"
+#include "token_iterator.h"
 
 /**
  * Function definition that every line is applied to.
  * This is used to abstract catalog registration of users, drivers and rides.
  * void *arg: the suposed catalog
- * LineIterator *iterator: the iterator that splits the line into tokens
+ * TokenIterator *iterator: the iterator that splits the line into tokens
  */
-typedef void(ApplyLineFunction)(void *, LineIterator *);
+typedef void(ApplyLineFunction)(void *, TokenIterator *);
 
 /**
  * Function that reads the CSV file and applies apply_line_function for each line.

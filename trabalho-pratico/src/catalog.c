@@ -73,21 +73,21 @@ int catalog_get_or_register_city_id(Catalog *catalog, char *city) {
 /**
  * Internal function that parses a line and registers the parsed user.
  */
-static inline void internal_parse_and_register_user(Catalog *catalog, LineIterator *line_iterator) {
+static inline void internal_parse_and_register_user(Catalog *catalog, TokenIterator *line_iterator) {
     User *user = parse_line_user(line_iterator);
     if (user == NULL) return;
 
     catalog_user_register_user(catalog->catalog_user, user);
 }
 
-void parse_and_register_user(void *catalog, LineIterator *line_iterator) {
+void parse_and_register_user(void *catalog, TokenIterator *line_iterator) {
     internal_parse_and_register_user(catalog, line_iterator);
 }
 
 /**
  * Internal function that parses a line and registers the parsed driver.
  */
-static inline void internal_parse_and_register_driver(Catalog *catalog, LineIterator *line_iterator) {
+static inline void internal_parse_and_register_driver(Catalog *catalog, TokenIterator *line_iterator) {
     char *city;
     Driver *driver = parse_line_driver_detailed(line_iterator, &city);
     if (driver == NULL) return;
@@ -98,14 +98,14 @@ static inline void internal_parse_and_register_driver(Catalog *catalog, LineIter
     catalog_driver_register_driver(catalog->catalog_driver, driver);
 }
 
-void parse_and_register_driver(void *catalog, LineIterator *line_iterator) {
+void parse_and_register_driver(void *catalog, TokenIterator *line_iterator) {
     internal_parse_and_register_driver(catalog, line_iterator);
 }
 
 /**
  * Internal function that parses a line and registers the parsed ride.
  */
-static inline void internal_parse_and_register_ride(Catalog *catalog, LineIterator *line_iterator) {
+static inline void internal_parse_and_register_ride(Catalog *catalog, TokenIterator *line_iterator) {
     char *city;
     char *user_username;
 
@@ -162,7 +162,7 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, LineIterat
     }
 }
 
-void parse_and_register_ride(void *catalog, LineIterator *line_iterator) {
+void parse_and_register_ride(void *catalog, TokenIterator *line_iterator) {
     internal_parse_and_register_ride(catalog, line_iterator);
 }
 
