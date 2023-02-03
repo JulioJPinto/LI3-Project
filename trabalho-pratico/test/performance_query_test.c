@@ -7,7 +7,7 @@
  */
 void load_catalog_execute_queries_and_benchmark(char *dataset_folder_path, char *queries_file_path) {
     Catalog *catalog = create_catalog();
-    catalog_load_dataset(catalog, dataset_folder_path);
+    catalog_load_csv_dataset(catalog, dataset_folder_path);
 
     // Don't force eager indexing, so we get worse case scenario
 

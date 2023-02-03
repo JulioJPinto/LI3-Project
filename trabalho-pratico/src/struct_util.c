@@ -1,9 +1,6 @@
 #include "struct_util.h"
 
-#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
 #include <glib.h>
 
 #include "string_util.h"
@@ -22,6 +19,13 @@ static int is_digit(char c) {
 
 int parse_int_safe(char *string, int *error) {
     int val = 0;
+
+    gboolean negative = FALSE;
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
+
     while (*string) {
         if (G_UNLIKELY(!is_digit(*string))) {
             *error = 1;
@@ -29,20 +33,34 @@ int parse_int_safe(char *string, int *error) {
         }
         val = val * 10 + (*string++ - '0');
     }
-    return val;
+    return negative ? -val : val;
 }
 
 inline int parse_int_unsafe(char *string) {
     int val = 0;
+    gboolean negative = FALSE;
+
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
+
     while (*string) {
         val = val * 10 + (*string++ - '0');
     }
-    return val;
+
+    return negative ? -val : val;
 }
 
 double parse_double_safe(char *string, int *error) {
     int integer_part = 0;
     double decimal_part = 0;
+
+    gboolean negative = FALSE;
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
 
     while (*string) {
         if (*string == '.') {
@@ -67,7 +85,10 @@ double parse_double_safe(char *string, int *error) {
         current_decimal_part_divider *= 10;
     }
 
-    return integer_part + decimal_part;
+    double result = integer_part + decimal_part;
+    if (negative) result *= -1;
+
+    return result;
 }
 
 int is_date_valid(Date date) {

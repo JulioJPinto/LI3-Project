@@ -20,7 +20,7 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
                                                              char *expected_query_result_folder_path,
                                                              gboolean lazy_loading) {
     Catalog *catalog = create_catalog();
-    catalog_load_dataset(catalog, dataset_folder_path);
+    catalog_load_csv_dataset(catalog, dataset_folder_path);
 
     if (!lazy_loading) catalog_force_eager_indexing(catalog);
 

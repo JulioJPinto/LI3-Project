@@ -3,6 +3,7 @@
 #define LI3_USER_H
 
 #include "struct_util.h"
+#include "line_iterator.h"
 
 /**
  * Struct that represents a user.
@@ -119,7 +120,7 @@ void user_register_ride_date(User *user, Date date);
 /**
  * Parses a string of the User File. 
  */
-User *parse_line_user(char *line, char delim);
+User *parse_line_user(LineIterator *line_iterator);
 
 /**
  * Function that compares users by activeness, total distance, last ride and username.

@@ -157,7 +157,7 @@ int start_program(Program *program, GPtrArray *program_args) {
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
-    if (!catalog_load_dataset(program->catalog, dataset_folder_path))
+    if (!catalog_load_csv_dataset(program->catalog, dataset_folder_path))
         return FALSE;
 
     char *lazy_loading_value_string = get_program_flag_value(program->flags, "lazy-loading", "true");
