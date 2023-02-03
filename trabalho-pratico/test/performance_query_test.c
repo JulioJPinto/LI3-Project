@@ -17,7 +17,7 @@ void load_catalog_execute_queries_and_benchmark(char *dataset_folder_path, char 
 
     char buffer[1024];
     while (fgets(buffer, 1024, queries_file) != NULL) {
-        format_fgets_input_line(buffer);
+        format_input_line(buffer);
 
         g_autofree GTimer *timer = g_timer_new();
         g_timer_start(timer);

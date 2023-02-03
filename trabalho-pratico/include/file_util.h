@@ -30,7 +30,7 @@ FILE *open_file(const char *file_name);
 /**
  * Removes the trailing newline character from fgets input
  */
-void format_fgets_input_line(char *line_buffer);
+void format_input_line(char *line_buffer);
 
 /**
  * Creates the output folder if it does not exist.

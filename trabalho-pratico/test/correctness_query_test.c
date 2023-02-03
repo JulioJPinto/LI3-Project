@@ -30,7 +30,7 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
     char buffer[1000];
     while (fgets(buffer, 1000, queries_file) != NULL) {
-        format_fgets_input_line(buffer);
+        format_input_line(buffer);
 
         char *query = g_strdup(buffer);
 
@@ -56,8 +56,8 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
             if (strcmp(expectedLine, actualLine) != 0) {
                 g_test_fail();
 
-                format_fgets_input_line(expectedLine);
-                format_fgets_input_line(actualLine);
+                format_input_line(expectedLine);
+                format_input_line(actualLine);
 
                 fprintf(stderr, "Query %d (%s) failed:\n", current_query_id, query);
                 fprintf(stderr, "Expected: '%s'\n", expectedLine);

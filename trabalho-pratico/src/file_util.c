@@ -22,7 +22,7 @@ FILE *open_file(const char *const file_name) {
     return file;
 }
 
-void format_fgets_input_line(char *line_buffer) {
+void format_input_line(char *line_buffer) {
     size_t line_buffer_length = strlen(line_buffer);
     if (line_buffer[line_buffer_length - 1] == '\n') {
         line_buffer[line_buffer_length - 1] = '\0';

@@ -126,7 +126,7 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
         return;
     }
 
-    char line_buffer[1024];
+    char line_buffer[1024]; // We want to limit the line size to 1024 characters, otherwise we might run out of memory
     while (fgets(line_buffer, 1024, input_file) != NULL) {
         write_output_line(output, line_buffer);
     }
