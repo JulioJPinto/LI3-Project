@@ -4,10 +4,15 @@
 
 \usepackage[a4paper]{geometry}
 \usepackage{pbox}
-\usepackage{caption, booktabs}
+\usepackage[labelfont=bf]{caption}
+\usepackage{booktabs}
 \usepackage{makecell}
 \usepackage{cellspace}
-\usepackage{lipsum}  
+\usepackage{lipsum}
+\usepackage[skip=\medskipamount]{parskip}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{epstopdf}
 
 
 \title{Relatório da Fase 2 - Grupo 03}
@@ -22,37 +27,34 @@
     Nesta fase como objetivos o trabalho necessitava a implementação de todas as queries
     , de um modo de operação interativo (incluindo menu de interação e um módulo de 
     paginação para apresentação de resultados longos) e evolução de aspetos relacionados
-    a modularidade, encapsulamento e qualidade de código. \\
+    a modularidade, encapsulamento e qualidade de código.
     
     Este relatório irá abranger as decisões tomadas pelo grupo tal como o método de 
     raciocínio para desenvolvimento do mesmo.
     
-    \section{Desenvolvimento}
-    
-    \subsection{Alterações realizadas}
-        \subsubsection{Ajustes apontados pelos docentes}
+    \section{Alterações realizadas}
+        \subsection{Ajustes apontados pelos docentes}
             Após a apresentação da primeira fase do trabalho foram levantados
-            alguns pontos por parte dos docentes. Primeiramente foi levantada
-            a questão quanto à maneira como o Catálogo, \emph{Catalog}, estava
-            estruturado. Originalmente tinhamos os Arrays e Hashtables das 
-            estruturas todos juntos, porém foi levantado o ponto que de tal 
-            maneira poderiamos estar a quebrar encapsulamento. Assim sendo, 
-            decidimos tornar o \emph{Catalog} num struct de catálogos de cada 
-            estrutura de dados, catálogos estes opacos ao \emph{Catalog} 
-            (será abordado mais abaixo).\\Para além disso, fomos informados 
-            pelos professores que não fazia sentido aplicarmos multithreading, 
-            \emph{pthreads}, visto que a maneira como o trabalho será testado 
-            não permitirá a realização de ações em paralelo, isto pois os 
-            programas são testado somente numa thread. Por último, foi nos 
-            também aconselhado por um dos professores a transfêrencia de 
-            uma estrutura de dados que tinhamos para informações relativamente 
-            às rides para a estrutura de dados das rides (será abordado mais 
-            abaixo).
+            alguns pontos por parte dos docentes. 
+            
+            Originalmente, no catálogo, tínhamos todos os \textit{Arrays} e \textit{Hashtables} das 
+            várias estruturas juntos, porém foi levantado o ponto que de que
+            poderíamos estar a quebrar encapsulamento. Assim sendo, 
+            decidimos tornar o catálogo num principal, que guarda os diferentes
+            catálogos das estruturas, catálogos estes opacos ao catálogo principal
+            (será abordado mais abaixo).
+            
+            Também tínhamos ideias de explorar o uso de programação paralela,
+            mas isso foi invalidado, já que a máquina de testes roda em \textit{single-core}.
 
-        \subsubsection{Ajustes de fator escala (Dataset maior)}
+            Foi nos avisado alguns ficheiros temporários de funções
+            utilitárias não eram uma solução ideal e então foram também
+            corrigidas ao longo do desenvolvimento do projeto.
+            
+        \subsection{Ajustes de fator escala (Dataset maior)}
             Da forma como tínhamos o projeto implementado, quando 
             usado o dataset maior, o programa mesmo assim continuava
-            a performar dentro dos limites de tempo com grandes 
+            a ter um desempenho dentro dos limites de tempo com grandes 
             margens. As estruturas de dados e estratégias para
             a resolução de queries foram então adequadas, pelo que
             não alteramos a implementação das queries já feitas
@@ -60,44 +62,62 @@
             mencionadas na fase 1 não foram necessárias de serem
             implementadas, exceto o \emph{lazy loading} que foi
             útil no modo interativo (será abordado mais abaixo).
+            No entanto, foram feitas algumas melhorias que acabaram
+            por otimizar estas funções como resultado disso.
 
-    \subsection{Pipeline}
-        Neste momento o nosso programa funciona da seguinte maneira:
-        \begin{itemize}
-            \item A nossa main recebe os argumentos, caso não receba nenhum argumento 
-            está inicializar o programa no modo intertativo (Command Line Enviroment), 
-            que já dentro do programa irá pedir o \emph{dataset} usado para este. Caso 
-            esta receba a \emph{path} para o \emph{dataset} e para o \emph{input} o programa 
-            será realizado no modo \emph{Batch}.
-            \item Após receber o a \emph{path} para o \emph{dataset} o nosso programa da
-            \emph{parse} dos dados encontrados em cada CSV. Este ainda mapaeia os mesmos 
-            para o catálogo e deixa o catálogo pronto para ser utilizado.
-            \item De seguida, dependendo do modo (\emph{Batch} ou Interativo), este irá 
-            correr os comandos/\emph{inputs} passados.
-            \item No caso do modo \emph{Batch}, este vai ler o ficheiro de \emph{input} 
-            e vai fazer cada uma das queries passadas neste. Quando uma query é chamada 
-            o programa acede ao nosso \emph{Query Manager} (Gestor de Queries) onde é 
-            mapeado para a \emph{Query} respetiva. 
-            \item Após este processo a query será calculada e será impressa para uma struct
-            \emph{OutuputWriter} onde guardamos o resultado. Caso este quando chega ao mesmo 
-            dependendo do modo, \emph{Batch} ou Interativo este será impresso para um ficheiro
-            de \emph{output} ou para o terminal. No modo interativo caso seja maior que o 
-            \emph{PAGE-SIZE} definido (10 linhas) este passará a modo de paginação. 
+    \section{Pipeline}
+        Neste momento, o nosso programa funciona da seguinte maneira:
+        \begin{enumerate}[\bfseries 1.]
+            \item Os ficheiros dos datasets são lidos conforme o \textit{input}
+            do programa (seja pedido no modo interativo ou passado como parâmetro).
+            \item Consoante o tipo de estrutura, a partir de um módulo de leitura,
+            cada linha é passada para o parser da estrutura correspondente.
+            A linha é então percorrida, quebrando-a em campos a cada caractere separador
+            e a estrutura é criada.
             
-        \end{itemize}
-    \subsection{Queries Implementadas}
+            Este passo foi otimizado desta forma devido aos requisitos do projeto apenas precisarem
+            de suportar inputs de ficheiros CSVs separados por ponto e vírgula.
+            
+            \item Após cada criação de estrutura, essa é adicionada no catálogo correspondente
+            e informação necessária para resolução de queries de outras estruturas
+            são atualizadas.
+            
+            \item No fim da leitura do datasets, os catálogos são indexados
+            conforme as exigências das queries (Apenas quando o \textit{Lazy loading} está desativado). 
+        
+            \item No caso do modo \textit{Batch}, os ficheiros de queries são lidos. No caso
+            do modo Interativo a \textit{query} (ou comando do programa) a ser executada é pedida continuamente ao utilizador.
+            Cada query é então passada para módulo de resolução de queries. 
+            
+            \item As queries são computadas acedendo ao catálogo principal.
+            O seu resultado é enviado, por linha, para um módulo de \textit{buffer} de output.
+            Este módulo abstraí a escrita para as diferentes formas de output: ficheiro no
+            modo \textit{Batch} ou terminal com possível paginação no modo Interativo.
+            
+            \item A memória do catálogo é libertada e o programa termina a execução.
+            
+        \end{enumerate}
+        
+        \bigskip
+        
+        \begin{center}
+            \includegraphics[scale=0.6]{Pipeline}
+            \captionof{figure}{Representação do pipeline}
+        \end{center}
+    \newpage
+    \section{Queries Implementadas}
         Para a segunda fase do trabalho foram aplicadas todas as queries em falta
         (Queries 1 a 5 realizadas na fase anterior). Foram implementadas as queries 6, 7, 8 e 9.
         A implementação das queries anteriores não foi alterada, apenas foi otimizado
-        algumas partes do catálogo para que o indexamento dos dados fosse mais rápido.
-        \subsubsection{Query 6}
+        algumas partes do catálogo para que o indexação dos dados fosse mais rápido.
+        \subsection{Query 6}
             De maneira a conseguirmos calcular o preço médio dentro de uma data usamos
             o \emph{array} de rides que está ordenado por data. Com ele fazemos \emph{binary search} para
             encontrar a data do começo (ou a próxima maior caso não exista) e percorremos o array, 
             linearmente, até a segunda data, fazendo média dos preços das viagens. O preço
             de cada viagem foi calculado e guardado na ride durante a inserção nos catálogos para evitar
             \emph{lookups} às informações do condutor quando necessário.
-        \subsubsection{Query 7}
+        \subsection{Query 7}
             Para a query 7 tivemos que recorrer a uma nova estrutura de dados separado dos condutores: \emph{DriverCityInfo}. 
             Essa estrutura de dados guarda o score de um condutor numa cidade específica.
             Conforme a inserção de rides no catálogo, vamos somando o score do condutor daquela ride
@@ -106,223 +126,342 @@
             seja necessário percorrer o array inteiro para encontrar (ou ver que ainda não existe)
             o \emph{DriverCityInfo} onde queremos somar o score de tal ride. 
             Quando surge uma nova cidade, é criado um novo \emph{array} e uma nova \emph{hashtable} temporária.
-            Após a inserção de todas as rides, os \emph{hashtables} são libertados e cada array é ordenado por score.
             
             Não foi possível, por exemplo, guardar um array na própria estrutura de dados do condutor
             porque não sabemos a quantidade de cidades que existem no dataset até o lermos por completo,
-            pelo que teríamos que fazer \emph{reallocs} muito constantes, o que não é de todo eficiente.
+            pelo que teríamos que fazer \emph{reallocs} muito constantes, o que impactaria muito a performance.
 
-            Assim, com esta implementação, conseguimos fazer com que cidades sejam lidas e adicionadas dinâmicamente
+            Assim, com esta implementação, conseguimos fazer com que cidades sejam lidas e adicionadas dinamicamente
             de forma eficiente.
-
-            Quando a query é chamada, simplesmente pegamos nos primeiros \emph{n} elementos do array
-            da cidade pedida e imprimimos o resultado formatado, visto que os arrays estão ordenados por score.
-        \subsubsection{Query 8}
-        REVIEW NESTAS QUERIES TB
-            De maneira a fazer a query 8 decidimos adcionar dois arrays ao Catálogo de Viagens. Adicionamos um
-            array para cada gênero, assim no \emph{loading} das viagens, guardamos cada viagem com o 
-            condutor e utilizador com o mesmo gênero no array respetivo. Depois quando a query for chamada
-            o array será ordenado pela data de criação da conta do utilizador e do condutor.
-        \subsubsection{Query 9}
-            Por último, para a query 9, decidimos seguir um raciocínio parecido ao da Query 2 e 3.
-            Para este tal como na query 6, utilizamos o \emph{array} de rides ordenado por data e pesquisamos
-            pela primeira data. Enquanto que percorremos o \emph{array} guardamos as viagens em que gorjeta foi
-            dada num \emph{array} de resultados. Até chegarmos ao final do array ou à segunda data.
+            Quando a query é chamada, todos os arrays sao ordenados (independente da cidade) e
+            pegamos nos primeiros \emph{n} elementos do array da cidade pedida e imprimimos o resultado formatado.
+        \subsection{Query 8}
+			De maneira a fazer a query 8 decidimos adicionar dois \textit{arrays} ao Catálogo de Viagens. Estes \textit{arrays} são populados conforme a inserção das viagens. 
+            Cada array guarda referências a viagens em que
+            o utilizador e o condutor têm o mesmo género para cada um, masculino e feminino. No fim da inserção, os dois
+            arrays são organizados, conforme os requisitos da query, pela data de criação da conta do condutor e em caso 
+            de empate, pela data de criação da conta do utilizador e em caso de empate novamente, pelo id da ride.
+            Na resolução da query, percorremos o \textit{array} dependendo do género pedido, e se as idades
+            da conta do utilizador e do condutor forem superiores à idade pedida, adiciona-o ao array de resultados.
+            Este percorrer acaba quando a idade da conta do condutor for inferior à idade pedida, visto que
+            o array está ordenado por essa idade da conta do condutor. Então não haverá mais condutores 
+            com conta de idade superior à pedida, no resto do \textit{array}.
             
-    \subsection{Estruturas de Dados}
-        \subsubsection{Catalógo}
-            Como foi dito na parte de ajustes, tivemos a necessidade de alterar a maneira como fazemos
-            o nosso catálogo. Para isso decidimos criar estruturas de dados para guardar os dados para
-            os Utilizadores, os Condutores e as Viagens. Um catálogo único para cada um deles, depois
-            agrupado num Catálogo Geral.
-            Em cada um dos catálogos guardamos pelo menos um array.
+        \subsection{Query 9}
+            Por último, tal como na query 6, utilizamos o \emph{array} de rides ordenado por data e fazemos
+            \textit{binary search} pela primeira data. Enquanto percorremos o \emph{array} linearmente, gerámos o resultado com
+            as viagens em que gorjeta é superior a 0 até chegarmos ao final do \textit{array} ou à segunda data.
 
-            No Catálogo dos Utilizadores guardamos um array, ordenado pela distância total percorrida
-            pelo utilizador. Uma hashtable para a procura rápida de um utilizador pelo username e
-            ainda também outro array para indexarmos os utilizadores por ID (ID criado por nós no
-            momento de inserção no array).
+    \section{Modo Interativo}
+            Para implementação do modo interativo, após alguma discussão, 
+            decidimos avançar com um no estilo de um \emph{Command Line 
+            Environment}, emulado dentro do programa. 
+            Para isso usamos a biblioteca \emph{readline} para leitura e histórico de inputs.
+        \subsection{Lista de Comandos}
+            No modo interativo decidimos fazer com que o ambiente tenha diversos comandos para serem executados.
+            Esses comandos foram feitos de forma genérica, de forma a que seja possível adição de novos muito facilmente.
 
-            No Catálogo dos Condutores guardamos um array, ordenado pelo \emph{score} do Condutor.
-            Ainda mais guardamos um array para procurar rápida do condutor e indexado pelo ID do
-            condutor. Para além destes dados temos uma struct, utilizada para a realização da query 7, 
-            (\emph{CatalogDriverCityInfo}) onde mapeamos as informações de cada condutor numa cidade 
+            \medskip
+            Escrevendo \textit{\textbf{help}} aparece uma lista com todos os comandos.
+
+            Para execução de \emph{queries}, o utilizador pode seguir dois métodos: escrever a query
+            no formato da mesma ou então pode utilizar o comando \textit{\textbf{file}} e passar-lhe um ficheiro
+            de input, semelhante ao modo \textit{batch}. Ao escrever uma query com o número de argumentos
+            errado, uma mensagem de uso e uma pequena explicação da query são mostradas.
+
+            Para visualização do output do comando \textit{file}, existem os comandos
+            \textit{\textbf{cat}} e \textit{\textbf{list-output}}, que leem e listam ficheiros de outputs
+            na pasta de Resultados, respetivamente.
+
+            Também existe o comando \textit{\textbf{clear}} que limpa as linhas do terminal
+            e \textit{\textbf{restart}} que recomeça o programa, pedindo um novo catálogo.
+
+            Caso o utilizador pretenda fechar o programa basta escrever o comando \textit{\textbf{exit}}.
+    
+        \subsection{Paginação}
+            A pedido de implementação, para queries que tenham um output superior ao valor estipulado de 10 linhas,
+            um menu de paginação surge onde é possível percorrer as páginas, escrevendo \textit{\textbf{n}} para avançar
+            para a próxima página, \textit{\textbf{p}} para recuar uma página e \textit{\textbf{«número»}}
+            para ir até uma página. Escreve-se \textit{\textbf{q}} para sair desse menu.
+            Ao trocar de página, todas as linhas da página atual são apagadas do terminal
+            (via recurso a caracteres ANSI) e as próximas são mostradas.
+            Ao sair do menu de paginação, o \textit{footer} onde se insere comandos é apagado
+            e a página atual é mantida no terminal.
+
+            Esta módulo de paginação poderá ser expandido de forma a separar as linhas
+            de output por ponto e vírgula e apresentar o formato em forma de tabela.
+        \subsection{Histórico de Comandos}
+            Através da utilização da biblioteca \emph{readline/history} foi possível
+            facilmente a criação de um histórico de comandos, em que, como num terminal
+            normal, ao clicar nas setas do teclado, é possível navegar pelos últimos
+            comandos digitados.
+            
+    \section{Estruturas de Dados}
+        \subsection{Catálogo}
+            Como foi dito na parte de ajustes, tivemos a necessidade de separar o nosso
+            catálogo num catálogo único para os utilizadores, condutores e viagens.
+            Existe um catálogo principal/controlador para os acessar e manter dados comuns entre eles.
+
+            Em cada um dos catálogos guardámos pelo menos um \textit{array}.
+            
+            No Catálogo dos Utilizadores guardamos um \textit{array}, ordenado pela distância total percorrida
+            pelo utilizador. Uma \textit{hashtable} para a procura rápida de um utilizador pelo username e
+            ainda também outro array para indexarmos os utilizadores por ID (ID gerado no
+            momento de inserção do utilizador no catálogo).
+			
+            No Catálogo dos Condutores guardamos um array, ordenado pelo \emph{score} do condutor e
+            um array para indexado pelo ID do condutor para rápido acesso à estrutura a partir dele.
+            Para além destes, este também inclui outro catálogo (\textit{CatalogDriverCityInfo}), utilizado para a realização da query 7, 
+            para guardar as informações de cada condutor para uma cidade 
             específica.
-
-            No Catálogo das Viagens também guardamos um array, ordenado pela data da
-            viagem. Para além desse array guardamos mais 3 arrays, um para mapearmos o ID dos utilizadores
-            , outro para mapearmos as viagens com ambos o utilizador e condutor com o gênero masculino e o
-            último para mapearmos as viagens com ambos o utilizador e condutor com o gênero feminino.
-
-            Por último, temos um array e uma hashtable para mapearmos facilmente um ID a uma cidade.            
+			
+            No Catálogo das Viagens guardamos um \textit{array} ordenado pela data da viagem. 
+            Também é guardado um \textit{array} de \textit{arrays} de viagens por cada cidade, cada índice
+            do \textit{array} principal correspondendo ao ID da cidade e mais dois \textit{arrays} para guardar
+            as viagens onde o utilizador e o condutor tem o mesmo género, um \textit{array} para cada,
+            utilizados para a realização da query 8.
             
-        \subsubsection{\emph{Lazy}}
+            No Catálogo Principal, temos um \textit{array} e uma \textit{hashtable} para mapearmos facilmente um ID a uma cidade e vice-versa.       
+            
+        \subsection{\emph{Lazy}}
             De maneira a tornar o programa mais eficiente decidimos criar uma
             estrutura de dados já presente ou semelhante em outras linguagens de programação.
             Para otimizar o tempo de carregamento dos dados, implementamos o '\emph{Lazy}' que é uma
             estrutura que permite aplicar uma função a um valor quando este é requisitado.
 
-            A função e o valor são passados como parametros na criação da estrutura.
+            A função e o valor são passados como parâmetros na criação da estrutura.
 
             A estrutura foi implementada da forma mais genérica possível, de forma a que
             possa ser usada para qualquer tipo de dados.
 
             Isto permite então que, por exemplo, várias funções de \emph{sort} sejam aplicadas
             apenas quando necessário, pelo que quando uma query nunca é chamada, as estruturas necessárias
-            não sejam indexadas desnecessariamente. Também torna o carregamento do modo interativo
+            não sejam indexadas desnecessariamente. Também torna o carregamento no modo interativo
             mais leve. 
 
             Este \emph{lazy sorting} é feito por defeito, mas para dar escolha ao utilizador,
             pode ser desativado passando \emph{flag} \emph{--lazy-loading=false}
             como argumento ao programa (esta \emph{flag} pode estar em qualquer
             posição não interferindo com os datasets passados como argumento).
-        \subsubsection{\emph{Program}}
-            Visto que o nosso modo interativo decidimos fazer um \emph{Command Line Enviorment} tivemos
-            a necessidade de criar a struct \emph{program}. 
-
-            Aqui temos uma hashtable (\emph{ProgramFlags}) onde guardamos as flags passadas na incialização
-            do projeto.
-            Para além disso também guardamos o Catálogo e o estado do programa.
-
-            Por último, guardamos um booleano que nos indica se devemos ou não sair do programa.
-
-    \subsection{Otimizações}
-        \subsubsection{Otimizações localidade espacial e temporal}
-            Apesar da estrutura previeamente implementada permitir a realização
-            do trabalho dentro dos limites de tempo com grandes margens, decidimos
-            mesmo assim otimizá-lo para além do que o que já tinhamos. Para tal alteramos 
-            certas estruturas de dados e certos métodos de guardar informações destes de 
-            maneira se adequar à melhor a uma melhor localidade temporal e espacial.
+        \subsection{\emph{Program}}
+            De forma a abstrair os possíveis modos de execução (\textit{batch} e \textit{interativo})
+            foi criado um módulo de \textit{\textbf{Program}} que guarda um catálogo e o estado do programa.
+            É aqui que as \textit{flags} do programa são também controladas.
+            Este módulo é responsável pelo tratamento de input e execução de comandos.
+        \subsection{\emph{OutputWriter}}
+            Para diferenciar diferentes formas de \textit{output} existe um módulo que controla
+            para onde vai o output escrito pelas queries. A query escreve para este \textit{\textbf{OutputWriter}} que
+            contém um \textit{buffer}. A estrutura também guarda apontadores de funções de escrita e fechamento.
             
-            Decidimos então alterar a maneira como guardamos os nossos condutores tanto 
+            Dependendo da forma de como se cria esta estrutura, o \textit{buffer} pode ser:
+            \begin{itemize}
+                \item Um ficheiro, em que a função de escrita, escreve para esse ficheiro diretamente, para
+                evitar criação de estruturas temporárias inúteis. 
+                
+                Usado no modo \textit{batch} e num comando do modo interativo.
+                \item Um \textit{array} de \textit{strings}, que a função de escrita, adiciona uma \textit{string} a esse \textit{array}.
+
+                Usado no modo interativo para fácil gestão de linhas na parte da paginação.
+                \item Vazio, usado na execução de testes de alguns testes unitários.
+            \end{itemize}
+            Mais tipos de implementação podem ser adicionados, visto que basta criar esta
+            estrutura com diferentes apontadores para funções.
+
+    \section{Otimizações}
+        Apesar das estruturas previamente implementada permitir a realização
+        do trabalho dentro dos limites de tempo com grandes margens, decidimos
+        mesmo assim otimizá-lo para além do que o que já tínhamos. Para tal, alterámos 
+        certas estruturas de dados e certas formas de guardar informações, de 
+        maneira a se atingir uma melhor utilização de memória e performance.
+        
+        Achámos que estas otimizações (juntamente com as estratégias de implementação das queries)
+        foram um sucesso, o que pudemos vir a confirmar a sermos o grupo com o programa mais rápido 
+        na plataforma de testes mesmo sendo o que usa menos memória.
+        \subsection{IDs de cidades}
+            Ao invés de guardar em cada condutor e viagem uma cópia em string da cidade,
+            guardámos um ID inteiro único para cada, de maneira a diminuir o uso de memória e o número de \emph{strdups} necessários.
+            Este ID é gerado conforme se lê novas cidades do dataset.
+            
+            Assim por consequência, é diminuído em muito o tempo necessário para a alocação e libertação
+            das strings tal como o número de bytes necessários para os condutores e viagens.
+            Isto implica também uma maior localidade espacial, dando uma melhor performance
+            a todas as queries.
+            
+            Alterámos a maneira como guardamos os nossos condutores tanto 
             como no Catálogo do Condutores como no Catálogo das Viagens, trocando a 
-            Hashtable presente neste por um array onde o índice da posição do condutor 
-            no array é igual ao ID desto condutor. 
+            \textit{hashtable} presente neste por um array onde o índice da posição do condutor 
+            no array é igual ao ID deste condutor. 
+        \subsection{IDs de users}
+            No mesmo contexto, alterámos também a maneira como as viagens guardam os utilizadores. 
+            Dando a cada utilizador um ID inteiro único permite nos então poupar na quantidade de espaço necessário,
+            da mesma forma da criação de IDs para cidades.
+            Esse ID é gerado conforme a leitura de utilizadores. 
+            A identificação do user a partir dele, é feita através de um array cujo índice é o tal ID gerado
+            e o valor um apontador para a estrutura do utilizador.
+            Devido à query 1, ainda é mantido a \textit{hashtable} que faz ligação dos usernames em string às estruturas de users.
+        \newpage
+        \subsection{Data}
+            Inicialmente a data era implementada numa struct com 3 inteiros de 32 bits.
+            Esta pôde ser compactada em apenas um inteiro de 32 bits de forma codificada.
+            Da direita para a esquerda, os primeiros 5 bits da eram reservados para o dia, os próximos 5 bits
+            reservados para o mês, e o resto reservado para o ano. A ordem dos bits
+            foi escolhida para que comparações entre datas seja uma simples subtração.
+            A estrutura é codificada e descodificada através de operações \textit{bitwise}.
             
-            Ainda mais decidimos também, ao invés de guardar em cada condutor e viagem a cidade, 
-            guardar um ID único para cada, de maneira a diminuir o número de \emph{strdups} necessários,
-            assim por consequência, diminuindo também o tempo necessário para a alocação e libertação 
-            destes \emph{strdups} tal como o número de bytes necessários para os condutores e
-            viagens. 
+            Com isto, para cada ride foi possível poupar 8 bytes e as comparações são
+            muito mais rápidas. Os melhoramentos no uso de memória e performance foram
+            notórios no dataset large, que para 10 milhões de rides foram poupados 80MBs,
+            aumentando assim também a localidade espacial.
+            \begin{figure}[h]
+                \centering
+                \includegraphics[scale=0.4]{data(1)}
+                \caption{Representação simplificada para 7 bits da Data}
+            \end{figure}
+        \subsection{Funções nativas}
+            Com recurso a um \textit{profiler} observámos que funções como \textit{strtok}, \textit{strtol},
+            \textit{strtod} estavam a demorar alguns meios segundos. Estas são chamadas várias milhões de vezes.
+            Por isso, implementando funções mais simples e otimizadas para as nossas necessidades, 
+            reduzimos grande parte do tempo gasto nessas funções.
+        \subsection{Remoção de campos não usados}
+            Observámos que alguns campos não estavam a ser utilizados por nenhuma query, 
+            pelo que são ignorados na leitura dos ficheiros ou na criação da estrutura.
+            Campos esses são, por exemplo, a matrícula do driver e os comentários da ride.
+        \subsection{Estruturas de dados (padding e otimização de memória)}
+            De forma a ainda gastar menos memória, os campos das estruturas
+            foram reorganizados de modo a reduzir o \textit{padding} dessas.
+            Também foram substituídos alguns inteiros de 32 bits por inteiros com menos bits
+            onde fosse possível.
             
-            No mesmo contexto, após alguma discussão, decidimos alterar também
-            a maneira como as viagens guardam os utilizadores. Dando a cada utilizador um
-            ID único permite nos então poupar na quantidade de espaço necessário para as mesmas.
-            Ao invés de guardarmos uma string, assim simplesmente, guardamos um inteiro, assim também
-            tornando a pesquisa pelo utilizador mais fácil (Utilizando o array de utilizadores onde cada
-            índice representa o array do utilizador).
-
-        \subsubsection{Micro-Otimizações}
-            De maneira a gerir melhor a memória usada pelo programa decidimos então
-            fazer diversas, mas eficazes alterações para a dimensão do projeto.
-            Para começar:
+            Com isso, cada estrutura está a ocupar:
+            \begin{itemize}
+                \item Ride: 48 bytes
+                \item User: 64 bytes (sem os valores de username e name)
+                \item Driver: 48 bytes
+            \end{itemize}
+    \newpage     
+    \section{Testes Unitários}
+        Os testes unitários foram algo que demos muita atenção no desenvolvimento deste software.
+        Para isso a sua concretização, usámos uma combinação de scripts e código.
+        
+        \medskip
+        Ao chamar \textit{make test}, o programa de testes compila juntamente com as sources do programa principal e é executado.
+        Com ele, recorremos à biblioteca de testes da GLib que permite adicionar testes unitários
+        muito facilmente. Testes unitários estes que testam:
+        \begin{itemize}
+            \item O encoding, decoding e parsing da estrutura de Data implementada.
+            \item Funcionalidade geral do \textit{Lazy}.
+            \item O parser do user, driver e ride para leitura de linhas de CSVs apenas válidas/apenas inválidas (recorrendo aos datasets dado pelos docentes).
+            \item Performance (limite estipulado de 1 segundo para cada query) para o dataset regular.
+        \end{itemize}
+        Caso qualquer uma destes testes falhe, é nos informado quais falharam e o programa retorna um error code diferente de 0.
+        Se não tiver falhado, o script prossegue a fazer testes \textit{end-to-end} com o programa principal.
+        O programa principal é executado para os diversos datasets e ficheiros de queries (dataset regular input 1 e 2 e dataset large),
+        e a cada execução é comparado os ficheiros de output da pasta Resultados com uma de resultados corretos.
+        
+        Também é verificado o pico de uso de memória, que se exceder os valores estipulados de 
+        200MB para os datasets regulares ou 2000MB para o dataset large, o teste é dado como falhado.
+        A verificação do pico de memória é feita com um script que chama o \textit{/usr/bin/time/}
+        passando parâmetros adequados conforme o sistema operativo onde é executado (Linux ou MacOS suportados).
+        
+        \subsection{Fugas de memória}
+        A verificação de fugas de memória do programa são separados dos testes principais, pelo que,
+        para a execução desse é feita através de \textit{make leaks}. Este chama o \textit{valgrind}
+        no Linux ou o \textit{leaks} no MacOS (\textit{Valgrind} ainda não é suportado nos novos M1s) para 
+        o programa principal com o dataset regular. Esta separação foi feita para evitar o grande
+        tempo de execução do \textit{valgrind} quando for apenas necessário correr os testes.
+        
+        \subsection{Actions do Github}
+            De maneira a reunir todos estes testes, tirámos partido das Actions do GitHub, que, a cada
+            commit, eram rodados: \textit{make}, \textit{make test} e \textit{make leaks} no GitHub. Isto foi muito útil
+            e conveniente, já que, para além de garantir o funcionamento correto do programa ao longo do seu desenvolvimento,
+            como estas são executadas na mesma distribuição Linux do que a da plataforma de testes de LI3,
+            ainda informava-nos se o programa rodaria corretamente aí.
             
-            Decidimos alterar a maneira como as datas, a struct \emph{Date},
-            funciona. Alteramos então a maneira deste de três ints de 32 bits para um int de 32 bits.
-            Pode não parecer muito porém num dataset de 10 mil rides, poupamos cerca de 
-            640 000 bits.
+            Os datasets necessários para a execução deles, são obtidos através de um link para um zip num
+            Google Drive. É feito o download deste e \textit{cacheado} nas Actions do GitHub para futuras
+            execuções.
             
-            Ainda mais, decidimos também substituir o uso da função \emph{strtol} e \emph{atoi}
-            pelas nossa próprias funções de parsing para inteiros.
-    \newpage
-    \subsection{Modo Interativo}
-            Como sugerido por alguns professores, ao invés de utilizarmos \emph{ncurses} ou outra 
-            biblioteca externa de maneira a fazer uma TUI (Terminal User Interface), após diversa 
-            discussão, decidimos avançar com um modo interativo no estilo de um \emph{Command Line 
-            Enviorment}. Para isso usamos bibliotecas como a \emph{readline/readline} e 
-            \emph{readline/history}. 
-        \subsubsection{Lista de Comandos}
-            No modo interativo decidimos aplicar diversos comandos.
-            Para começar aplicamos o comando \emph{help} que dá display de todos os comandos do programa.
-
-            De maneira a correr as \emph{queries} o utilizador pode seguir dois métodos, escrevendo a query
-            no formato da mesma, ou então pode utilizar o comando \emph{file} e passar lhe um ficheiro de 
-            onde corre as \emph{queries}. 
-
-            Enquanto que ao correr as \emph{queries} diretamente no modo interativo, no terminal, porém a
-            correr com o comando \emph{file} não conseguimos dar display. Para isso criamos o comando
-            \emph{list-output}, que lista os ficheiros/IDs do output, e o comando \emph{cat} que abre um 
-            ficheiro pelo ID, ou caso ele seja .txt.
-
-            Por último temos o comando \emph{clear} e \emph{restart} que, respetivamente, limpa todas as
-            linhas no terminal e recomeça o programa.
-
-            Caso o utilizador pretenda fechar o programa basta escrever o comando \emph{exit}.
-            
-        \subsubsection{Histórico de Comandos}
-            Através da utilização da biblioteca \emph{readline/history} decidimos também implementar um 
-            histórico de comandos. Desta maneira caso o utilizador necessite de reutilizar um comando 
-            anteriror não precisa de se preocupar, visto que os comandos previamente introduzidos são 
-            guardados em memória.
-        \subsubsection{Paginação}
-            Como em certas queries (Ex: Query 2 e 3) existe a possibilidade de termos um output muito 
-            grande de linhas, tal como pedido no enunciado, implementamos um sistema de paginação para
-            essas situações. No nosso sistema de paginação conseguimos percorrer o \emph{output} de duas 
-            maneiras diferentes. Conseguimos percorrer este página a página, avançando ou retrocedendo de
-            página, como também conseguimos simplesmente dizer a página que pretendemos e esta será impressa 
-            no terminal. De ambas as maneiras a página anterior será apagada do terminal.
-    \subsection{Testes Unitários}
-            COMMENT: REVIEW NESTA SECTION PLS
-            Como pedido no enunciado aplicamos testes de performance, uso de memória e resposta das queries.
-            Ainda mais também aplicamos testes para as nossas estruturas, o nosso \emph{parser} e para os \emph{
-            lazys}.
-        \subsubsection{Actions do Github}
-            De maneira a conseguirmos garantir que o código presente no nosso repositório passaria sempre os
-            testes dos professores, decidimos criar algumas Actions para o mesmo. Assim mesmo que não
-            conseguissemos testar na nossa máquina local, saberiamos caso o projeto tivesse \emph{memory
-            leaks} ou falhas nos testes, seriamos alertados, tal como nos seria demonstrado onde errou ou a o
-            output do valgrind.
-        \subsubsection{\emph{CSV Generator}}
-            COMMENT: Provavelmente vou tirar esta parte
-            De maneira a garantir que o nosso programa funcionava independente do \emph{dataset} fornecido
-            decidimos criar um gerador de CSVs em Rust e Python. Este permitiu nos, como o nome indica, gerar mais
-            CSVs e aumentar a possibilidade de testes realizados.
+    \newpage     
     \section{Testes de Performance}
+            Comparando o desempenho da execução de todas as queries para 
+            os ficheiros de input do conjunto de testes expandido das pastas 
+            \emph{data-regular} e \emph{data-large} temos na Tabela 2 os resultados 
+            conforme as especificações dos computadores na Tabela 1. Ainda não existe um
+            \emph{standard} para a medição de desempenho dos programas, por isso,
+            medimos da seguinte forma:
+
+            \begin{itemize}
+                \item O programa foi compilado com as flags \emph{-O3 -flto -funroll-loops -march=native}.
+                \item Não são considerados tempos de \emph{free} de memória (no fim da execução
+                do programa) em nenhum dos tempos.
+                \item O resultado é uma média de 20 execuções, para o \emph{regular dataset}, e 5 execuções, 
+                para o \emph{large dataset}, após 3 execuções de aquecimento. 
+                \item O tempo foi medido no código com o utilitário \emph{GTimer} do \emph{GLib}. Enquanto 
+                que para a média foi utilizado o programa \emph{hyperfine}.
+            \end{itemize}
+            
         \begin{table}[hbt!]
             \centering
-            \begin{tabular}{|*{3}{c|}}
+            
+            \begin{tabular}{|*{4}{c|}}
                 \hline
-                & \thead{PC 1}&\thead{PC 2}\\
+                & \thead{PC 1}&\thead{PC 2}&\thead{PC3}\\
                 \hline
-                CPU        & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 4-core \\
-                RAM        & 16GB LPDDR5                     & 8GB DDR4 2400MHz \\
-                Disco      & 500GB NVME                      & 500GB NVME \\
-                OS         & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9 \\
-                Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0 \\
+                CPU             & M1 Pro 8-core (6 perf. e 2 ef.) & Intel i7-8550U 4-core 		&  Ryzen 7 7700X 8-core \\
+                RAM            & 16GB LPDDR5                    	 & 8GB DDR4 2400MHz		 & 32GB DDR5 5600MHz \\
+                Disco			 & 500GB NVME                      	   & 500GB NVME 				 &  1TB NVME\\
+                OS                 & MacOS Ventura 13.0.1            & ArcoLinux Kernel 6.0.9 & W11 (WSL2 Ubuntu 22)\\
+                Compilador & Clang 15.0.5 (ARM64)            & GCC 12.2.0 						& GCC 11.3.0\\
                 \hline
             \end{tabular}
             \caption{Especificações dos PCs}
+                \centering
+                \begin{tabular}{|*{5}{c|}}
+                    \hline
+                    & \thead{PC 1}&\thead{PC 2}&\thead{PC 3}&\thead{Testes dos\\ Professores}\\
+                    \hline
+                    Regular Dataset (with invalid entries)   & 8.0ms   & 1.531s & 32.7ms &\\
+                    Regular Dataset (without invalid entries) & 14.1ms  & 1.594s &  66.5 ms &\\
+                    Large Dataset (with invalid entries)   & 8.0ms   &  & 23.783s &  \\
+                    Large Dataset (without invalid entries) & 14.1ms  & 24.254s &  66.5 ms & \\
+                    
+                    \hline
+                \end{tabular} 
+                \caption{Tempos de execução para os Datasets}
         \end{table}
-         
-
-        \begin{table}[hbt!]
-                \centering
-                \begin{tabular}{|*{4}{c|}}
-                    \hline
-                    & \thead{PC 1}&\thead{PC 2}&\thead{Testes dos Professores}\\
-                    \hline
-                    Loading de ficheiros                  & 767.1ms & 1466.1ms & 1427.4ms \\
-                    Regular Dataset (with invalid entries)   & 8.0ms   & 23.3ms & 32.7ms \\
-                    Regular Dataset (without invalid entries) & 14.1ms  & 45.2ms &  66.5 ms \\
-                    \hline
-                \end{tabular}
-                \caption{Tempos de execução para o Regular Dataset}
-
-                \centering
-                \begin{tabular}{|*{4}{c|}}
-                    \hline
-                    & \thead{PC 1}&\thead{PC 2}&\thead{Testes dos Professores}\\
-                    \hline
-                    Loading de ficheiros                  & 767.1ms & 1466.1ms & 1427.4ms \\
-                    Large Dataset (with invalid entries)   & 8.0ms   & 23.3ms & 32.7ms \\
-                    Large Dataset (without invalid entries) & 14.1ms  & 45.2ms &  66.5 ms \\
-                    \hline
-                \end{tabular}
-                \caption{Tempos de execução para o Large Dataset}
-            \end{table} 
 
         
+        \begin{table}
+                               
+        \end{table}
+        
+            Garantir que o programa não tenha fugas de memória foi objetivo prioritário nosso, 
+            pelo que esse foi atingido com sucesso.
+        \newpage
+        \section{Outros}
+            \subsection{\emph{CSV Generator}}            
+                Como no início da segunda parte do projeto ainda não nos tinham sido disponibilizados os datasets grandes,
+                fizemos um script rápido em \textit{Python} para gerar datasets de grande escala. Contudo, talvez
+                por inexperiência nossa ou pela natureza da linguagem, os datasets grandes demoravam mais que tempo útil 
+                a serem gerados. Portanto, fizemos um programa simples em \textit{Rust} para o mesmo objetivo.
+                Com a implementação nesta linguagem, já conseguimos gerar datasets de maior tamanho 
+                em tempo útil e prosseguir no projeto enquanto que os datasets originais não eram lançados pelos docentes.
+            \subsection{Documentação}
+                Para a documentação, usámos o padrão do Doxygen no código.
+                De forma a assegurar que todas as funções ficassem devidamente comentadas,
+                a cobertura da documentação pode ser gerada a partir de \textit{'make generate-doxygen'}.
 
+        \section{Conclusão}
+        Para concluir, acreditámos que o desenvolvimento desta segunda fase foi
+        muito satisfatória. Tal como na primeira fase do trabalho, conseguimos consolidar 
+        os nossos conhecimentos de C com conhecimentos mais avançados relacionados a performance,
+        gestão de memória, encapsulamento e modularidade. 
 
-    
+        Nesta segunda fase, estávamos mais familiarizados com conceitos de
+        modularidade e encapsulamento, o que nos permitiu uma melhor realização
+        do projeto, tal como a resolução de todos os problemas apontados na apresentação da primeira
+        fase. Achámos que o nosso projeto encontra-se num excelente estado, não só devido
+        à sua performance e pouco uso de memória, mas como também à maneira de como 
+        aplicámos conceitos de encapsulamento e modularidade para a realização do mesmo.
 
 \end{document}
