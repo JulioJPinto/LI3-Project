@@ -171,10 +171,6 @@ void writer_write_output_token_end(OutputWriter *output_writer, const char *form
     }
 }
 
-void *output_writer_get_target(OutputWriter *output_writer) {
-    return output_writer->target;
-}
-
 void close_output_writer(OutputWriter *output_writer) {
     free_buffer(&output_writer->buffer);
     free(output_writer);

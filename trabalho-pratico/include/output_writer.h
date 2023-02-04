@@ -16,8 +16,6 @@ typedef struct OutputWriter OutputWriter;
  * The output writer will write to the file directly with no overhead,
  * separating tokens with semicolons and ending lines with newlines.
  *
- * The file is stored in target and can be accessed with output_writer_get_target.
- *
  * The output writer will not close the file when close_output_writer is called.
  */
 OutputWriter *create_semicolon_file_output_writer(FILE *file);
@@ -28,7 +26,6 @@ OutputWriter *create_semicolon_file_output_writer(FILE *file);
  * The output writer will write buffer, separating tokens with semicolons and ending lines with newlines.
  * Only when the end function is called, the string is added to the array.
  *
- * The array of strings is stored in target and can be accessed with output_writer_get_target.
  * The output writer will not free the array when close_output_writer is called.
  */
 OutputWriter *create_array_of_semicolon_strings_output_writer(GPtrArray *array);
@@ -50,13 +47,6 @@ void writer_write_output_token(OutputWriter *output_writer, const char *format, 
  * depending on the implementation defined when creating the output writer.
  */
 void writer_write_output_token_end(OutputWriter *output_writer, const char *format, ...);
-
-/**
- * Returns the target of the output writer.
- *
- * The target is a file, an array of strings, or null depending on the implementation chosen.
- */
-void *output_writer_get_target(OutputWriter *output_writer);
 
 /**
  * Frees the allocated memory of the output writer.

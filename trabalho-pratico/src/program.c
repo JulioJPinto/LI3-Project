@@ -77,9 +77,10 @@ void program_ask_for_dataset_path(Program *program) {
  * Function that runs a query and prints the output to the terminal (paginated if big enough).
  */
 void run_query_and_print_output(Catalog *catalog, char *query) {
-    OutputWriter *writer = create_array_of_semicolon_strings_output_writer();
+    GPtrArray *output = g_ptr_array_new_with_free_func(free);
+    OutputWriter *writer = create_array_of_semicolon_strings_output_writer(output);
     parse_and_run_query(catalog, writer, query);
-    print_content(output_writer_get_target(writer));
+    print_content(output);
     close_output_writer(writer);
 }
 

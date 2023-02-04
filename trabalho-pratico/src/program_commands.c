@@ -107,8 +107,9 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
         LOG_WARNING_VA("Can't open '%s' file, can only open .txt files", input_file_path);
         return;
     } 
-    
-    OutputWriter *output = create_array_of_semicolon_strings_output_writer();
+
+    GPtrArray *output = g_ptr_array_new_with_free_func(free);
+    OutputWriter *output_writer = create_array_of_semicolon_strings_output_writer(output);
 
     FILE *input_file = fopen(input_file_path, "r");
     if (input_file == NULL) {
@@ -122,18 +123,19 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
         free(file_path);
     }
     if (input_file == NULL) {
-        LOG_WARNING_VA("Could not find file, output file or output file id with name '%s'", input_file_path);
+        LOG_WARNING_VA("Could not find file, output_writer file or output_writer file id with name '%s'", input_file_path);
         return;
     }
 
     char line_buffer[1024]; // We want to limit the line size to 1024 characters, otherwise we might run out of memory
     while (fgets(line_buffer, 1024, input_file) != NULL) {
-        writer_write_output_token_end(output, line_buffer);
+        writer_write_output_token_end(output_writer, line_buffer);
     }
 
-    print_content(output_writer_get_target(output));
+    print_content(output);
 
-    close_output_writer(output);
+    close_output_writer(output_writer);
+    g_ptr_array_free(output, TRUE);
     fclose(input_file);
 }
 

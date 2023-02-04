@@ -34,11 +34,14 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
         char *query = g_strdup(buffer);
 
-        OutputWriter *writer = create_array_of_semicolon_strings_output_writer();
-        parse_and_run_query(catalog, writer, query);
-        GPtrArray *actualResult = output_writer_get_target(writer);
+        GPtrArray *actualResult = g_ptr_array_new_with_free_func(free);
+        GPtrArray *expectedResult = g_ptr_array_new_with_free_func(free);
 
-        OutputWriter *expectedWriter = create_array_of_semicolon_strings_output_writer();
+        OutputWriter *writer = create_array_of_semicolon_strings_output_writer(actualResult);
+        OutputWriter *expectedWriter = create_array_of_semicolon_strings_output_writer(expectedResult);
+
+        parse_and_run_query(catalog, writer, query);
+
         char *expected_query_result_file_path = g_strdup_printf("command%d_output.txt", current_query_id);
         FILE *expected_query_result_file = open_file_folder(expected_query_result_folder_path, expected_query_result_file_path);
 
@@ -47,7 +50,6 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
             writer_write_output_token_end(expectedWriter, buffer);
         }
 
-        GPtrArray *expectedResult = output_writer_get_target(expectedWriter);
 
         int maxFileLines = MAX(actualResult->len, expectedResult->len);
 
@@ -69,6 +71,8 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
         close_output_writer(writer);
         close_output_writer(expectedWriter);
+        g_ptr_array_free(actualResult, TRUE);
+        g_ptr_array_free(expectedResult, TRUE);
         free(query);
         free(expected_query_result_file_path);
         fclose(expected_query_result_file);
