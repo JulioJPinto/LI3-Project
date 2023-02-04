@@ -13,9 +13,9 @@ struct Ride {
     Date date;
     Date user_account_creation_date;
     Date driver_account_creation_date;
-    u_int32_t user_id;
-    u_int32_t id;
-    u_int32_t driver_id;
+    int32_t user_id;
+    int32_t id;
+    int32_t driver_id;
     u_int8_t distance;
     u_int8_t city_id;
     u_int8_t score_user;
@@ -37,45 +37,45 @@ Ride *create_ride(int id, Date date, int driver_id, int city_id, int distance, i
     return ride;
 }
 
-Ride *parse_line_ride(char *line, char delim) {
-    return parse_line_ride_detailed(line, delim, NULL, NULL);
+Ride *parse_line_ride(TokenIterator *line_iterator) {
+    return parse_line_ride_detailed(line_iterator, NULL, NULL);
 }
 
-Ride *parse_line_ride_detailed(char *line, char delim, char **parsed_city, char **parsed_user_username) {
-    char *id_string = next_token(&line, delim);
+Ride *parse_line_ride_detailed(TokenIterator *line_iterator, char **parsed_city, char **parsed_user_username) {
+    char *id_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(id_string)) return NULL;
     int id = parse_int_unsafe(id_string);
 
-    char *date_string = next_token(&line, delim);
+    char *date_string = token_iterator_next(line_iterator);
     Date date = parse_date(date_string);
     if (!is_date_valid(date)) return NULL;
 
-    char *driver_string = next_token(&line, delim);
+    char *driver_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(driver_string)) return NULL;
     int driver_id = parse_int_unsafe(driver_string);
 
-    char *user = next_token(&line, delim);
+    char *user = token_iterator_next(line_iterator);
     if (IS_EMPTY(user)) return NULL;
 
-    char *city = next_token(&line, delim);
+    char *city = token_iterator_next(line_iterator);
     if (IS_EMPTY(city)) return NULL;
     int city_id = 0;
 
     int error = 0;
 
-    char *distance_string = next_token(&line, delim);
+    char *distance_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(distance_string)) return NULL;
     int distance = parse_int_safe(distance_string, &error);
 
-    char *user_score_string = next_token(&line, delim);
+    char *user_score_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(user_score_string)) return NULL;
     int user_score = parse_int_safe(user_score_string, &error);
 
-    char *driver_score_string = next_token(&line, delim);
+    char *driver_score_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(driver_score_string)) return NULL;
     int driver_score = parse_int_safe(driver_score_string, &error);
 
-    char *tip_string = next_token(&line, delim);
+    char *tip_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(tip_string)) return NULL;
     double tip = parse_double_safe(tip_string, &error);
 

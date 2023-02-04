@@ -12,94 +12,94 @@ static int failed_lines = 0;
 /**
  * Parses an user line and ensures that it returns NULL.
  */
-void parse_user_and_check_for_null(void *first_arg, char *line, char separator) {
+void parse_user_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    User *user = parse_line_user(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    User *user = parse_line_user(iterator);
     if (user != NULL) {
         fprintf(stderr, "User should've been NULL for line '%s'\n", line);
         failed_lines++;
         free(user);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
  * Parses a driver line and ensures that it returns NULL.
  */
-void parse_driver_and_check_for_null(void *first_arg, char *line, char separator) {
+void parse_driver_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    Driver *driver = parse_line_driver(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    Driver *driver = parse_line_driver(iterator);
     if (driver != NULL) {
         fprintf(stderr, "Driver should've been NULL for line '%s'\n", line);
         failed_lines++;
         free(driver);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
  * Parses a ride line and ensures that it returns NULL.
  */
-void parse_ride_and_check_for_null(void *first_arg, char *line, char separator) {
+void parse_ride_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    Ride *ride = parse_line_ride(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    Ride *ride = parse_line_ride(iterator);
     if (ride != NULL) {
         fprintf(stderr, "Ride should've been NULL for line '%s'\n", line);
         failed_lines++;
         free(ride);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
  * Parses an user line and ensures that it does not return NULL.
  */
-void parse_user_and_check_for_non_null(void *first_arg, char *line, char separator) {
+void parse_user_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    User *user = parse_line_user(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    User *user = parse_line_user(iterator);
     if (user == NULL) {
         fprintf(stderr, "User should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
         free(user);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
  * Parses a driver line and ensures that it does not return NULL.
  */
-void parse_driver_and_check_for_non_null(void *first_arg, char *line, char separator) {
+void parse_driver_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    Driver *driver = parse_line_driver(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    Driver *driver = parse_line_driver(iterator);
     if (driver == NULL) {
         fprintf(stderr, "Driver should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
         free(driver);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
  * Parses a ride line and ensures that it does not return NULL.
  */
-void parse_ride_and_check_for_non_null(void *first_arg, char *line, char separator) {
+void parse_ride_and_check_for_non_null(void *first_arg, TokenIterator *iterator) {
     (void) first_arg;
-    char *new_line = g_strdup(line);
-    Ride *ride = parse_line_ride(new_line, separator);
+    char *line = g_strdup(token_iterator_current(iterator));
+    Ride *ride = parse_line_ride(iterator);
     if (ride == NULL) {
         fprintf(stderr, "Ride should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
         free(ride);
     }
-    free(new_line);
+    free(line);
 }
 
 /**
@@ -112,9 +112,9 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
 
     failed_lines = 0;
 
-    read_file(users_file, parse_user_and_check_for_null, NULL);
-    read_file(drivers_file, parse_driver_and_check_for_null, NULL);
-    read_file(rides_file, parse_ride_and_check_for_null, NULL);
+    read_csv_file(users_file, parse_user_and_check_for_null, NULL);
+    read_csv_file(drivers_file, parse_driver_and_check_for_null, NULL);
+    read_csv_file(rides_file, parse_ride_and_check_for_null, NULL);
 
     if (failed_lines) {
         g_test_fail_printf("Failed for %d lines", failed_lines);
@@ -147,9 +147,9 @@ void assert_valid_csv_loads_everything_regular(void) {
 
     failed_lines = 0;
 
-    read_file(users_file, parse_user_and_check_for_non_null, NULL);
-    read_file(drivers_file, parse_driver_and_check_for_non_null, NULL);
-    read_file(rides_file, parse_ride_and_check_for_non_null, NULL);
+    read_csv_file(users_file, parse_user_and_check_for_non_null, NULL);
+    read_csv_file(drivers_file, parse_driver_and_check_for_non_null, NULL);
+    read_csv_file(rides_file, parse_ride_and_check_for_non_null, NULL);
 
     if (failed_lines) {
         g_test_fail_printf("Failed for %d lines", failed_lines);

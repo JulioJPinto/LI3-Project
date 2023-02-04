@@ -13,7 +13,7 @@ struct User {
     Date birthdate;
     Date account_create_date;
     Date most_recent_ride;
-    u_int32_t id;
+    int32_t id;
     u_int16_t accumulated_score;
     u_int16_t total_distance;
     u_int16_t rides_amount;
@@ -42,30 +42,30 @@ User *create_user(char *username, char *name, Gender gender, Date birthdate, Dat
     return user;
 }
 
-User *parse_line_user(char *line, char delim) {
-    char *username = next_token(&line, delim);
+User *parse_line_user(TokenIterator *line_iterator) {
+    char *username = token_iterator_next(line_iterator);
     if (IS_EMPTY(username)) return NULL;
 
-    char *name = next_token(&line, delim);
+    char *name = token_iterator_next(line_iterator);
     if (IS_EMPTY(name)) return NULL;
 
-    char *gender_string = next_token(&line, delim);
+    char *gender_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(gender_string)) return NULL;
     Gender gender = parse_gender(gender_string);
 
-    char *birth_date_string = next_token(&line, delim);
+    char *birth_date_string = token_iterator_next(line_iterator);
     Date birth_date = parse_date(birth_date_string);
     if (!is_date_valid(birth_date)) return NULL;
 
-    char *acc_creation_string = next_token(&line, delim);
+    char *acc_creation_string = token_iterator_next(line_iterator);
     Date acc_creation = parse_date(acc_creation_string);
     if (!is_date_valid(acc_creation)) return NULL;
 
-    char *pay_method_string = next_token(&line, delim);
+    char *pay_method_string = token_iterator_next(line_iterator);
     if (IS_EMPTY(pay_method_string)) return NULL;
     PaymentMethod pay_method = parse_pay_method(pay_method_string);
 
-    char *acc_status_string = next_token(&line, delim);
+    char *acc_status_string = token_iterator_next(line_iterator);
     AccountStatus acc_status = parse_acc_status(acc_status_string);
     if (acc_status == INVALID_ACCOUNT_STATUS) return NULL;
 

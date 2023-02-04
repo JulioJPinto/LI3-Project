@@ -20,7 +20,7 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
                                                              char *expected_query_result_folder_path,
                                                              gboolean lazy_loading) {
     Catalog *catalog = create_catalog();
-    catalog_load_dataset(catalog, dataset_folder_path);
+    catalog_load_csv_dataset(catalog, dataset_folder_path);
 
     if (!lazy_loading) catalog_force_eager_indexing(catalog);
 
@@ -30,23 +30,26 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
 
     char buffer[1000];
     while (fgets(buffer, 1000, queries_file) != NULL) {
-        format_fgets_input_line(buffer);
+        format_input_line(buffer);
 
         char *query = g_strdup(buffer);
 
-        OutputWriter *writer = create_array_of_strings_output_writer();
-        parse_and_run_query(catalog, writer, query);
-        GPtrArray *actualResult = get_buffer(writer);
+        GPtrArray *actualResult = g_ptr_array_new_with_free_func(free);
+        GPtrArray *expectedResult = g_ptr_array_new_with_free_func(free);
 
-        OutputWriter *expectedWriter = create_array_of_strings_output_writer();
+        OutputWriter *writer = create_array_of_semicolon_strings_output_writer(actualResult);
+        OutputWriter *expectedWriter = create_array_of_semicolon_strings_output_writer(expectedResult);
+
+        parse_and_run_query(catalog, writer, query);
+
         char *expected_query_result_file_path = g_strdup_printf("command%d_output.txt", current_query_id);
         FILE *expected_query_result_file = open_file_folder(expected_query_result_folder_path, expected_query_result_file_path);
 
         while (fgets(buffer, 1000, expected_query_result_file) != NULL) {
-            write_output_line(expectedWriter, buffer);
+            format_input_line(buffer);
+            writer_write_output_token_end(expectedWriter, buffer);
         }
 
-        GPtrArray *expectedResult = get_buffer(expectedWriter);
 
         int maxFileLines = MAX(actualResult->len, expectedResult->len);
 
@@ -56,18 +59,20 @@ void load_catalog_execute_queries_and_check_expected_outputs(char *dataset_folde
             if (strcmp(expectedLine, actualLine) != 0) {
                 g_test_fail();
 
-                format_fgets_input_line(expectedLine);
-                format_fgets_input_line(actualLine);
+                format_input_line(expectedLine);
+                format_input_line(actualLine);
 
                 fprintf(stderr, "Query %d (%s) failed:\n", current_query_id, query);
                 fprintf(stderr, "Expected: '%s'\n", expectedLine);
-                fprintf(stderr, "Actual: '%s'\n\n", actualLine);
+                fprintf(stderr, "Actual:   '%s'\n\n", actualLine);
             }
         }
         current_query_id++;
 
         close_output_writer(writer);
         close_output_writer(expectedWriter);
+        g_ptr_array_free(actualResult, TRUE);
+        g_ptr_array_free(expectedResult, TRUE);
         free(query);
         free(expected_query_result_file_path);
         fclose(expected_query_result_file);

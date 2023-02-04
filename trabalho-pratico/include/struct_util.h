@@ -82,6 +82,12 @@ int parse_int_unsafe(char *string);
 double parse_double_safe(char *string, int *error);
 
 /**
+ * Returns a string representation of the date in the format dd/mm/yyyy
+ * The string is allocated in the heap and must be freed
+ */
+char *convert_date_to_string(Date date);
+
+/**
  * Returns 1 if the date is valid, 0 otherwise
  */
 int is_date_valid(Date date);
@@ -115,6 +121,12 @@ int date_get_month(Date date);
  * As the date is encoded, this function will extract the year from the encoded date
  */
 int date_get_year(Date date);
+
+/**
+ * Returns a string representation of the gender
+ * The string is in static memory and must not be freed
+ */
+char *convert_gender_to_string(Gender gender);
 
 /**
  * Parses a string into a gender struct 

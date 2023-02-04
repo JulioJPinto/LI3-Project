@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include "program.h"
 
 #include <ctype.h>
@@ -75,9 +77,10 @@ void program_ask_for_dataset_path(Program *program) {
  * Function that runs a query and prints the output to the terminal (paginated if big enough).
  */
 void run_query_and_print_output(Catalog *catalog, char *query) {
-    OutputWriter *writer = create_array_of_strings_output_writer();
+    GPtrArray *output = g_ptr_array_new_with_free_func(free);
+    OutputWriter *writer = create_array_of_semicolon_strings_output_writer(output);
     parse_and_run_query(catalog, writer, query);
-    print_content(get_buffer(writer));
+    print_content(output);
     close_output_writer(writer);
 }
 
@@ -88,7 +91,7 @@ void run_query_and_save_in_output_file(Catalog *catalog, char *query, int query_
     create_output_folder_if_not_exists();
     FILE *output_file = create_command_output_file(query_number);
 
-    OutputWriter *writer = create_file_output_writer(output_file);
+    OutputWriter *writer = create_semicolon_file_output_writer(output_file);
 
     BENCHMARK_START(query_benchmark);
     parse_and_run_query(catalog, writer, query);
@@ -157,7 +160,7 @@ int start_program(Program *program, GPtrArray *program_args) {
 }
 
 gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
-    if (!catalog_load_dataset(program->catalog, dataset_folder_path))
+    if (!catalog_load_csv_dataset(program->catalog, dataset_folder_path))
         return FALSE;
 
     char *lazy_loading_value_string = get_program_flag_value(program->flags, "lazy-loading", "true");
@@ -175,16 +178,21 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
 
     BENCHMARK_START(input_file_execution_timer);
 
-    char line_buffer[1024];
-
     int id = 0;
 
-    while (fgets(line_buffer, 1024, input_file)) {
-        format_fgets_input_line(line_buffer);
-        if (*line_buffer == '#') continue; // Ignore comments
+    char *line_buffer = malloc(1024);
+    size_t line_buffer_size = 1024;
+
+    // By using getline, we are assuming the input has not big enough lines to run out of memory.
+
+    while (getline(&line_buffer, &line_buffer_size, input_file) >= 0) {
+        format_input_line(line_buffer);
+        if (*line_buffer == '\0' || *line_buffer == '#') continue; // Hashtag to ignore comments
 
         run_query_and_save_in_output_file(program->catalog, line_buffer, ++id);
     }
+
+    free(line_buffer);
 
     g_timer_stop(input_file_execution_timer);
     BENCHMARK_LOG("%d queries from '%s' executed in %f seconds\n", id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));

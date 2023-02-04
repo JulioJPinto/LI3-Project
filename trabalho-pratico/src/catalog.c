@@ -73,23 +73,23 @@ int catalog_get_or_register_city_id(Catalog *catalog, char *city) {
 /**
  * Internal function that parses a line and registers the parsed user.
  */
-static inline void internal_parse_and_register_user(Catalog *catalog, char *line, char separator) {
-    User *user = parse_line_user(line, separator);
+static inline void internal_parse_and_register_user(Catalog *catalog, TokenIterator *line_iterator) {
+    User *user = parse_line_user(line_iterator);
     if (user == NULL) return;
 
     catalog_user_register_user(catalog->catalog_user, user);
 }
 
-void parse_and_register_user(void *catalog, char *line, char separator) {
-    internal_parse_and_register_user(catalog, line, separator);
+void parse_and_register_user(void *catalog, TokenIterator *line_iterator) {
+    internal_parse_and_register_user(catalog, line_iterator);
 }
 
 /**
  * Internal function that parses a line and registers the parsed driver.
  */
-static inline void internal_parse_and_register_driver(Catalog *catalog, char *line, char separator) {
+static inline void internal_parse_and_register_driver(Catalog *catalog, TokenIterator *line_iterator) {
     char *city;
-    Driver *driver = parse_line_driver_detailed(line, separator, &city);
+    Driver *driver = parse_line_driver_detailed(line_iterator, &city);
     if (driver == NULL) return;
 
     int city_id = catalog_get_or_register_city_id(catalog, city);
@@ -98,18 +98,18 @@ static inline void internal_parse_and_register_driver(Catalog *catalog, char *li
     catalog_driver_register_driver(catalog->catalog_driver, driver);
 }
 
-void parse_and_register_driver(void *catalog, char *line, char separator) {
-    internal_parse_and_register_driver(catalog, line, separator);
+void parse_and_register_driver(void *catalog, TokenIterator *line_iterator) {
+    internal_parse_and_register_driver(catalog, line_iterator);
 }
 
 /**
  * Internal function that parses a line and registers the parsed ride.
  */
-static inline void internal_parse_and_register_ride(Catalog *catalog, char *line, char separator) {
+static inline void internal_parse_and_register_ride(Catalog *catalog, TokenIterator *line_iterator) {
     char *city;
     char *user_username;
 
-    Ride *ride = parse_line_ride_detailed(line, separator, &city, &user_username);
+    Ride *ride = parse_line_ride_detailed(line_iterator, &city, &user_username);
     if (ride == NULL) return;
     int city_id = catalog_get_or_register_city_id(catalog, city);
     ride_set_city_id(ride, city_id);
@@ -162,8 +162,8 @@ static inline void internal_parse_and_register_ride(Catalog *catalog, char *line
     }
 }
 
-void parse_and_register_ride(void *catalog, char *line, char separator) {
-    internal_parse_and_register_ride(catalog, line, separator);
+void parse_and_register_ride(void *catalog, TokenIterator *line_iterator) {
+    internal_parse_and_register_ride(catalog, line_iterator);
 }
 
 User *catalog_get_user_by_user_id(Catalog *catalog, int user_id) {

@@ -7,7 +7,7 @@
  */
 void load_catalog_execute_queries_and_benchmark(char *dataset_folder_path, char *queries_file_path) {
     Catalog *catalog = create_catalog();
-    catalog_load_dataset(catalog, dataset_folder_path);
+    catalog_load_csv_dataset(catalog, dataset_folder_path);
 
     // Don't force eager indexing, so we get worse case scenario
 
@@ -17,7 +17,7 @@ void load_catalog_execute_queries_and_benchmark(char *dataset_folder_path, char 
 
     char buffer[1024];
     while (fgets(buffer, 1024, queries_file) != NULL) {
-        format_fgets_input_line(buffer);
+        format_input_line(buffer);
 
         g_autofree GTimer *timer = g_timer_new();
         g_timer_start(timer);

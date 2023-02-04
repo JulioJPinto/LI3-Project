@@ -3,6 +3,8 @@
 #include "correctness_parser_test.c"
 #include "correctness_query_test.c"
 #include "performance_query_test.c"
+#include "output_writer_test.c"
+#include "token_iterator_test.c"
 
 #include <glib.h>
 
@@ -24,6 +26,9 @@ int main(int argc, char *argv[]) {
     ADD_TEST("/struct_utils/", assert_test_date_age);
     ADD_TEST("/lazy/", test_lazy_behavior_int_apply_function);
     ADD_TEST("/lazy/", test_lazy_behavior_null_apply_function);
+    ADD_TEST("/token_iterator/", test_semicolon_separated_token_iterator);
+    ADD_TEST("/output_writer/", test_semicolon_file_output_writer);
+    ADD_TEST("/output_writer/", test_array_of_semicolon_strings_output_writer);
     ADD_TEST("/correctness/parser/", assert_invalid_csv_loads_nothing_large);
     ADD_TEST("/correctness/parser/", assert_invalid_csv_loads_nothing_regular);
     ADD_TEST("/correctness/parser/", assert_valid_csv_loads_everything_regular);

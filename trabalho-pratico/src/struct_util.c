@@ -1,10 +1,8 @@
 #include "struct_util.h"
 
-#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
 #include <glib.h>
+#include <stdio.h>
 
 #include "string_util.h"
 
@@ -22,6 +20,13 @@ static int is_digit(char c) {
 
 int parse_int_safe(char *string, int *error) {
     int val = 0;
+
+    gboolean negative = FALSE;
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
+
     while (*string) {
         if (G_UNLIKELY(!is_digit(*string))) {
             *error = 1;
@@ -29,20 +34,34 @@ int parse_int_safe(char *string, int *error) {
         }
         val = val * 10 + (*string++ - '0');
     }
-    return val;
+    return negative ? -val : val;
 }
 
 inline int parse_int_unsafe(char *string) {
     int val = 0;
+    gboolean negative = FALSE;
+
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
+
     while (*string) {
         val = val * 10 + (*string++ - '0');
     }
-    return val;
+
+    return negative ? -val : val;
 }
 
 double parse_double_safe(char *string, int *error) {
     int integer_part = 0;
     double decimal_part = 0;
+
+    gboolean negative = FALSE;
+    if (*string == '-') {
+        negative = TRUE;
+        string++;
+    }
 
     while (*string) {
         if (*string == '.') {
@@ -67,7 +86,17 @@ double parse_double_safe(char *string, int *error) {
         current_decimal_part_divider *= 10;
     }
 
-    return integer_part + decimal_part;
+    double result = integer_part + decimal_part;
+    if (negative) result *= -1;
+
+    return result;
+}
+
+char *convert_date_to_string(Date date) {
+    char *string = malloc(11);
+    // This can be further modified to accept different date formats
+    sprintf(string, "%02d/%02d/%04d", date_get_day(date), date_get_month(date), date_get_year(date));
+    return string;
 }
 
 int is_date_valid(Date date) {
@@ -126,6 +155,10 @@ int date_get_month(Date date) {
 
 int date_get_year(Date date) {
     return (int) (date.encoded_date >> 10) & 0x7FFF;
+}
+
+char *convert_gender_to_string(Gender gender) {
+    return gender == F ? "F" : "M";
 }
 
 inline Gender parse_gender(const char *string) {
