@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include "program.h"
 
 #include <ctype.h>
@@ -170,6 +168,8 @@ gboolean program_load_dataset(Program *program, char *dataset_folder_path) {
     return TRUE;
 }
 
+#define BUFFER_SIZE 1024
+
 gboolean program_run_queries_from_file(Program *program, char *input_file_path) {
     FILE *input_file = open_file(input_file_path);
     if (input_file == NULL) {
@@ -180,19 +180,14 @@ gboolean program_run_queries_from_file(Program *program, char *input_file_path) 
 
     int id = 0;
 
-    char *line_buffer = malloc(1024);
-    size_t line_buffer_size = 1024;
-
-    // By using getline, we are assuming the input has not big enough lines to run out of memory.
-
-    while (getline(&line_buffer, &line_buffer_size, input_file) >= 0) {
+    char line_buffer[BUFFER_SIZE];
+    
+    while (fgets(line_buffer, BUFFER_SIZE, input_file)) {
         format_input_line(line_buffer);
         if (*line_buffer == '\0' || *line_buffer == '#') continue; // Hashtag to ignore comments
 
         run_query_and_save_in_output_file(program->catalog, line_buffer, ++id);
     }
-
-    free(line_buffer);
 
     g_timer_stop(input_file_execution_timer);
     BENCHMARK_LOG("%d queries from '%s' executed in %f seconds\n", id, input_file_path, g_timer_elapsed(input_file_execution_timer, NULL));
