@@ -11,7 +11,7 @@ void write_output_debug(OutputWriter *stream, const char *format, ...) {
 #ifdef DEBUG
     va_list args;
     va_start(args, format);
-    write_output_line(stream, format, args);
+    writer_write_output_token_end(stream, format, args);
     va_end(args);
 #else
     UNUSED(stream);
@@ -26,23 +26,28 @@ void execute_query_find_user_by_name(Catalog *catalog, OutputWriter *output, cha
     User *user = catalog_get_user_by_username(catalog, username);
 
     if (user == NULL) {
-        write_output_debug(output, "User %s not found\n", username);
+        write_output_debug(output, "User %s not found", username);
         return;
     }
 
     if (user_get_account_status(user) == INACTIVE) {
-        write_output_debug(output, "User %s is inactive\n", username);
+        write_output_debug(output, "User %s is inactive", username);
         return;
     }
 
     char *name = user_get_name(user);
-    const char *gender = user_get_gender(user) == F ? "F" : "M";
+    const char *gender = convert_gender_to_string(user_get_gender(user));
     int age = get_age(user_get_birthdate(user));
     double average_score = user_get_average_score(user);
     int number_of_rides = user_get_number_of_rides(user);
     double total_spent = user_get_total_spent(user);
 
-    write_output_line(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+    writer_write_output_token(output, "%s", name);
+    writer_write_output_token(output, "%s", gender);
+    writer_write_output_token(output, "%d", age);
+    writer_write_output_token(output, "%.3f", average_score);
+    writer_write_output_token(output, "%d", number_of_rides);
+    writer_write_output_token_end(output, "%.3f", total_spent);
 
     free(name);
 }
@@ -54,23 +59,28 @@ void execute_query_find_driver_by_id(Catalog *catalog, OutputWriter *output, int
     Driver *driver = catalog_get_driver(catalog, id);
 
     if (driver == NULL) {
-        write_output_debug(output, "Driver %d not found\n", id);
+        write_output_debug(output, "Driver %d not found", id);
         return;
     }
 
     if (driver_get_account_status(driver) == INACTIVE) {
-        write_output_debug(output, "Driver %d is inactive\n", id);
+        write_output_debug(output, "Driver %d is inactive", id);
         return;
     }
 
     char *name = driver_get_name(driver);
-    const char *gender = driver_get_gender(driver) == F ? "F" : "M";
+    const char *gender = convert_gender_to_string(driver_get_gender(driver));
     int age = get_age(driver_get_birthdate(driver));
     double average_score = driver_get_average_score(driver);
     int number_of_rides = driver_get_number_of_rides(driver);
     double total_spent = driver_get_total_earned(driver);
 
-    write_output_line(output, "%s;%s;%d;%.3f;%d;%.3f\n", name, gender, age, average_score, number_of_rides, total_spent);
+    writer_write_output_token(output, "%s", name);
+    writer_write_output_token(output, "%s", gender);
+    writer_write_output_token(output, "%d", age);
+    writer_write_output_token(output, "%.3f", average_score);
+    writer_write_output_token(output, "%d", number_of_rides);
+    writer_write_output_token_end(output, "%.3f", total_spent);
 
     free(name);
 }
@@ -112,7 +122,9 @@ void execute_query_top_n_drivers(Catalog *catalog, OutputWriter *output, char **
         char *name = driver_get_name(driver);
         double average_score = driver_get_average_score(driver);
 
-        write_output_line(output, "%012d;%s;%.3f\n", id, name, average_score);
+        writer_write_output_token(output, "%012d", id);
+        writer_write_output_token(output, "%s", name);
+        writer_write_output_token_end(output, "%.3f", average_score);
 
         free(name);
     }
@@ -128,7 +140,7 @@ void execute_query_longest_n_total_distance(Catalog *catalog, OutputWriter *outp
     int n = parse_int_safe(args[0], &error);
 
     if (error) {
-        LOG_WARNING_VA("Couldn't parse number of size of top users '%s'\n", args[0]);
+        LOG_WARNING_VA("Couldn't parse number of size of top users '%s'", args[0]);
         return;
     }
 
@@ -143,7 +155,9 @@ void execute_query_longest_n_total_distance(Catalog *catalog, OutputWriter *outp
         char *name = user_get_name(user);
         int total_distance = user_get_total_distance(user);
 
-        write_output_line(output, "%s;%s;%d\n", username, name, total_distance);
+        writer_write_output_token(output, "%s", username);
+        writer_write_output_token(output, "%s", name);
+        writer_write_output_token_end(output, "%d", total_distance);
 
         free(username);
         free(name);
@@ -160,13 +174,13 @@ void execute_query_average_price_in_city(Catalog *catalog, OutputWriter *output,
 
     int city_id = catalog_get_city_id(catalog, city);
     if (city_id == -1) {
-        write_output_debug(output, "City %s not found\n", city);
+        write_output_debug(output, "City %s not found", city);
         return;
     }
 
     double average_price = query_4_catalog_get_average_price_in_city(catalog, city_id);
 
-    write_output_line(output, "%.3f\n", average_price);
+    writer_write_output_token_end(output, "%.3f", average_price);
 }
 
 /**
@@ -192,11 +206,11 @@ void execute_query_average_price_in_date_range(Catalog *catalog, OutputWriter *o
     double average_price = query_5_catalog_get_average_price_in_date_range(catalog, start_date, end_date);
 
     if (average_price == -1) {
-        write_output_debug(output, "No rides in date range\n");
+        write_output_debug(output, "No rides in date range");
         return;
     }
 
-    write_output_line(output, "%.3f\n", average_price);
+    writer_write_output_token_end(output, "%.3f", average_price);
 }
 
 /**
@@ -223,18 +237,18 @@ void execute_query_average_distance_in_city_in_date_range(Catalog *catalog, Outp
 
     int city_id = catalog_get_city_id(catalog, city);
     if (city_id == -1) {
-        write_output_debug(output, "City %s not found\n", city);
+        write_output_debug(output, "City %s not found", city);
         return;
     }
 
     double average_distance = query_6_catalog_get_average_distance_in_city_by_date(catalog, start_date, end_date, city_id);
 
     if (average_distance == -1) {
-        write_output_debug(output, "No rides in date range\n");
+        write_output_debug(output, "No rides in date range");
         return;
     }
 
-    write_output_line(output, "%.3f\n", average_distance);
+    writer_write_output_token_end(output, "%.3f", average_distance);
 }
 
 /**
@@ -252,7 +266,7 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, Output
 
     int city_id = catalog_get_city_id(catalog, city);
     if (city_id == -1) {
-        write_output_debug(output, "City %s not found\n", city);
+        write_output_debug(output, "City %s not found", city);
         return;
     }
 
@@ -267,7 +281,10 @@ void execute_query_top_drivers_in_city_by_average_score(Catalog *catalog, Output
         char *name = driver_get_name(driver);
         double average_score = driver_city_info_get_average_score(driver_city_info);
 
-        write_output_line(output, "%012d;%s;%.3f\n", id, name, average_score);
+        writer_write_output_token(output, "%012d", id);
+        writer_write_output_token(output, "%s", name);
+        writer_write_output_token_end(output, "%.3f", average_score);
+
         free(name);
     }
 
@@ -303,7 +320,10 @@ void execute_query_rides_with_users_and_drivers_same_gender_by_account_creation_
         char *user_username = user_get_username(user);
         char *user_name = user_get_name(user);
 
-        write_output_line(output, "%012d;%s;%s;%s\n", driver_id, driver_name, user_username, user_name);
+        writer_write_output_token(output, "%012d", driver_id);
+        writer_write_output_token(output, "%s", driver_name);
+        writer_write_output_token(output, "%s", user_username);
+        writer_write_output_token_end(output, "%s", user_name);
 
         free(driver_name);
         free(user_username);
@@ -345,12 +365,15 @@ void execute_query_passenger_that_gave_tip(Catalog *catalog, OutputWriter *outpu
         char *city = catalog_get_city_name(catalog, city_id);
         double tip = ride_get_tip(ride);
 
-        int day = date_get_day(date);
-        int month = date_get_month(date);
-        int year = date_get_year(date);
+        char *date_string = convert_date_to_string(date);
 
-        write_output_line(output, "%012d;%02d/%02d/%02d;%d;%s;%.3f\n", id, day, month, year, distance, city, tip);
+        writer_write_output_token(output, "%012d", id);
+        writer_write_output_token(output, "%s", date_string);
+        writer_write_output_token(output, "%d", distance);
+        writer_write_output_token(output, "%s", city);
+        writer_write_output_token_end(output, "%.3f", tip);
 
+        free(date_string);
         free(city);
     }
 

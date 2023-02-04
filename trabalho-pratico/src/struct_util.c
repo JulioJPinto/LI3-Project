@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <glib.h>
+#include <stdio.h>
 
 #include "string_util.h"
 
@@ -91,6 +92,13 @@ double parse_double_safe(char *string, int *error) {
     return result;
 }
 
+char *convert_date_to_string(Date date) {
+    char *string = malloc(11);
+    // This can be further modified to accept different date formats
+    sprintf(string, "%02d/%02d/%04d", date_get_day(date), date_get_month(date), date_get_year(date));
+    return string;
+}
+
 int is_date_valid(Date date) {
     return date.encoded_date != 0;
 }
@@ -147,6 +155,10 @@ int date_get_month(Date date) {
 
 int date_get_year(Date date) {
     return (int) (date.encoded_date >> 10) & 0x7FFF;
+}
+
+char *convert_gender_to_string(Gender gender) {
+    return gender == F ? "F" : "M";
 }
 
 inline Gender parse_gender(const char *string) {

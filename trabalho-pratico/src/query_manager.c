@@ -1,7 +1,5 @@
 #include "query_manager.h"
 
-#include <stdlib.h>
-
 #include "queries.h"
 #include "logger.h"
 
@@ -42,7 +40,7 @@ void parse_and_run_query(Catalog *catalog, OutputWriter *output, char *query) {
     int query_id = parse_int_safe(args[0], &error);
 
     if (error) {
-        write_output_line(output, "Invalid query id: %s\n", args[0]);
+        writer_write_output_token_end(output, "Invalid query id: %s\n", args[0]);
     } else {
         run_query(catalog, output, query_id, args + 1);
     }
@@ -52,13 +50,13 @@ void parse_and_run_query(Catalog *catalog, OutputWriter *output, char *query) {
 
 void run_query(Catalog *catalog, OutputWriter *output, int query_id, char **args) {
     if (query_id <= 0 || query_id > (int) query_functions_size) {
-        write_output_line(output, "Query %d not implemented\n", query_id);
+        writer_write_output_token_end(output, "Query %d not implemented\n", query_id);
         return;
     }
 
     QueryFunctionInfo query_function_info = query_functions[query_id - 1];
     int min_args = query_function_info.min_args;
-    int args_count = g_strv_length(args);
+    int args_count = (int) g_strv_length(args);
 
     if (args_count < min_args) {
         fprintf(stdout, TERMINAL_YELLOW_BOLD "Query %d " TERMINAL_RESET "- %s\n", query_id, query_function_info.description);

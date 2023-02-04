@@ -75,9 +75,9 @@ void program_ask_for_dataset_path(Program *program) {
  * Function that runs a query and prints the output to the terminal (paginated if big enough).
  */
 void run_query_and_print_output(Catalog *catalog, char *query) {
-    OutputWriter *writer = create_array_of_strings_output_writer();
+    OutputWriter *writer = create_array_of_semicolon_strings_output_writer();
     parse_and_run_query(catalog, writer, query);
-    print_content(get_buffer(writer));
+    print_content(output_writer_get_target(writer));
     close_output_writer(writer);
 }
 
@@ -88,7 +88,7 @@ void run_query_and_save_in_output_file(Catalog *catalog, char *query, int query_
     create_output_folder_if_not_exists();
     FILE *output_file = create_command_output_file(query_number);
 
-    OutputWriter *writer = create_file_output_writer(output_file);
+    OutputWriter *writer = create_semicolon_file_output_writer(output_file);
 
     BENCHMARK_START(query_benchmark);
     parse_and_run_query(catalog, writer, query);

@@ -3,6 +3,9 @@
 #include "string_util.h"
 #include <stdlib.h>
 
+/**
+ * Struct implementation of TokenIterator.
+ */
 struct TokenIterator {
     char *string;
 };

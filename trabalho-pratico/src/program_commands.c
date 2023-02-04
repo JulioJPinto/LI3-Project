@@ -108,7 +108,7 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
         return;
     } 
     
-    OutputWriter *output = create_array_of_strings_output_writer();
+    OutputWriter *output = create_array_of_semicolon_strings_output_writer();
 
     FILE *input_file = fopen(input_file_path, "r");
     if (input_file == NULL) {
@@ -128,10 +128,10 @@ void program_cat_files_command(Program *program, char **args, int arg_size) {
 
     char line_buffer[1024]; // We want to limit the line size to 1024 characters, otherwise we might run out of memory
     while (fgets(line_buffer, 1024, input_file) != NULL) {
-        write_output_line(output, line_buffer);
+        writer_write_output_token_end(output, line_buffer);
     }
 
-    print_content(get_buffer(output));
+    print_content(output_writer_get_target(output));
 
     close_output_writer(output);
     fclose(input_file);
