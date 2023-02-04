@@ -1,3 +1,6 @@
+/**
+ * Test if the semicolon file output writer is working properly.
+ */
 void test_semicolon_file_output_writer(void) {
     FILE *file = tmpfile();
 
@@ -14,6 +17,9 @@ void test_semicolon_file_output_writer(void) {
     fclose(file);
 }
 
+/**
+ * Test if the array of semicolon strings output writer is working properly.
+ */
 void test_array_of_semicolon_strings_output_writer(void) {
     GPtrArray *array = g_ptr_array_new();
 
