@@ -16,7 +16,7 @@ void read_csv_file(FILE *stream, ApplyLineFunction *apply_line_function, void *a
         return;
     }
 
-    TokenIterator *iterator = init_csv_line_token_iterator();
+    TokenIterator *iterator = init_semicolon_separated_token_iterator();
 
     while (getline(&line_buffer, &line_buffer_size, stream) >= 0) {
         format_input_line(line_buffer);

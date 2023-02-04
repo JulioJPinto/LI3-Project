@@ -10,7 +10,7 @@ typedef struct TokenIterator TokenIterator;
 /**
  * Creates a new TokenIterator that iterates over a line of a CSV file (semicolon separated values).
  */
-TokenIterator *init_csv_line_token_iterator(void);
+TokenIterator *init_semicolon_separated_token_iterator(void);
 
 /**
  * Returns the current line of the iterator.

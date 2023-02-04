@@ -10,7 +10,7 @@ struct TokenIterator {
     char *string;
 };
 
-TokenIterator *init_csv_line_token_iterator(void) {
+TokenIterator *init_semicolon_separated_token_iterator(void) {
     TokenIterator *iterator = malloc(sizeof(TokenIterator));
     return iterator;
 }
