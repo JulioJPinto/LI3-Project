@@ -15,7 +15,7 @@ ifeq ($(BUILD_TYPE), debug)
 	CFLAGS += -Iinclude/
 	SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), release)
-	CFLAGS += -g -O3 -flto -funroll-loops
+	CFLAGS += -O3 -flto -funroll-loops
 	EXEC := $(EXEC)-release
 	BUILD_DIR_PATH := build/release
 	SRC_FOLDER := src
