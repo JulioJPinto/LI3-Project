@@ -8,19 +8,19 @@ LIBS := $(shell pkg-config --libs glib-2.0) -lreadline
 
 BUILD_TYPE ?= release
 ifeq ($(BUILD_TYPE), debug)
-    CFLAGS += -O0 -g -DDEBUG=1
-    EXEC := $(EXEC)-debug
-    BUILD_DIR_PATH := build/debug
-    SRC_FOLDER := src
-    CFLAGS += -Iinclude/
-    SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
+	CFLAGS += -O0 -g -DDEBUG=1
+	EXEC := $(EXEC)-debug
+	BUILD_DIR_PATH := build/debug
+	SRC_FOLDER := src
+	CFLAGS += -Iinclude/
+	SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), release)
-    CFLAGS += -g -O3 -flto -funroll-loops
-    EXEC := $(EXEC)-release
-    BUILD_DIR_PATH := build/release
-    SRC_FOLDER := src
-    CFLAGS += -Iinclude/
-    SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
+	CFLAGS += -g -O3 -flto -funroll-loops
+	EXEC := $(EXEC)-release
+	BUILD_DIR_PATH := build/release
+	SRC_FOLDER := src
+	CFLAGS += -Iinclude/
+	SRC += $(wildcard $(SRC_FOLDER)/*.c $(SRC_FOLDER)/*/*.c)
 else ifeq ($(BUILD_TYPE), test)
 	CFLAGS += -O0 -g -DOMIT_BENCHMARK_LOGGING
 	EXEC := $(EXEC)-test
