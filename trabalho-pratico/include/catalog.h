@@ -26,19 +26,15 @@ void free_catalog(Catalog *catalog);
 
 /**
  * Returns the city name associated with the given city id.
+ * If the city is not registered, returns NULL.
  */
 char *catalog_get_city_name(Catalog *catalog, int city_id);
 
 /**
  * Returns the city id associated with the given city name.
+ * If the city is not registered, returns -1.
  */
 int catalog_get_city_id(Catalog *catalog, char *city);
-
-/**
- * Returns the city id associated with the given city name.
- * If the city is not registered, it is registered and its id is returned.
- */
-int catalog_get_or_register_city_id(Catalog *catalog, char *city);
 
 /**
  * Registers a user in the catalog.
