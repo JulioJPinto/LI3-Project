@@ -1,4 +1,4 @@
-CC := gcc-12
+CC := gcc
 
 EXEC := li3
 CFLAGS := -std=c11 -Wall -Wextra -Wdouble-promotion -Werror=pedantic -Werror=vla -pedantic-errors -Wfatal-errors

@@ -363,7 +363,29 @@
                 \item User: 64 bytes (mais o espaço dos valores do username e name)
                 \item Driver: 48 bytes
             \end{itemize}
-  
+
+        \subsection{Por implementar}
+            Como as referências das estruturas estão a ser guardadas em \textit{GPtrArrays}, não há qualquer
+            garantias que as estruturas fiquem juntas na memória, prejudicando assim
+            a localidade espacial. O que podia ter sido feito era guardar a própria
+            estrutura, sem ser um apontador para ela, num \textit{GArray} (por exemplo)
+            e qualquer referências a essas seriam inteiros correspondentes ao índice
+            da estrutura nesse \textit{array} (não podem continuar a ser apontadores para os valores
+            do \textit{array} devido a \textit{reallocs} que irão mudar os valores de lugar na memória).
+            
+            Isto poderia não só diminuir o uso de memória, visto que tais 
+            inteiros poderiam ser de 32 bits (IDs), mas como também poderia reduzir
+            substancialmente o tempo de qualquer tipo de acesso contínuo a estruturas,
+            por exemplo, o \textit{sorting} de \textit{arrays} e algumas queries
+            que percorrem o array linearmente. 
+            
+            Contudo, referências em inteiro implicariam acesso a duas estruturas,
+            uma para encontrar o inteiro e outra para encontrar o valor, o que na verdade
+            podia tornar o código mais lento.
+
+            A ideia não foi implementada pois implicaria grandes mudanças no código já estabelecido
+            e haveria sempre o risco de não haver benefício nenhum para tal tarefa custosa.
+            
     \section{Testes Unitários}
         Os testes unitários foram algo que demos muita atenção no desenvolvimento deste software.
         Para isso a sua concretização, usámos uma combinação de scripts e código.
