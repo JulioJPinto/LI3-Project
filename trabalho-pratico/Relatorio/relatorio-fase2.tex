@@ -507,18 +507,22 @@
                     \end{tabular} 
                     \caption{Pico de uso de memória nas diferentes máquinas}
                 \end{table}
-            
-            Desconfiamos que alterações entre os PCs serão devido a diferentes 
-            implementações de alocação de memória por parte do sistema operativo, 
+
+            Com estes resultados podemos notar que as otimizações feitas foram bem conseguidas.
+            O programa está a rodar mais rápido e com menos memória (com as 9 queries implementadas)
+            do que na primeira fase (com apenas 5 queries implementadas).
+
+            \bigskip
+            Desconfiamos que alterações entre os PCs serão devido a diferentes
+            implementações de alocação de memória por parte do sistema operativo,
             ou de estratégias de alocação por parte do compilador.
+
             Fazendo uma pequena investigação das diferenças, testámos no PC 1 (MacOS) o uso
             de memória para os mesmos datasets, só que usando \textit{GCC 12.2.0} como compilador.
-            O uso de memória registado com o novo compilador foi ainda mais baixo (94, 97, 925, 964 MB), portanto as 
+            O uso de memória registado com o novo compilador foi ainda mais baixo (94, 97, 925, 964 MB), portanto as
             mudanças devem dever-se ao alocador de memória do MacOS, a uma diferente
             implementação da ferramenta de medição de pico de memória ou à natureza da arquitetura ARM.
 
-            \bigskip
-            Com estes resultados podemos notar que as otimizações feitas foram bem conseguidas. O programa está a rodar mais rápido e com menos memória (com as 9 queries implementadas) do que na primeira fase (com apenas 5 queries implementadas).
         \pagebreak
         \section{Outros}
             \subsection{\emph{CSV Generator}}            
