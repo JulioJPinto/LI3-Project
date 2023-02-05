@@ -80,6 +80,7 @@ void run_query_and_print_output(Catalog *catalog, char *query) {
     parse_and_run_query(catalog, writer, query);
     print_content(output);
     close_output_writer(writer);
+    g_ptr_array_free(output, TRUE);
 }
 
 /**
@@ -108,17 +109,19 @@ void program_execute_command(Program *program, char *input) {
     char **args = g_strsplit(input, " ", 0);
     int arg_size = (int) g_strv_length(args);
 
-    if (arg_size == 0) return;
+    if (arg_size != 0) {
+        const ProgramCommand *program_command = get_program_command(args[0]);
 
-    const ProgramCommand *program_command = get_program_command(args[0]);
-
-    if (program_command != NULL) {
-        run_program_command(program_command, program, args, arg_size);
-    } else if (isdigit(args[0][0])) {
-        run_query_and_print_output(program->catalog, input);
-    } else {
-        LOG_WARNING_VA("Invalid command '%s'", args[0]);
+        if (program_command != NULL) {
+            run_program_command(program_command, program, args, arg_size);
+        } else if (isdigit(args[0][0])) {
+            run_query_and_print_output(program->catalog, input);
+        } else {
+            LOG_WARNING_VA("Invalid command '%s'", args[0]);
+        }
     }
+
+    g_strfreev(args);
 }
 
 /**
@@ -149,9 +152,12 @@ int start_program(Program *program, GPtrArray *program_args) {
 
         program_ask_for_dataset_path(program);
         log_info("\nType " TERMINAL_YELLOW_BOLD "help " TERMINAL_RESET "to list all commands\n\n");
+        
         while (program->state != PROGRAM_STATE_EXITING) {
             program_ask_for_command(program);
         }
+
+        clear_history();
     }
 
     return EXIT_SUCCESS;

@@ -40,6 +40,8 @@ void free_driver_city_info_collection(gpointer value) {
     if (value == NULL) return;
 
     DriverCityInfoCollection *collection = value;
+    if(collection->driver_city_info_hashtable != NULL) g_hash_table_destroy(collection->driver_city_info_hashtable);
+    
     g_ptr_array_free(collection->driver_city_info_array, TRUE);
     free(collection);
 }
@@ -57,6 +59,7 @@ void lazy_driver_city_info_collection_array_apply_function(gpointer lazy_value) 
         if (collection == NULL) continue;
 
         g_hash_table_destroy(collection->driver_city_info_hashtable);
+        collection->driver_city_info_hashtable = NULL;
 
         sort_array(collection->driver_city_info_array, compare_driver_city_infos_by_average_score);
         BENCHMARK_LOG("driver_city_info_destroy_and_sort (%d): %lf seconds\n", i, g_timer_elapsed(driver_city_info_destroy_and_sort, NULL));
