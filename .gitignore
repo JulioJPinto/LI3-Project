@@ -32,6 +32,7 @@ input*.txt
 # LaTeX
 
 !relatorio-fase1.pdf
+!relatorio-fase2.pdf
 */Relatorio/*
 !*/Relatorio/*.tex
 

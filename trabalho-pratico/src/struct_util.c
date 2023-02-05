@@ -93,7 +93,7 @@ double parse_double_safe(char *string, int *error) {
 }
 
 char *convert_date_to_string(Date date) {
-    char *string = malloc(11);
+    char *string = malloc(12);
     // This can be further modified to accept different date formats
     sprintf(string, "%02d/%02d/%04d", date_get_day(date), date_get_month(date), date_get_year(date));
     return string;

@@ -2,7 +2,10 @@
 
 \usepackage[portuguese]{babel}
 
-\usepackage[a4paper]{geometry}
+\usepackage[a4paper,
+ total={170mm,257mm},
+ left=30mm,
+ right=30mm]{geometry}
 \usepackage{pbox}
 \usepackage[labelfont=bf]{caption}
 \usepackage{booktabs}
@@ -13,13 +16,19 @@
 \usepackage{enumerate}
 \usepackage{graphicx}
 \usepackage{epstopdf}
-
+\usepackage{geometry}
 
 \title{Relatório da Fase 2 - Grupo 03}
 \author{Francisco Macedo Ferreira (A100660)\\Júlio José Medeiros Pereira Pinto (A100742)}
 
 \begin{document}  
     \maketitle
+
+    \pagebreak
+    \setcounter{tocdepth}{2}
+    \tableofcontents
+    
+    \pagebreak
     
     \section{Introdução}
     Este relatório tem como intuito abordar a segunda fase do projeto da UC Laboratórios 
@@ -41,7 +50,7 @@
                 
                 \item Originalmente, no catálogo, tínhamos todos os \textit{Arrays} e \textit{Hashtables} das 
                 várias estruturas juntas, porém foi levantado o ponto que de que
-                poderia constituir uma quebra de encapsulamento. Assim sendo, 
+                poderia constituir uma quebra de modularidade. Assim sendo, 
                 tornámos o catálogo num principal, que guarda os diferentes
                 catálogos das estruturas, catálogos estes opacos ao catálogo principal
                 (será abordado mais abaixo).
@@ -83,7 +92,7 @@
             útil no modo interativo (será abordado mais abaixo).
             No entanto, foram feitas algumas melhorias que acabaram
             por otimizar estas funções como resultado disso.
-
+    \pagebreak
     \section{Pipeline}
         Neste momento, o nosso programa funciona da seguinte maneira:
         \begin{enumerate}[\bfseries 1.]
@@ -120,9 +129,10 @@
         \bigskip
         
         \begin{center}
-            \includegraphics[scale=0.6]{Pipeline}
+            \includegraphics[scale=0.12]{res/pipeline.png}
             \captionof{figure}{Representação do pipeline}
         \end{center}
+
     \section{Queries Implementadas}
         Para a segunda fase do trabalho foram aplicadas todas as queries em falta
         (Queries 1 a 5 realizadas na fase anterior). Foram implementadas as queries 6, 7, 8 e 9.
@@ -134,7 +144,7 @@
             encontrar a data do começo (ou a próxima maior caso não exista) e percorremos o array, 
             linearmente, até a segunda data, fazendo média dos preços das viagens. O preço
             de cada viagem foi calculado e guardado na ride durante a inserção nos catálogos para evitar
-            \emph{lookups} às informações do condutor quando necessário.
+            \emph{lookups} às informações do condutor.
         \subsection{Query 7}
             Para a query 7 tivemos de recorrer a uma nova estrutura de dados separado dos condutores: \emph{DriverCityInfo}. 
             Essa estrutura de dados guarda o score de um condutor numa cidade específica.
@@ -179,8 +189,7 @@
         \subsection{Lista de Comandos}
             O modo interativo tem vários comandos que podem ser executados.
             Esses comandos foram implementados de forma genérica, de modo seja possível adição de novos muito facilmente.
-
-            \medskip
+            
             Escrevendo \textit{\textbf{help}} no \textit{terminal }aparece uma lista com todos os comandos.
 
             Para execução de \emph{queries}, o utilizador pode seguir dois métodos: escrever a query
@@ -197,7 +206,7 @@
             e \textit{\textbf{restart}} que recomeça o programa, pedindo um novo catálogo.
 
             Caso o utilizador pretenda fechar o programa basta escrever o comando \textit{\textbf{exit}}.
-    
+        \pagebreak
         \subsection{Paginação}
             A pedido de implementação, para queries que tenham um output superior a um valor estipulado de 10 linhas,
             um menu de paginação surge onde é possível percorrer as páginas, escrevendo \textit{\textbf{n}} para avançar
@@ -217,7 +226,7 @@
         \subsection{Catálogo}
             Como foi dito na parte de ajustes, tivemos a necessidade de separar o nosso
             catálogo num catálogo único para os utilizadores, condutores e viagens.
-            Existe um catálogo principal/controlador para acedê-los e manter dados comuns entre eles.
+            Existe um catálogo principal/controlador para acedê-los e controlar dados comuns entre eles.
 
             Em cada um dos catálogos guardámos pelo menos um \textit{array}.
             
@@ -237,8 +246,9 @@
             do \textit{array} principal correspondendo ao ID da cidade e mais dois \textit{arrays} para guardar
             as viagens onde o utilizador e o condutor têm o mesmo género, um \textit{array} para cada,
             utilizados para a realização da query 8.
-            
-            No Catálogo Principal, temos um \textit{array} e uma \textit{hashtable} para mapearmos facilmente um ID a uma cidade e vice-versa.       
+
+            Por fim, também existe um Catálogo de Cidades para atribuição de
+            IDs inteiros a cidades. Será abordado na secção das otimizações.  
             
         \subsection{\emph{Lazy}}
             De maneira a tornar o programa mais eficiente decidimos criar uma
@@ -268,8 +278,8 @@
         \subsection{\emph{OutputWriter}}
             Para diferenciar diferentes formas de \textit{output} existe um módulo que controla
             para onde vai o output gerado pelas queries.
-            A query escreve cada \textit{token} para este \textit{\textbf{OutputWriter}} separadamente,
-            e notifica quando uma "linha" de informação termina.
+            A query escreve cada \textit{token} do resultado para este \textit{\textbf{OutputWriter}} separadamente,
+            e notifica quando uma linha de informação termina.
             
             Dependendo da forma de como se cria esta estrutura, o \textit{OutputWriter} pode escrever:
             \begin{itemize}
@@ -277,7 +287,6 @@
                 Usado no modo \textit{batch} e num comando do modo interativo.
                 
                 \item Para um \textit{array} de \textit{strings}, que a função de escrita, adiciona uma \textit{string} a esse \textit{array}.
-
                 Usado no modo interativo para fácil gestão de linhas na parte da paginação.
                 \item Para vazio, usado na execução de testes de alguns testes unitários.
             \end{itemize}
@@ -290,6 +299,7 @@
             
             Para já, esta estrutura suporta apenas leitura de CSVs, mas devido à generalização desta, 
             pode ser expandida futuramente para leituras de qualquer forma de \textit{input}.
+
     \section{Otimizações}
         Apesar das estruturas previamente implementadas permitirem a resolução
         das queries dentro dos limites de tempo, com grandes margens, decidimos
@@ -298,10 +308,10 @@
         maneira a atingir-se uma melhor utilização de memória e performance.
         
         \subsection{IDs de cidades}
-            Ao invés de guardar em cada condutor e viagem uma cópia em string da cidade,
-            guardámos um ID inteiro único para cada. 
+            Ao invés de se guardar em cada condutor e viagem uma cópia em string da cidade,
+            passámos a guardar um ID inteiro único para cada. 
             Isto diminuiu muito o uso de memória e o número de \emph{strdups} necessários.
-            Este ID é gerado conforme se lê novas cidades do dataset.
+            Este ID é gerado e guardado, no Catálogo das Cidades, conforme se lê novas cidades do dataset.
             
             Por consequência, o tempo necessário para a alocação e libertação
             das strings é reduzido, tal como o número de bytes necessários para cada condutor e viagem.
@@ -309,14 +319,11 @@
             a todas as queries.
         \subsection{IDs de users}
             No mesmo contexto, alterámos também a maneira como as viagens guardam os utilizadores.
-            
             Atribuindo a cada utilizador um ID inteiro único, permite-nos então poupar na quantidade de espaço necessário
             pelas estruturas das viagens e evita-se que um username do utilizador seja alocado várias vezes pelas viagens
-            
             Esse ID é gerado conforme a leitura de utilizadores. 
             A identificação do user a partir do ID, é feita através de um array cujo índices são os tais IDs gerados
             com valores apontadores para estruturas de utilizadores.
-            
             Devido à query 1, ainda é mantido a \textit{hashtable} que faz ligação dos usernames em string às estruturas de users.
         \subsection{Data}
             Inicialmente a data era implementada numa struct com 3 inteiros de 32 bits.
@@ -326,18 +333,18 @@
             foi escolhida para que comparações entre datas seja uma simples subtração.
             A estrutura é codificada e descodificada através de operações \textit{bitwise}.
             
+            \begin{figure}[h]
+                \centering
+                \includegraphics[scale=0.12]{res/data.png}
+                \caption{Representação binária da data 31/01/2023}
+            \end{figure}
             Com isto, para cada ride foi possível poupar 8 bytes e as comparações são
             muito mais rápidas. Os melhoramentos no uso de memória e performance foram
             notórios no dataset large, que para 10 milhões de rides foram poupados 80MBs,
             aumentando também assim a localidade espacial.
-            \begin{figure}[h]
-                \centering
-                \includegraphics[scale=0.4]{data(1)}
-                \caption{Representação simplificada para 7 bits da Data}
-            \end{figure}
         \subsection{Funções nativas}
             Com recurso a um \textit{profiler} observámos que funções como \textit{strtok}, \textit{strtol},
-            \textit{strtod} estavam a demorar alguns meios segundos. Estas são chamadas várias milhões de vezes.
+            \textit{strtod} estavam a demorar alguns meios segundos. Estas são chamadas algumas milhões de vezes.
             Por isso, implementando funções mais simples e otimizadas para as nossas necessidades, 
             reduzimos grande parte do tempo gasto nessas funções.
         \subsection{Remoção de campos não usados}
@@ -356,6 +363,7 @@
                 \item User: 64 bytes (mais o espaço dos valores do username e name)
                 \item Driver: 48 bytes
             \end{itemize}
+  
     \section{Testes Unitários}
         Os testes unitários foram algo que demos muita atenção no desenvolvimento deste software.
         Para isso a sua concretização, usámos uma combinação de scripts e código.
@@ -397,9 +405,7 @@
             Os datasets necessários para a execução deles, são obtidos através de um link para um zip num
             Google Drive. É feito o download deste e \textit{cacheado} nas Actions do GitHub para futuras
             execuções.
-    
-    \pagebreak
-    
+     
     \section{Testes de Desempenho}
             Comparando o desempenho do programa para os vários datasets em diferentes máquinas,
             temos na Tabela 2 os resultados obtidos para as especificações dos PCs na Tabela 1.
@@ -416,9 +422,7 @@
                 \item Os ficheiros de input são os mesmos utilizados na plataforma de testes.
                 \item As médias e desvios padrões do tempo de execução foram obtidos usando a ferramenta \textit{Hyperfine}.
             \end{itemize}
-            
-            \bigskip
-            
+            \pagebreak
            As especificações dos computadores e resultados das medições são então:
             
             \begin{table}[h!]
@@ -437,7 +441,6 @@
                 \end{tabular}
                 
                 \caption{Especificações dos PCs}
-                
                 \bigskip
                 
                 \centering
@@ -445,48 +448,56 @@
                     \hline
                     \thead{Datasets} &\thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                     \hline
-                    Regular Dataset (with invalid entries)    & \makecell{557.6ms \\ ± 4.7ms} & \makecell{XXX.Xms \\ ± X.Xms} & \makecell{540.4ms \\ ± 2.9ms}\\
+                    Regular Dataset (with invalid entries)    & \makecell{557.6ms \\ ± 4.7ms} & \makecell{1466.0ms \\ ± 31.0ms} & \makecell{540.4ms \\ ± 2.9ms}\\
                     \hline
-                    Regular Dataset (without invalid entries) & \makecell{576.3ms \\ ± 7.5ms} & \makecell{XXX.Xms \\ ± X.Xms} & \makecell{559.6ms \\ ± 5.2ms}\\
+                    Regular Dataset (without invalid entries) & \makecell{576.3ms \\ ± 7.5ms} & \makecell{1507.0ms \\ ± 49.0ms} & \makecell{559.6ms \\ ± 5.2ms}\\
                     \hline
-                    Large Dataset (with invalid entries)      & \makecell{9.176s \\ ± 0.064s} & \makecell{XXX.Xs \\ ± X.Xms} & \makecell{9.072s \\ ± 0.077s}\\
+                    Large Dataset (with invalid entries)      & \makecell{9.176s \\ ± 0.064s} & \makecell{23.218s \\ ± 0.267s} & \makecell{9.072s \\ ± 0.077s}\\
                     \hline
-                    Large Dataset (without invalid entries)   & \makecell{9.559s \\ ± 0.077s} & \makecell{XXX.Xs \\ ± X.Xms} & \makecell{9.579s \\ ± 0.095s}\\
+                    Large Dataset (without invalid entries)   & \makecell{9.559s \\ ± 0.077s} & \makecell{24.119s \\ ± 0.456s} & \makecell{9.579s \\ ± 0.095s}\\
                     \hline
                 \end{tabular} 
                 \caption{Tempos de execução para os Datasets}
             \end{table}
-        
-        
+
             \subsection{Uso de memória}
             
                 Garantir que o programa não tenha fugas de memória foi um objetivo prioritário pelo que foi devidamente atingido.
                 
-                Na tabela seguinte, apresentámos os picos de uso memória para os diferentes datasets nos diferentes PCs.
-                Desconfiamos que alterações entre eles serão devido a diferentes implementações de alocação de memória por parte do sistema operativo.
+                Na tabela seguinte, apresentámos os picos de uso memória para os 
+                diferentes datasets nos diferentes PCs, medidos com 
+                a ferramenta \textit{/usr/bin/time}.
                 
-                \begin{table}[h!]
+                \begin{table}[!ht]
                     \centering
                     \begin{tabular}{|*{4}{c|}}
                         \hline
                         \thead{Datasets} &\thead{PC 1}&\thead{PC 2}&\thead{PC 3}\\
                         \hline
-                        Regular Dataset (with invalid entries)    & 92 MB & 000 MB & 113 MB\\
+                        Regular Dataset (with invalid entries)    & 92 MB & 113 MB & 113 MB\\
                         \hline
-                        Regular Dataset (without invalid entries) & 96 MB & 000 MB & 116 MB\\
+                        Regular Dataset (without invalid entries) & 96 MB & 116 MB & 116 MB\\
                         \hline
-                        Large Dataset (with invalid entries)      & 987 MB & 000 MB & 1120 MB\\
+                        Large Dataset (with invalid entries)      & 987 MB & 1114 MB & 1120 MB\\
                         \hline
-                        Large Dataset (without invalid entries)   & 1019 MB & 000 MB & 1155 MB\\
+                        Large Dataset (without invalid entries)   & 1019 MB & 1150 MB & 1155 MB\\
                         \hline
                     \end{tabular} 
                     \caption{Pico de uso de memória nas diferentes máquinas}
                 \end{table}
-                
-            Com estes resultados podemos notar que as otimizações feitas foram bem conseguidas. O programa está a rodar
-            mais rápido e com menos memória (com as 9 queries implementadas) do que na primeira fase (com apenas 5 queries implementadas).
-                
             
+            Desconfiamos que alterações entre os PCs serão devido a diferentes 
+            implementações de alocação de memória por parte do sistema operativo, 
+            ou de estratégias de alocação por parte do compilador.
+            Fazendo uma pequena investigação das diferenças, testámos no PC 1 (MacOS) o uso
+            de memória para os mesmos datasets, só que usando \textit{GCC 12.2.0} como compilador.
+            O uso de memória registado com o novo compilador foi ainda mais baixo (94, 97, 925, 964 MB), portanto as 
+            mudanças devem dever-se ao alocador de memória do MacOS, a uma diferente
+            implementação da ferramenta de medição de pico de memória ou à natureza da arquitetura ARM.
+
+            \bigskip
+            Com estes resultados podemos notar que as otimizações feitas foram bem conseguidas. O programa está a rodar mais rápido e com menos memória (com as 9 queries implementadas) do que na primeira fase (com apenas 5 queries implementadas).
+        \pagebreak
         \section{Outros}
             \subsection{\emph{CSV Generator}}            
                 Como no início da segunda parte do projeto ainda não nos tinham sido disponibilizados os datasets grandes,
@@ -499,18 +510,17 @@
                 Para a documentação, usámos o padrão do Doxygen no código.
                 De forma a assegurar que todas as funções ficassem devidamente comentadas,
                 a cobertura da documentação pode ser gerada a partir de \textit{'make generate-doxygen'}.
-
+        
         \section{Conclusão}
-        Para concluir, acreditámos que o desenvolvimento desta segunda fase foi
-        muito satisfatório. Tal como na primeira fase do trabalho, conseguimos consolidar 
-        os nossos conhecimentos de C com conhecimentos mais avançados relacionados a performance,
-        gestão de memória, encapsulamento e modularidade. 
+        Com o desenvolvimento desta segunda fase, conseguimos, tal como na primeira fase, consolidar
+        o nosso conhecimento de C, com conhecimentos mais avançados relacionados a performance, gestão
+        de memória e encapsulamento e modularidade. Mesmo assim, apesar de mais familiarizados com estes
+        conhecimentos, acreditamos que o uso de uma linguagem de baixo nível como C, sem suporte a objetos,
+        causou por vezes alguma confusão na aplicação destes conceitos.
 
-        Nesta segunda fase, estávamos mais familiarizados com conceitos de
-        modularidade e encapsulamento, o que nos permitiu uma melhor realização
-        do projeto, tal como a resolução de todos os problemas apontados na apresentação da primeira
-        fase. Achámos que o nosso projeto se encontra num bom estado, não só devido
-        à sua performance e pouco uso de memória, mas como também à maneira de como 
-        aplicámos conceitos de encapsulamento e modularidade para a sua realização.
+        Porém, perante os desafios apresentados, acreditamos que o nosso trabalho teve um desempenho muito
+        satisfatório. Aplicando conhecimentos teóricos e práticos adquiridos durante a UC. A nossa dedicação e empenho
+        resultaram num bom desempenho na unidade curricular e nos preparou para futuros desafios académicos.
+        
 
 \end{document}

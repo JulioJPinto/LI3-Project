@@ -1,4 +1,4 @@
-CC := gcc
+CC := gcc-12
 
 EXEC := li3
 CFLAGS := -std=c11 -Wall -Wextra -Wdouble-promotion -Werror=pedantic -Werror=vla -pedantic-errors -Wfatal-errors
@@ -111,8 +111,13 @@ test: build-test build-release
 	@echo "# End of end-to-end tests"
 	@echo "\nTests passed!"
 
-compile-latex:
+compile-latex: compile-latex-fase1 compile-latex-fase2
+
+compile-latex-fase1:
 	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase1.tex && cp relatorio-fase1.pdf ../
+
+compile-latex-fase2:
+	cd Relatorio && pdflatex -interaction=nonstopmode -halt-on-error -file-line-error relatorio-fase2.tex && cp relatorio-fase2.pdf ../
 
 generate-doxygen:
 	doxygen doxyfile.cfg
