@@ -1,3 +1,5 @@
+#include <glib.h>
+
 /**
  * Test if the semicolon file output writer is working properly.
  */
@@ -29,4 +31,5 @@ void test_array_of_semicolon_strings_output_writer(void) {
     close_output_writer(writer);
 
     g_assert_cmpstr("Hello;World\n", ==, g_ptr_array_index(array, 0));
+    g_ptr_array_free(array, TRUE);
 }

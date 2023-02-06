@@ -19,7 +19,7 @@ void parse_user_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     if (user != NULL) {
         fprintf(stderr, "User should've been NULL for line '%s'\n", line);
         failed_lines++;
-        free(user);
+        free_user(user);
     }
     free(line);
 }
@@ -34,7 +34,7 @@ void parse_driver_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     if (driver != NULL) {
         fprintf(stderr, "Driver should've been NULL for line '%s'\n", line);
         failed_lines++;
-        free(driver);
+        free_driver(driver);
     }
     free(line);
 }
@@ -49,7 +49,7 @@ void parse_ride_and_check_for_null(void *first_arg, TokenIterator *iterator) {
     if (ride != NULL) {
         fprintf(stderr, "Ride should've been NULL for line '%s'\n", line);
         failed_lines++;
-        free(ride);
+        free_ride(ride);
     }
     free(line);
 }
@@ -65,7 +65,7 @@ void parse_user_and_check_for_non_null(void *first_arg, TokenIterator *iterator)
         fprintf(stderr, "User should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
-        free(user);
+        free_user(user);
     }
     free(line);
 }
@@ -81,7 +81,7 @@ void parse_driver_and_check_for_non_null(void *first_arg, TokenIterator *iterato
         fprintf(stderr, "Driver should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
-        free(driver);
+        free_driver(driver);
     }
     free(line);
 }
@@ -97,7 +97,7 @@ void parse_ride_and_check_for_non_null(void *first_arg, TokenIterator *iterator)
         fprintf(stderr, "Ride should've been non-NULL for line '%s'\n", line);
         failed_lines++;
     } else {
-        free(ride);
+        free_ride(ride);
     }
     free(line);
 }
@@ -119,6 +119,10 @@ void assert_invalid_csv_loads_nothing(char *dataset_folder_path) {
     if (failed_lines) {
         g_test_fail_printf("Failed for %d lines", failed_lines);
     }
+
+    fclose(users_file);
+    fclose(drivers_file);
+    fclose(rides_file);
 }
 
 /**
@@ -154,4 +158,8 @@ void assert_valid_csv_loads_everything_regular(void) {
     if (failed_lines) {
         g_test_fail_printf("Failed for %d lines", failed_lines);
     }
+
+    fclose(users_file);
+    fclose(drivers_file);
+    fclose(rides_file);
 }
