@@ -2,6 +2,7 @@
 
 #include "string_util.h"
 #include <stdlib.h>
+#include <glib.h>
 
 /**
  * Struct implementation of TokenIterator.
@@ -16,7 +17,7 @@ TokenIterator *init_semicolon_separated_token_iterator(void) {
 }
 
 char *token_iterator_current(TokenIterator *iterator) {
-    return iterator->string;
+    return g_strdup(iterator->string);
 }
 
 void token_iterator_set_current(TokenIterator *iterator, char *string) {

@@ -13,7 +13,8 @@ typedef struct TokenIterator TokenIterator;
 TokenIterator *init_semicolon_separated_token_iterator(void);
 
 /**
- * Returns the current line of the iterator.
+ * Returns a copy of the current line of the iterator.
+ * The returned string must be freed.
  * Used to show the whole line in tests.
  */
 char *token_iterator_current(TokenIterator *iterator);
