@@ -41,8 +41,8 @@ __Formatting the code__
 $ make format
 ```
 
-__[1] :__ This command has been hard-coded therefore might not work unless  
-__[2] :__ This command works either with valgrind if you arent in MacOS or with leaks if you are in MacOS
+__[1] :__ This command has been hard-coded therefore might not work unless. 
+__[2] :__ This command works either with valgrind if you arent in MacOS or with leaks if you are in MacOS.
 
 ## Contributors
 - [__Francisco Ferreira__](https://github.com/chicoferreira)
