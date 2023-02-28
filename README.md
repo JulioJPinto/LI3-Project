@@ -16,7 +16,7 @@ __Compiling the program__
 $ make
 ```
 __Running the program__
-```
+```bash
 #interactive mode
 $ ./programa-principal 
 
