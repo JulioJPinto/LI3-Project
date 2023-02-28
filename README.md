@@ -1,6 +1,9 @@
 # LI3 PROJECT
 
-### Final Grade: 
+### Final Grade: 19/20
+
+- __1st Phase__: 18.68
+- __2nd Phase__: 20.00 
 
 ## About the Project
 
@@ -14,10 +17,12 @@ $ make
 ```
 __Running the program__
 ```
-$ ./programa-principal
+#interactive mode
+$ ./programa-principal 
 
-or
+#or
 
+#batch mode
 $ ./programa-principal <dataset-folder> <input-file>
 ```
 __Compiling the program for debugging__
